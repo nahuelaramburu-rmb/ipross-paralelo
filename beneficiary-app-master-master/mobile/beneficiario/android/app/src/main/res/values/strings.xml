@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Ipross Rio Negro</string>
+    <string name="default_notification_channel_id">notification-channel</string>
+</resources>

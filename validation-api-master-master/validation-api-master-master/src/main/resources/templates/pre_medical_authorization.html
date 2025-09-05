@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html" charset="UTF-8"/>
+    <link media="all" rel="stylesheet" th:href="@{classpath:templates/style.css}" type="text/css"/>
+    <title></title>
+</head>
+<body>
+<div class="header" th:insert="header.html :: header"></div>
+<h1 style="text-align: center">Homoclave</h1>
+<div>
+    <div style="text-align: center">
+        <img alt="qr" style="position: relative" th:src="@{'data:image/png;base64,'+${base64QrCode}}">
+    </div>
+    <div style="text-align: center">
+        <span style="font-size: 14px">Código Manual: <strong>[[${data.getCode()}]]</strong></span><br/>
+        <span>Generación: <strong>[[${#temporals.format(data.getCreatedAt(), 'dd/MM/yyyy HH:mm')}]]</strong></span><br/>
+        <span>Vencimiento: <strong>[[${#temporals.format(data.getExpirationDate(), 'dd/MM/yyyy')}]]</strong></span><br/>
+    </div>
+    <table>
+        <tr class="block">
+            <td class="bottom" th:insert="beneficiary.html :: beneficiary"></td>
+            <span th:if="${data.getPetitioner() != null}">
+                 <td class="bottom right" th:insert="petitioner.html :: petitioner"></td>
+            </span>
+        </tr>
+    </table>
+    <hr>
+</div>
+<h2>Detalle</h2>
+<table>
+    <tr>
+        <td colspan="4">
+            <table>
+                <tr class="heading">
+                    <td>
+                        Práctica
+                    </td>
+                    <td>
+                        Cantidad
+                    </td>
+                    <td>
+                        Precio Unitario Coseguro
+                    </td>
+                </tr>
+                <tr class="item" th:each="item :${data.getPreMedicalAuthorizationItems()}">
+                    <td style="max-width: 150px">
+                        ([[${item.getNomenclator().getNomenclatorCode()}]])
+                        [[${item.getNomenclator().getMedicalPractice().getName()}]]
+                    </td>
+                    <td>
+                        [[${item.getQuantity()}]]
+                    </td>
+                    <td>
+                        [[${item.getChargeUnitPrice()} != null ? ${item.getChargeUnitPrice()} : 'Aplica Cobertura']]
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr style="margin-top: 10px"></tr>
+</table>
+<span style="font-style: italic; font-size: 12px">
+    Los datos contenidos en la homoclave no podrán ser editados en la validación.
+</span>
+</body>
+</html>

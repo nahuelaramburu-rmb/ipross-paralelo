@@ -1,0 +1,12 @@
+alter table if exists contract_item add column refundable boolean DEFAULT false;
+alter table if exists contract_item_audit_log add column refundable boolean;
+alter table if exists contract_item_audit_log add column refundable_mod boolean;
+alter table if exists medical_authorization add column refundable_items boolean DEFAULT false not null;
+alter table if exists medical_authorization_audit_log add column refundable_items boolean;
+alter table if exists medical_authorization_audit_log add column refundable_items_mod boolean;
+alter table if exists medical_authorization_item add column refundable boolean DEFAULT false not null;
+alter table if exists medical_authorization_item_audit_log add column refundable boolean;
+alter table if exists medical_authorization_item_audit_log add column refundable_mod boolean;
+alter table if exists settlement_item add column refundable boolean;
+update settlement_item set refundable = false;
+alter table settlement_item alter column refundable set not null;

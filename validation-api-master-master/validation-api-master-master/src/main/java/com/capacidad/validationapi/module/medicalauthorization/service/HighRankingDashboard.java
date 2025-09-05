@@ -1,0 +1,9 @@
+package com.capacidad.validationapi.module.medicalauthorization.service;
+
+import com.capacidad.validationapi.module.dashboard.service.DashboardChargesStatistics;
+import com.capacidad.validationapi.module.dashboard.service.DashboardMedicalAuthorizationStatistics;
+import com.capacidad.validationapi.module.dashboard.service.DashboardPrescriptionStatistics;
+import com.capacidad.validationapi.module.dashboard.service.DashboardSettlementStatistics;
+
+public interface HighRankingDashboard extends DashboardMedicalAuthorizationStatistics, DashboardSettlementStatistics, DashboardPrescriptionStatistics, DashboardChargesStatistics {
+}

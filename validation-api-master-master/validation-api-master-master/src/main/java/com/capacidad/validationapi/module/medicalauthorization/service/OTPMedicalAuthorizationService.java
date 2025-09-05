@@ -1,0 +1,7 @@
+package com.capacidad.validationapi.module.medicalauthorization.service;
+
+import com.capacidad.validationapi.module.medicalauthorization.dto.OTPMedicalAuthorizationDTO;
+import com.capacidad.validationapi.module.medicalauthorization.model.OTPMedicalAuthorization;
+
+public interface OTPMedicalAuthorizationService extends BaseMedicalAuthorizationService<OTPMedicalAuthorization, OTPMedicalAuthorizationDTO> {
+}

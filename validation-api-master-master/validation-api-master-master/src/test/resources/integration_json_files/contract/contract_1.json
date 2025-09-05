@@ -1,0 +1,8 @@
+{
+  "name": "Test Contract",
+  "contractCode": "AAA0000",
+  "active": true,
+  "transitCondition": false,
+  "dayOfSettlement": 31,
+  "autoSettlement": false
+}

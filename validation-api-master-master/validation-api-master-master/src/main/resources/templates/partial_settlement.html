@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html" charset="UTF-8"/>
+    <link media="all" rel="stylesheet" th:href="@{classpath:templates/style.css}" type="text/css"/>
+    <title></title>
+</head>
+<body>
+<div class="header" th:insert="header.html :: header"></div>
+<h1 style="text-align: center">Liquidación Parcial de Prestador</h1>
+<div>
+    <table>
+        <tr class="block">
+            <td></td>
+            <td class="bottom right">
+                <span style="font-size: 16px;">Información General</span><br/>
+                <span>Liquidación #[[${data.getId()}]]</span><br/>
+                <span><strong>[[${data.getStatus().getName()}]]</strong></span><br/>
+                <strong><span>[[${data.getContract().getName()}]]</span></strong><br/>
+                <span>Fecha de Apertura: [[${#temporals.format(data.getCreatedAt(), 'dd/MM/yyyy HH:mm')}]]</span><br/>
+                <span>Fecha de Cierre: [[${data.getClosedAt()} ? ${#temporals.format(data.getClosedAt(), 'dd/MM/yyyy HH:mm')} : 'Periodo no finalizado']]</span><br/>
+            </td>
+        </tr>
+        <tr class="block">
+            <td class="bottom"></td>
+            <td class="bottom right" th:insert="practitioner.html :: practitioner"></td>
+        </tr>
+    </table>
+    <hr>
+</div>
+<h2>Detalle</h2>
+<table>
+    <tr>
+        <td colspan="4">
+            <table>
+                <tr class="heading" style="font-size: 11px;">
+                    <td>
+                        Práctica
+                    </td>
+                    <td>
+                        Validación
+                    </td>
+                    <td>
+                        Afiliado
+                    </td>
+                    <td>
+                        Centro
+                    </td>
+                    <td>
+                        Cantidad
+                    </td>
+                    <td>
+                        Valor
+                    </td>
+                    <td>
+                        Coseguros
+                    </td>
+                    <td>
+                        Subtotal
+                    </td>
+                    <td>
+                        Reintegrable
+                    </td>
+                </tr>
+                <tr class="item" style="font-size: 11px;" th:each="item :${items}">
+                    <td style="max-width: 150px">
+                        ([[${item.getNomenclator().getNomenclatorCode()}]])<br/>
+                        [[${item.getNomenclator().getMedicalPractice().getName()}]]
+                    </td>
+                    <td>
+                        #[[${item.getMedicalAuthorization().getId()}]]<br/>
+                        [[${#temporals.format(item.getMedicalAuthorization().getCreatedAt(), 'dd/MM/yyyy HH:mm')}]]
+                    </td>
+                    <td>
+                        [[${item.getMedicalAuthorization().getBeneficiary().getLastName()}]],
+                        [[${item.getMedicalAuthorization().getBeneficiary().getName()}]]<br/>
+                        [[${item.getMedicalAuthorization().getBeneficiary().getBeneficiaryCode()}]]
+                    </td>
+                    <td>
+                        [[${item.getMedicalCenter().getName()}]]
+                    </td>
+                    <td>
+                        [[${item.getQuantity()}]]
+                    </td>
+                    <td>
+                        $[[${item.getUnitPrice()}]]
+                    </td>
+                    <td>
+                        -$<span
+                            th:text="${item.getChargeUnitPrice() == null} ? '0.00' : ${item.getChargeUnitPrice()}"></span><br/>
+                    </td>
+                    <td>
+                        $[[${item.getSubtotal()}]]
+                    </td>
+                    <td>
+                        [[${item.getRefundable()} ? 'Si' : 'No']]
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr class="right">
+        <td>
+            <h2 class="subtotal">Total: <strong>$[[${partialTotal}]]</strong></h2>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

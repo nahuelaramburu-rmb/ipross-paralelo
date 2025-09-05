@@ -1,0 +1,42 @@
+{
+  "studies": {
+    "id": 9
+  },
+  "maritalStatus": {
+    "id": 2
+  },
+  "occupation": {
+    "id": 1
+  },
+  "address": {
+    "street": "Street Test 1",
+    "district": "District Test 1",
+    "streetNumber": "123",
+    "apartment": "1 A",
+    "city": {
+      "id": 1
+    }
+  },
+  "phone": {
+    "areaCode": 299,
+    "phoneNumber": 4222222,
+    "phoneType": "MOVIL"
+  },
+  "email": "beneficiary@test.com",
+  "name": "Beneficiary",
+  "lastName": " Test",
+  "idNumber": 10101010,
+  "idType": {
+    "id": 1
+  },
+  "workIdNumber": 20101010105,
+  "gender": "MASCULINO",
+  "birthDate": "1993-01-01",
+  "beneficiaryCode": "4525000122245454",
+  "relationshipType": {
+    "id": 1
+  },
+  "paymentMethod": {
+    "id": 2
+  }
+}

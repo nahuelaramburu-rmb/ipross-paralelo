@@ -1,0 +1,7 @@
+{
+  "name": "Plan Test 1",
+  "insurancePlanType": {
+    "id": 1
+  },
+  "priority": 1
+}

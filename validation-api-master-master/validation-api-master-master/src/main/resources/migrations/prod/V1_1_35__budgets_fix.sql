@@ -1,0 +1,1 @@
+update medical_authorization set company_id = null where payment_method_id = 2;

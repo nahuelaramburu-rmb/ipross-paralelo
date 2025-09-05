@@ -1,0 +1,7 @@
+create sequence contract_item_special_price_seq start 1 increment 1;
+create table contract_item_special_price (id int8 not null, client_id varchar(255), created_at timestamp, created_by varchar(255), deleted boolean DEFAULT false not null, deletion_token uuid DEFAULT uuid_nil() not null, modified_at timestamp, modified_by varchar(255), tenant_id uuid not null, event_type varchar(255), special_value numeric(19, 2), charge_type_id int8 not null, contract_item_id int8 not null, primary key (id));
+create table contract_item_special_price_audit_log (id int8 not null, rev int4 not null, revtype int2, client_id varchar(255), created_at timestamp, created_by varchar(255), modified_at timestamp, modified_by varchar(255), special_value numeric(19, 2), value_mod boolean, charge_type_id int8, charge_type_mod boolean, primary key (id, rev));
+alter table if exists contract_item_special_price add constraint FK79e7q1nmcwt7rvuspapc1mbbw foreign key (charge_type_id) references charge_type;
+alter table if exists contract_item_special_price add constraint FK8lcp3ujbt1qojy5ba0c1fyf1s foreign key (contract_item_id) references contract_item;
+alter table if exists contract_item_special_price_audit_log add constraint FKkkg9bav0ejdd96mpvur7wwc35 foreign key (rev) references revinfo;
+alter table if exists medical_authorization_item add column calendar_event_type varchar(255);

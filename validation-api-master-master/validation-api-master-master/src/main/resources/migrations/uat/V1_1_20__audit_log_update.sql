@@ -1,0 +1,12 @@
+create table budget_item_audit_log (id int8 not null, rev int4 not null, revtype int2, client_id varchar(255), created_at timestamp, created_by varchar(255), modified_at timestamp, modified_by varchar(255), charge_subtotal numeric(19, 2), charge_unit_price numeric(19, 2), quantity int4, budget_id int8, medical_authorization_id int8, nomenclator_id int8, primary key (id, rev));
+alter table if exists budget_item_audit_log add constraint FKjs28uvp9imop9exb15u51jh6b foreign key (rev) references revinfo;
+alter table beneficiary_insurance_plan_audit_log drop column beneficiary_mod;
+alter table beneficiary_insurance_plan_audit_log drop column insurance_plan_mod;
+alter table if exists medical_authorization_item_audit_log add column quantity int4;
+alter table if exists medical_authorization_item_audit_log add column quantity_mod boolean;
+alter table if exists medical_authorization_audit_log add column failures_mod boolean;
+create table medical_authorization_failure_audit_log (rev int4 not null, medical_authorization_id int8 not null, failure_id int8 not null, revtype int2, primary key (rev, medical_authorization_id, failure_id));
+alter table if exists medical_authorization_failure_audit_log add constraint FKlcyh525tscaa03om67e420u7w foreign key (rev) references revinfo;
+alter table if exists medical_authorization_item_audit_log add column failures_mod boolean;
+create table medical_authorization_item_failure_audit_log (rev int4 not null, medical_authorization_item_id int8 not null, failure_id int8 not null, revtype int2, primary key (rev, medical_authorization_item_id, failure_id));
+alter table if exists medical_authorization_item_failure_audit_log add constraint FKo0f2ojdc6esihd015xr9q318t foreign key (rev) references revinfo;

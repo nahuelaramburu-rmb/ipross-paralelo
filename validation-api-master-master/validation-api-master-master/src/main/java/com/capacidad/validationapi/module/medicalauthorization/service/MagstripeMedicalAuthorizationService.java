@@ -1,0 +1,7 @@
+package com.capacidad.validationapi.module.medicalauthorization.service;
+
+import com.capacidad.validationapi.module.medicalauthorization.dto.MagstripeMedicalAuthorizationDTO;
+import com.capacidad.validationapi.module.medicalauthorization.model.MedicalAuthorization;
+
+public interface MagstripeMedicalAuthorizationService extends BaseMedicalAuthorizationService<MedicalAuthorization, MagstripeMedicalAuthorizationDTO> {
+}

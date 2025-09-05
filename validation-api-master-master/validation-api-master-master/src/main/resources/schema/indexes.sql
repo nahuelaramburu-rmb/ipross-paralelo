@@ -1,0 +1,1 @@
+create index prescription_exchange_id_idx ON prescription_exchange_id (exchange_id);
