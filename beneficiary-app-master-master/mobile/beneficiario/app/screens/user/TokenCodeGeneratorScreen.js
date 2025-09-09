@@ -13,7 +13,7 @@ import { font_styles } from '../../lib/default-styles';
 import { generator, strtohex } from '../../lib/otp';
 import * as Progress from 'react-native-progress';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 import base32 from 'base-32';
 import { moderateScale, verticalScale } from '../../lib/size-normalizer';
 import { bold } from '../../constants/Fonts';
@@ -50,7 +50,7 @@ export default class TokenCodeGeneratorScreen extends Component {
                     this.hashids.encode(props.route.params.idNumber, props.route.params.idNumber)
                 ).toUpperCase()
             )
-            .replace(/=/g, '');
+            .replace(new RegExp('=', 'g'), '');
         this._printValues = this._printValues.bind(this);
         this._getCountdownPercentage = this._getCountdownPercentage.bind(this);
     }

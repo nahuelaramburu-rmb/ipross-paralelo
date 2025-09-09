@@ -10,11 +10,11 @@ import {
     Platform,
 } from 'react-native';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { verticalScale, moderateScale } from '../../lib/size-normalizer';
 import * as Colors from '../../constants/Colors';
 import { font_styles } from '../../lib/default-styles';
 import { getStatusColor } from '../../lib/utils';
-import FileUploader from '../../components/FileUploader';
 import ImageCard from '../../components/ImageCard';
 import Icon from 'react-native-vector-icons/Fontisto';
 import strings from '../../constants/Strings';
@@ -37,8 +37,7 @@ class ValidationStatusScreen extends Component {
         this.state = {
             validation: props.validation,
         };
-        
-       
+
         this._renderMedicalItem = this._renderMedicalItem.bind(this);
     }
 
@@ -48,10 +47,11 @@ class ValidationStatusScreen extends Component {
         //if (Object.keys(validation).length > 0) this.props.searchValidationAssociatedFiles(validation.id);
     }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.validation !== this.props.validation) {
-            this.setState({ validation: this.props.validation });
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.validation !== prevState.validation) {
+            return { validation: nextProps.validation };
         }
+        return null;
     }
 
     _renderMedicalItem(it) {
@@ -144,7 +144,7 @@ class ValidationStatusScreen extends Component {
 
     render() {
         const { validation } = this.state;
-        const { loading_files, files, validation_loading, insets } = this.props;
+        const { validation_loading, insets } = this.props;
 
         if (Object.keys(validation).length === 0 && !validation_loading) return null;
         else if (Object.keys(validation).length === 0 && validation_loading) {
@@ -228,6 +228,14 @@ class ValidationStatusScreen extends Component {
         );
     }
 }
+
+ValidationStatusScreen.propTypes = {
+    validation: PropTypes.object,
+    route: PropTypes.object,
+    getValidation: PropTypes.func,
+    validation_loading: PropTypes.bool,
+    insets: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
     container: {

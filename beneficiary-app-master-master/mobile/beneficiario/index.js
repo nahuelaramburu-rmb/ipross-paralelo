@@ -1,3 +1,2 @@
 /** @format */
 import './app/index';
-
