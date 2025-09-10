@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 import com.android.build.OutputFile
 
@@ -80,7 +81,11 @@ project.ext.react = [
     enableHermes: true,  // clean and rebuild if changing
 ]
 
-// apply from: "../../node_modules/react-native/react.gradle"
+// Simplified React configuration for React Native 0.81.1
+react {
+    root = file("../../")
+    reactNativeDir = file("../../node_modules/react-native")
+}
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -119,6 +124,9 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  */
 def enableHermes = project.ext.react.get("enableHermes", false);
 
+// Add hermesEnabled property for compatibility
+project.ext.hermesEnabled = enableHermes
+
 // Load keystore
 def keystorePropertiesFile = rootProject.file("keystore.properties");
 def keystoreProperties = new Properties()
@@ -128,6 +136,10 @@ android {
     namespace 'com.capacidad.beneficiaryapp'
     ndkVersion "27.1.12297006"
     compileSdkVersion rootProject.ext.compileSdkVersion
+
+    buildFeatures {
+        buildConfig true
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -141,9 +153,6 @@ android {
         versionCode 141
         versionName "1.4.1"
         multiDexEnabled true
-    }
-    dexOptions {
-        javaMaxHeapSize "4g"
     }
     splits {
         abi {
@@ -201,7 +210,6 @@ dependencies {
     
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.google.android.gms:play-services-base:17.0.0"
-    implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
@@ -235,6 +243,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply plugin: 'com.google.gms.google-services'
