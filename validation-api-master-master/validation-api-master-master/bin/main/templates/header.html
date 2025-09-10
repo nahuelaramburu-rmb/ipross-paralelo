@@ -1,0 +1,14 @@
+<div th:fragment="header">
+    <table>
+        <tr>
+            <td><img alt="logo" class="logo"
+                     src="https://ui-validation-module-statics.s3.amazonaws.com/logo_title.png"></td>
+            <td class="generated-by">Generado por usuario <strong><span th:text="${generatedBy}"></span></strong><br/>
+                el dia <strong><span>[[${#temporals.format(generatedAt, 'dd/MM/yyyy HH:mm')}]]</span></strong><br/><br/>
+                <br/>
+                <strong style="border-bottom: 1px solid">Página <span id="pagenumber"></span> de <span
+                        id="pagecount"></span></strong>
+            </td>
+        </tr>
+    </table>
+</div>

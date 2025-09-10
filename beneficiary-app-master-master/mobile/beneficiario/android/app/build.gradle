@@ -79,12 +79,17 @@ import com.android.build.OutputFile
 project.ext.react = [
     entryFile: "index.js",
     enableHermes: false,  // temporarily disabled due to build issues
+    bundleInDebug: true,  // Bundle JS in debug mode to avoid dev server issues
+    bundleInRelease: true,
+    devDisabledInDebug: true,  // Disable dev mode in debug builds
+    devDisabledInRelease: true,
 ]
 
 // Simplified React configuration for React Native 0.81.1
 react {
     root = file("../../")
     reactNativeDir = file("../../node_modules/react-native")
+    codegenDir = file("../../node_modules/react-native/ReactAndroid/build/generated/source/codegen")
 }
 
 // Disable problematic autolinking task
@@ -227,6 +232,9 @@ dependencies {
 
     // React Native Core - ESSENTIAL for React classes
     implementation "com.facebook.react:react-android"
+    
+    // Additional React Native dependencies
+    implementation "com.facebook.soloader:soloader:0.10.5"
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 

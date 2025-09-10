@@ -1,0 +1,11 @@
+alter table settlement_item add column medical_authorization_item_id int8;
+alter table settlement_item add constraint FKrkkdbg1s8n9aube84epgubw2c foreign key (medical_authorization_item_id) references medical_authorization_item;
+alter table settlement add column opened_at timestamp;
+update settlement set opened_at = created_at;
+alter table settlement alter column opened_at set not null;
+update settlement_item si set medical_authorization_item_id = mi.id from medical_authorization_item mi where si.nomenclator_id = mi.nomenclator_id and si.medical_authorization_id = mi.medical_authorization_id;
+alter table settlement_item alter column medical_authorization_item_id set not null;
+create table settlement_item_audit_log (id int8 not null, rev int4 not null, revtype int2, client_id varchar(255), created_at timestamp, created_by varchar(255), modified_at timestamp, modified_by varchar(255), charge_unit_price numeric(19, 2), quantity int4, subtotal numeric(19, 2), unit_price numeric(19, 2), medical_authorization_id int8, medical_authorization_item_id int8, medical_center_id int8, nomenclator_id int8, settlement_id int8, primary key (id, rev));
+alter table if exists settlement_item_audit_log add constraint FK1buel112cs2ccc7ogr0k6q45 foreign key (rev) references revinfo;
+create table settlement_audit_log (id int8 not null, rev int4 not null, revtype int2, client_id varchar(255), created_at timestamp, created_by varchar(255), modified_at timestamp, modified_by varchar(255), closed_at timestamp, closed_at_mod boolean, opened_at timestamp, opened_at_mod boolean, status_id int8, status_mod boolean, primary key (id, rev));
+alter table if exists settlement_audit_log add constraint FKluerrf4hi42m51jmta18gjptf foreign key (rev) references revinfo;

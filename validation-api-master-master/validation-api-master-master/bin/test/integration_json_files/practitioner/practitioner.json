@@ -1,0 +1,37 @@
+{
+  "maritalStatus": {
+    "id": 2
+  },
+  "address": {
+    "street": "Street Test 2",
+    "district": "District Test 2",
+    "streetNumber": "234",
+    "apartment": "2 A",
+    "city": {
+      "id": 1
+    }
+  },
+  "phone": {
+    "areaCode": 351,
+    "phoneNumber": 4111111,
+    "phoneType": "FIJO"
+  },
+  "email": "practitioner@test.com",
+  "name": "Practitioner Name",
+  "lastName": "Practitioner Lastname",
+  "idNumber": 44332211,
+  "workIdNumber": 20443322115,
+  "idType": {
+    "id": 1
+  },
+  "birthDate": "1953-05-15",
+  "gender": "MASCULINO",
+  "practitionerCode": "B1B1B1",
+  "medicalSpecialties": [
+    {
+      "id": 47
+    }
+  ],
+  "medicalCenters": [],
+  "medicalRegistrations": []
+}

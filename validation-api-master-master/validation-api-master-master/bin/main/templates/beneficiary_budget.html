@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html" charset="UTF-8"/>
+    <link media="all" rel="stylesheet" th:href="@{classpath:templates/style.css}" type="text/css"/>
+    <title></title>
+</head>
+<body>
+<div class="header" th:insert="header.html :: header"></div>
+<h1 style="text-align: center">Descuento de Coseguros por Recibo de Sueldo</h1>
+<div>
+    <table>
+        <tr class="block">
+            <td></td>
+            <td class="bottom right">
+                <span style="font-size: 16px;">Información General</span><br/>
+                <strong>#[[${data.getId()}]]</strong><br/>
+                <strong><span>[[${data.getStatus().getName()}]]</span></strong><br/>
+                <span>Fecha de Apertura: [[${#temporals.format(data.getCreatedAt(), 'dd/MM/yyyy HH:mm')}]]</span><br/>
+                <span>Fecha de Cierre: [[${#temporals.format(data.getClosedAt(), 'dd/MM/yyyy HH:mm')}]]</span><br/>
+            </td>
+        </tr>
+        <tr class="block">
+            <td class="bottom" th:insert="beneficiary.html :: beneficiary"></td>
+            <td class="bottom right">
+                <div style="margin-top: 25px;">
+                    <span style="font-size: 16px;">Empresa</span><br/>
+                    <strong>[[${data.getCompany().getName()}]]</strong><br/>
+                    <span>[[${data.getCompany().getAddress().getCity().getName()}]],
+                        [[${data.getCompany().getAddress().getCity().getProvince().getName()}]]</span><br/>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <hr>
+</div>
+<h2>Detalle</h2>
+<table>
+    <tr>
+        <td colspan="4">
+            <table>
+                <tr class="heading">
+                    <td>
+                        Práctica
+                    </td>
+                    <td>
+                        Validación
+                    </td>
+                    <td>
+                        Cantidad
+                    </td>
+                    <td>
+                        Valor de Coseguro
+                    </td>
+                    <td>
+                        Subtotal
+                    </td>
+                </tr>
+                <tr class="item" th:each="item :${data.getBudgetItems()}">
+                    <td style="max-width: 150px">
+                        ([[${item.getNomenclator().getNomenclatorCode()}]])
+                        [[${item.getNomenclator().getMedicalPractice().getName()}]]
+                    </td>
+                    <td>
+                        #[[${item.getMedicalAuthorization().getId()}]]
+                    </td>
+                    <td>
+                        [[${item.getQuantity()}]]
+                    </td>
+                    <td>
+                        $[[${item.getChargeUnitPrice()}]]
+                    </td>
+                    <td>
+                        $[[${item.getChargeSubtotal()}]]
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr class="right">
+        <td>
+            <h2 class="subtotal">Total: <strong>$[[${data.getTotal()}]]</strong></h2>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

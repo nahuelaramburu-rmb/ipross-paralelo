@@ -1,0 +1,1 @@
+alter table if exists tenant_properties add column mappings jsonb;

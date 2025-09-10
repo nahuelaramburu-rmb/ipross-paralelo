@@ -1,0 +1,1 @@
+alter table medical_authorization drop constraint ukakcisu4yx3tyda8skt2h6mr14;

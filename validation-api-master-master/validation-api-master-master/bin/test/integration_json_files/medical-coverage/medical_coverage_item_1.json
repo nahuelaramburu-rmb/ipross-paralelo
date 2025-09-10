@@ -1,0 +1,18 @@
+{
+  "gender": "INDISTINTO",
+  "ageFrom": "0",
+  "ageTo": "150",
+  "awaitDays": "0",
+  "restrictionType": {
+    "id": 1
+  },
+  "fixedMaxQuantity": 10,
+  "fixedMaxDays": 10,
+  "freeMaxQuantity": 0,
+  "freeMaxDays": 1,
+  "chargeType": {
+    "id": 1
+  },
+  "chargeValue": 50,
+  "auditRequired": false
+}

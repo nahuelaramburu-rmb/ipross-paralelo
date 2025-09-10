@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html" charset="UTF-8"/>
+    <link media="all" rel="stylesheet" th:href="@{classpath:templates/style.css}" type="text/css"/>
+    <title></title>
+</head>
+<body>
+<div class="header" th:insert="header.html :: header"></div>
+<h1 style="text-align: center">Comprobante de Receta</h1>
+<div>
+    <table>
+        <tr class="block">
+            <td></td>
+            <td class="bottom right">
+                <span style="font-size: 16px;">Número <strong>#[[${data.getId()}]]</strong></span><br/>
+                <strong><span>[[${data.getStatus().getName()}]]</span></strong><br/>
+                <span>[[${#temporals.format(data.getCreatedAt(), 'dd/MM/yyyy HH:mm')}]]</span><br/>
+                <span><strong>[[${data.getPreAuthorized()} ? 'Receta Preautorizada' : '']]</strong></span><br/>
+                <br/>
+                <span>
+                    <strong>Números de Autorización</strong>
+                    <table>
+                        <tr th:each="item :${data.getExchangeId()}">
+                            <td>
+                                [[${item}]]<br/>
+                            </td>
+                        </tr>
+                    </table>
+                </span><br/>
+            </td>
+        </tr>
+        <tr class="block">
+            <td class="bottom" th:insert="beneficiary.html :: beneficiary"></td>
+            <td class="bottom right" th:insert="practitioner.html :: practitioner"></td>
+        </tr>
+    </table>
+    <hr>
+</div>
+<h2>Detalle</h2>
+<table>
+    <tr>
+        <td colspan="4">
+            <table>
+                <tr class="heading">
+                    <td>
+                        Medicamento
+                    </td>
+                    <td>
+                        Días de Tratamiento
+                    </td>
+                    <td>
+                        Dosis Diaria
+                    </td>
+                    <td>
+                        Cantidad de Envases
+                    </td>
+                </tr>
+                <tr class="item" th:each="item :${data.getPrescriptionItems()}">
+                    <td style="max-width: 150px">
+                        [[${item.getMedicine().getProduct()}]]<br/>
+                        ([[${item.getMedicine().getPresentation()}]])
+                    </td>
+                    <td>
+                        [[${item.getTreatmentDays()}]]
+                    </td>
+                    <td>
+                        [[${item.getDailyDosage()}]]
+                    </td>
+                    <td>
+                        [[${item.getQuantity()}]]
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

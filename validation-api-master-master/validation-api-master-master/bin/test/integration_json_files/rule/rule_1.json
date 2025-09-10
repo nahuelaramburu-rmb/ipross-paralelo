@@ -1,0 +1,13 @@
+{
+  "ruleRef": {
+    "id": 1
+  },
+  "active": true,
+  "applyToBatch": false,
+  "data": [
+    {
+      "dataIdentifier": "maxAmount",
+      "content": 2
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+alter table medical_coverage alter column region_id drop not null;

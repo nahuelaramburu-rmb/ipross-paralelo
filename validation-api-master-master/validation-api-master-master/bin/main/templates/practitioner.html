@@ -1,0 +1,8 @@
+<div style="margin-top: 10px;" th:fragment="practitioner">
+    <span style="font-size: 16px;">Prestador Efector</span><br/>
+    <strong>[[${data.getPractitioner().getLastName()}]], [[${data.getPractitioner().getName()}]]</strong>
+    [[${data.getPractitioner().getIdType().getAlias()}]] [[${data.getPractitioner().getIdNumber()}]]<br/>
+    <div th:each="medSpec :${data.getPractitioner().getMedicalSpecialties()}">
+        <span th:text="${medSpec.getName()}"> </span>
+    </div>
+</div>
