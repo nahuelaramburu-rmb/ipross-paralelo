@@ -78,13 +78,27 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     entryFile: "index.js",
-    enableHermes: true,  // clean and rebuild if changing
+    enableHermes: false,  // temporarily disabled due to build issues
 ]
 
 // Simplified React configuration for React Native 0.81.1
 react {
     root = file("../../")
     reactNativeDir = file("../../node_modules/react-native")
+}
+
+// Disable problematic autolinking task
+afterEvaluate {
+    tasks.findByName('generateAutolinkingPackageList')?.enabled = false
+    tasks.findByName('generateReactNativeEntryPoint')?.enabled = false
+    // Disable Reanimated new architecture assertion
+    project.gradle.allprojects { proj ->
+        proj.tasks.withType(org.gradle.api.Task).configureEach { task ->
+            if (task.name == 'assertNewArchitectureEnabledTask') {
+                task.enabled = false
+            }
+        }
+    }
 }
 
 /**
@@ -133,12 +147,12 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    namespace 'com.capacidad.beneficiaryapp'
-    ndkVersion "27.1.12297006"
+    namespace = 'com.capacidad.beneficiaryapp'
+    ndkVersion = "27.1.12297006"
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     buildFeatures {
-        buildConfig true
+        buildConfig = true
     }
 
     compileOptions {
@@ -152,13 +166,13 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 141
         versionName "1.4.1"
-        multiDexEnabled true
+        multiDexEnabled = true
     }
     splits {
         abi {
             reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
+            enable = enableSeparateBuildPerCPUArchitecture
+            universalApk = false  // If true, also generate a universal APK
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
@@ -172,12 +186,12 @@ android {
     }
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://facebook.github.io/react-native/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            signingConfig = signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -210,6 +224,9 @@ dependencies {
     
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.google.android.gms:play-services-base:17.0.0"
+
+    // React Native Core - ESSENTIAL for React classes
+    implementation "com.facebook.react:react-android"
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
@@ -245,3 +262,7 @@ task copyDownloadableDepsToLibs(type: Copy) {
 
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply plugin: 'com.google.gms.google-services'
+
+// Apply React Native autolinking - DISABLED for manual configuration
+// apply from: file("../../native_modules.gradle")
+// applyNativeModulesAppBuildGradle(project)

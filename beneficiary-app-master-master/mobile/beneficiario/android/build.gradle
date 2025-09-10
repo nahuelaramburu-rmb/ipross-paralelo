@@ -2,9 +2,8 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "34.0.0"
-        minSdkVersion = 21
-        compileSdkVersion = 34
+        minSdkVersion = 24
+        compileSdkVersion = 35
         targetSdkVersion = 34
         supportLibVersion = "28.0.0"
         layServicesVersion = "17.0.0" // or find latest version
@@ -30,15 +29,17 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://www.jitpack.io' }
+        maven { 
+            url = 'https://www.jitpack.io' 
+        }
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url("$rootDir/../node_modules/react-native/android")
+            url = "$rootDir/../node_modules/react-native/android"
             name = "React Native"
         }
         maven {
             // Android JSC is installed from npm
-            url("$rootDir/../node_modules/jsc-android/dist")
+            url = "$rootDir/../node_modules/jsc-android/dist"
             name = "JSC"
         }
         mavenLocal()
@@ -49,8 +50,8 @@ subprojects {
     afterEvaluate {project ->
         if (project.hasProperty("android")) {
             android {
-                compileSdkVersion  34
-                buildToolsVersion "34.0.0"
+                compileSdkVersion  35
+                // buildToolsVersion "34.0.0" // Removed as suggested by Android Gradle Plugin 8.11.0
             }
         }
     }
