@@ -5,10 +5,11 @@ import com.capacidad.identityservice.config.security.JWTAuthenticationToken;
 import com.capacidad.identityservice.config.token.TokenVerifier;
 import com.capacidad.identityservice.exception.GlobalExceptionHandler;
 import com.capacidad.identityservice.misc.Utils;
+import com.capacidad.identityservice.misc.securityutils.SecurityUtils;
 import com.capacidad.identityservice.model.Group;
 import com.capacidad.identityservice.model.Tenant;
 import com.capacidad.identityservice.service.TenantService;
-import com.capacidad.utils.SecurityUtils;
+
 import com.capacidad.utils.TokenUtils;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,14 @@ import static com.capacidad.identityservice.functional.ThrowingConsumer.throwing
 import static com.capacidad.identityservice.misc.Utils.isNotCustomEndpoint;
 import static com.capacidad.identityservice.misc.Utils.sendError;
 import static com.capacidad.utils.Constants.*;
+
+
+/*
+ * función principal: interceptar las solicitudes, validar el JWT que viene en los headers,
+ * y configurar el contexto de seguridad para que la aplicación sepa quién es el usuario autenticado, su rol, permisos y tenant.
+ *
+ *
+ * */
 
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {

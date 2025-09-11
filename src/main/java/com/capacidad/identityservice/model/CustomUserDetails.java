@@ -9,13 +9,15 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 
 public class CustomUserDetails implements UserDetails, CredentialsContainer, Serializable {
 
-    private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final String username;
     private final Set<GrantedAuthority> authorities;
@@ -27,6 +29,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
 
     private final String tenantId;
 
+
     public String getTenantId() {
         return tenantId;
     }
@@ -37,6 +40,12 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
 
     // ~ Constructors
     // ===================================================================================================
+
+    // Constructor principal que acepta authorities
+    public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        this(username, password, true, true, true, true, authorities, null);
+    }
+
 
     /**
      * Calls the more complex constructor with all boolean arguments set to {@code true}.
@@ -182,7 +191,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
      */
     @Override
     public boolean equals(Object rhs) {
-        if (rhs instanceof User) {
+        if (rhs instanceof CustomUserDetails) {
             return username.equals(((CustomUserDetails) rhs).username);
         }
         return false;

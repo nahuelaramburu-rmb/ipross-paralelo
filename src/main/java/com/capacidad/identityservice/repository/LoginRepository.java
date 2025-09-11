@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface LoginRepository extends ExtendedRepository<Login, Long> {
 
+
+    // obtiene los intentos de ingreso fallido de un user
+    // retorna el dto con los campos  id , createdAt, principal
     @Query("select new com.capacidad.identityservice.model.projection.LoginViewDTO(l.id, l.createdAt, l.principal) from Login l " +
             "where l.principal = :username and l.ipAddress = :ipAddress and l.loginEvent = 'FAILURE'")
     List<LoginViewDTO> findAllByPrincipalOrIpAddressAndFailureEvent(@Param("username") String username,

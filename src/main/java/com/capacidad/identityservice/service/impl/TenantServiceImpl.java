@@ -13,7 +13,10 @@ import com.capacidad.utils.exception.ObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.oauth2.provider.ClientDetails;
+
+//import org.springframework.security.oauth2.provider.ClientDetails;
+
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -41,39 +44,44 @@ public class TenantServiceImpl extends BaseServiceImpl<Tenant, Long> implements 
     }
 
     @Override
-    public ApplicationUserContext validateTenant(ApplicationUser user, ClientDetails clientDetails, String tenantHeader) {
+    public ApplicationUserContext validateTenant(ApplicationUser user, RegisteredClient registeredClient, String tenantHeader) {
+
         if (user.getContextSet().size() > 1) {
             if (StringUtils.isBlank(tenantHeader)) {
                 String tenants = user.getContextSet().stream()
                         .map(context -> Utils.buildTenantResponse(context.getTenant()))
                         .collect(Collectors.joining(COMA));
+
                 throw new UnspecifiedTenantException(tenants);
+
             } else {
                 ApplicationUserContext context = user.getContextSet().stream()
                         .filter(userContext -> StringUtils.equals(userContext.getTenant().getTenantId().toString(),
                                 tenantHeader))
                         .findFirst()
                         .orElse(null);
-                validateAndSetTenant(context, clientDetails);
+                validateAndSetTenant(context, registeredClient);
                 return context;
             }
         } else {
             ApplicationUserContext context = user.getContextSet().iterator().next();
-            validateAndSetTenant(context, clientDetails);
+            validateAndSetTenant(context, registeredClient);
             return context;
         }
     }
 
-    private void validateAndSetTenant(ApplicationUserContext context, ClientDetails clientDetails) {
+    private void validateAndSetTenant(ApplicationUserContext context, RegisteredClient registeredClient) {
         if (context == null)
             throw new InsufficientAuthenticationException("tenant.invalidTenantUser");
         Tenant contextTenant = context.getTenant();
-        validateClientTenant(clientDetails, contextTenant);
+        validateClientTenant(registeredClient, contextTenant);
         TenantContext.setTenant(contextTenant);
     }
 
-    private void validateClientTenant(ClientDetails clientDetails, Tenant tenant) {
-        String clientTenantId = Utils.getClientAdditionalInformation(TENANT_ID, clientDetails).orElse("");
+    private void validateClientTenant(RegisteredClient registeredClient, Tenant tenant) {
+
+        String clientTenantId = Utils.getClientAdditionalInformation(TENANT_ID, registeredClient).orElse("");
+
         if (StringUtils.isNotBlank(clientTenantId) && !StringUtils.equals(clientTenantId, tenant.getTenantId().toString()))
             throw new InsufficientAuthenticationException("tenant.clientCannotOperate");
     }

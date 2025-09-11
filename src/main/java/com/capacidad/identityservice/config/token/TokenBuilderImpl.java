@@ -11,7 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

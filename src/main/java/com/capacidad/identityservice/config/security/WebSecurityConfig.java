@@ -28,13 +28,22 @@ import static com.capacidad.identityservice.misc.constant.SecurityConstants.FUND
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true)  // habilita la seguridad a nivel de métodos con anotaciones como @PreAuthorize y @PostAuthorize.
 public class WebSecurityConfig {
 
+    //servicio personalizado para cargar usuarios desde BD o cualquier fuente.
     private final CustomUserDetailsService userDetailsService;
+
+    //se encarga de codificar y verificar contraseñas
     private final PasswordEncoder passwordEncoder;
+
+    //filtro que valida tokens JWT en cada request
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
+
+    // filtro extra para autenticar clientes vía Basic Auth
     private final ClientBasicAuthenticationFilter clientBasicAuthenticationFilter;
+
+    //filtro que gestiona la internacionalización (idiomas) en las peticiones
     private final I18nFilter i18nFilter;
 
     public WebSecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter,
@@ -49,11 +58,13 @@ public class WebSecurityConfig {
         this.i18nFilter = i18nFilter;
     }
 
+    //maneja cabeceras de proxies/reverse proxies (ej. X-Forwarded-For
     @Bean
     public ForwardedHeaderFilter forwardedHeaderFilter() {
         return new ForwardedHeaderFilter();
     }
 
+    // proveedor de autenticación basado en usuarios de BD, usando CustomUserDetailsService + PasswordEncoder
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -62,14 +73,17 @@ public class WebSecurityConfig {
         return provider;
     }
 
+    //el administrador que coordina la autenticación
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManager.class);
     }
 
+    // se define toda la configuración (endpoints protegidos, filtros, roles, etc.).
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint customAuthEntryPoint) throws Exception {
 
+        //aplica configuración por defecto para un Authorization Server OAuth2 (endpoints de autorización, tokens, etc.).
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
         // Configuración de endpoints ignorados
@@ -90,14 +104,14 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(customAuthEntryPoint) // manejador custom
+                        .authenticationEntryPoint(customAuthEntryPoint) // manejar errores de autenticación personalizados.
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(i18nFilter, JWTAuthenticationFilter.class)
-                .addFilterAfter(clientBasicAuthenticationFilter, JWTAuthenticationFilter.class);
+                .addFilterAfter(clientBasicAuthenticationFilter, JWTAuthenticationFilter.class);  // TODO , REVISAR clientBasicAuthenticationFilter
 
         return http.build();
     }

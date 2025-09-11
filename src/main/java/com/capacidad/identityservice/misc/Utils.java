@@ -18,13 +18,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.ClientDetails;
+
+// paquete deprecado
+//import org.springframework.security.oauth2.provider.ClientDetails;
+
+// ahora se usa este
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -97,11 +104,25 @@ public class Utils {
         return StringUtils.replace(iss, "http://", StringUtils.join("http://", activeProfile, "-"));
     }
 
-    public static Optional<String> getClientAdditionalInformation(String key, ClientDetails clientDetails) {
-        if (clientDetails.getAdditionalInformation() != null && clientDetails.getAdditionalInformation().containsKey(key))
-            return Optional.of((String) clientDetails.getAdditionalInformation().get(key));
+
+    // TODO , REVISAR registeredClient.getClientSettings().getSettings().get(key)
+    // TODO , YA QUE DEBO ENCOTRAR DONDE SE CREA EL USER , Y POR ELLO , DONDE SE SETEAN SUS VALORES (KEY)
+    public static Optional<String> getClientAdditionalInformation(String key, RegisteredClient registeredClient) {
+
+        if (registeredClient != null && registeredClient.getClientSettings() != null) {
+
+            // metadata extra de clientes (ej: "DEV", "PROD", "TEST"  o  TENANT_ID , DE ACUERDO AL KEY QUE SE LE PASE!!).
+            Object value = registeredClient.getClientSettings().getSettings().get(key);
+
+            if (value != null) {
+                // se retonar el group/tenant_id como string
+                return Optional.of(value.toString());
+            }
+        }
+
         return Optional.empty();
     }
+
 
     public static Group getAuthenticatedAuthorityGroup() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -140,9 +161,9 @@ public class Utils {
         return String.join(COLON, tenant.getName(), tenant.getTenantId().toString());
     }
 
-    public static String buildTenantResponse(ClientDetails clientDetails) {
-        String tenantName = getClientAdditionalInformation(TENANT_NAME, clientDetails).orElse("");
-        String tenantId = getClientAdditionalInformation(TENANT_ID, clientDetails).orElse("");
+    public static String buildTenantResponse(RegisteredClient registeredClient) {
+        String tenantName = getClientAdditionalInformation(TENANT_NAME, registeredClient).orElse("");
+        String tenantId = getClientAdditionalInformation(TENANT_ID, registeredClient).orElse("");
         if (StringUtils.isNotBlank(tenantName) && StringUtils.isNotBlank(tenantId))
             return String.join(COLON, tenantName, tenantId);
         return "";

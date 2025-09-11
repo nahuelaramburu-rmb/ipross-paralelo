@@ -1,64 +1,77 @@
 package com.capacidad.identityservice.config.token;
 
-import com.auth0.jwk.Jwk;
-import com.auth0.jwk.JwkException;
-import com.auth0.jwk.JwkProvider;
-import com.auth0.jwk.UrlJwkProvider;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.capacidad.identityservice.misc.ApplicationProperties;
 import com.capacidad.identityservice.misc.Utils;
-import com.capacidad.utils.TokenUtils;
 import com.capacidad.utils.exception.ExpiredTokenException;
 import com.capacidad.utils.exception.InvalidTokenException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
-
-import java.security.interfaces.RSAPublicKey;
 
 @Slf4j
 @Component
 public class TokenVerifierImpl implements TokenVerifier {
 
-    private final JwkProvider jwkProvider;
+    private final JwtDecoder jwtDecoder;
     private final ApplicationProperties applicationProperties;
 
-    @Autowired
     public TokenVerifierImpl(ApplicationProperties applicationProperties) {
-        this.jwkProvider = new UrlJwkProvider(Utils.getFileURL("keys.jwks.json"));
+
         this.applicationProperties = applicationProperties;
+
+        this.jwtDecoder = NimbusJwtDecoder
+                .withJwkSetUri(Utils.getFileURL("keys.jwks.json").toString())  // verificar filename !!
+                .build();
     }
 
+
     @Override
-    public void verify(String jwt) {
+    public void verify(String token) {
         try {
-            String keyId = TokenUtils.getJwtKid(jwt)
-                    .orElseThrow(() -> new InvalidTokenException("tokenVerifier.invalidHeaders"));
-            Jwk jwk = this.jwkProvider.get(keyId);
-            RSAPublicKey publicKey = (RSAPublicKey) jwk.getPublicKey();
-            Algorithm algorithm = Algorithm.RSA256(publicKey, null);
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer(Utils.buildJwtIssuer(
-                            applicationProperties.getJwtIssuer(), applicationProperties.getActiveProfile()
-                            )
-                    )
-                    .build();
-            verifier.verify(jwt);
-        } catch (JWTVerificationException | JwkException e) {
-            log.error("Invalid verification for token: {} - ERROR: {}", jwt, e.getMessage());
-            if (StringUtils.contains(e.getMessage(), "expired"))
+            Jwt decoded = jwtDecoder.decode(token);
+
+            // validación adicional opcional: issuer exacto
+            String expectedIssuer = Utils.buildJwtIssuer(
+                    applicationProperties.getJwtIssuer(),
+                    applicationProperties.getActiveProfile()
+            );
+
+            if (decoded.getIssuer() == null || !expectedIssuer.equals(decoded.getIssuer().toString())) {
+                throw new InvalidTokenException("tokenVerifier.invalidIssuer");
+            }
+
+            // si llegamos acá, la firma y los checks básicos (exp/nbf) ya fueron validados
+
+        } catch (JwtException e) {
+            log.error("Token validation error for token [{}]: {}", token, e.getMessage());
+
+            // intentar detectar expirado (mejor: basarse en tipo o mensajes)
+            if (e.getMessage() != null && e.getMessage().toLowerCase().contains("expired")) {
                 throw new ExpiredTokenException("tokenVerifier.expiredToken");
-            throw new InvalidTokenException("tokenVerifier.generalError");
+            }
+            throw new InvalidTokenException("tokenVerifier.invalidToken");
         }
     }
 
     @Override
     public void validate(String jwt) {
-        TokenUtils.validate(jwt, applicationProperties.getApiIdentifier(), applicationProperties.getActiveProfile());
-    }
+        try {
+            Jwt decoded = jwtDecoder.decode(jwt);
 
+            // valida audience
+            String apiId = applicationProperties.getApiIdentifier();
+            if (apiId != null && !decoded.getAudience().contains(apiId)) {
+                throw new InvalidTokenException("tokenVerifier.invalidAudience");
+            }
+
+            // otras validaciones , a implementar (scope, claim custom, etc.)
+
+
+        } catch (JwtException e) {
+            log.error("Token validate error for token [{}]: {}", jwt, e.getMessage());
+            throw new InvalidTokenException("tokenVerifier.invalidToken");
+        }
+    }
 }
+
+

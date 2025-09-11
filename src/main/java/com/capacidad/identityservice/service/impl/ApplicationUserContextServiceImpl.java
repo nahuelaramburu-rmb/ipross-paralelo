@@ -26,7 +26,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.security.oauth2.provider.ClientDetails;
+
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -168,10 +171,11 @@ public class ApplicationUserContextServiceImpl extends BaseServiceImpl<Applicati
         supportService.sendRestoreEmail(user);
     }
 
+
     @Override
-    public void checkOperationalState(ApplicationUser user, ApplicationUserContext context, ClientDetails clientDetails) {
+    public void checkOperationalState(ApplicationUser user, ApplicationUserContext context, RegisteredClient registeredClient) {
         userService.checkUserState(user);
-        roleService.validateClientRoleAccess(context.getRole(), clientDetails.getScope());
+        roleService.validateClientRoleAccess(context.getRole(), registeredClient.getScope());
     }
 
     @Override
@@ -205,7 +209,7 @@ public class ApplicationUserContextServiceImpl extends BaseServiceImpl<Applicati
     public ApplicationUserContextProjection update(UUID sub, UpdateApplicationUserContextDTO input) throws ObjectNotFoundException {
 
         ApplicationUserContext context = userContextRepository.find(supportService.buildUserSubAndTenantSpec(sub),
-                supportService.buildUserAndPermissionsSearchQueryHints(false, false, true))
+                        supportService.buildUserAndPermissionsSearchQueryHints(false, false, true))
                 .orElseThrow(() -> new ObjectNotFoundException("applicationUserContext.subNotFound", sub.toString()));
 
         roleService.validateAuthorityRoleAccess(context.getRole(), UPDATE);
