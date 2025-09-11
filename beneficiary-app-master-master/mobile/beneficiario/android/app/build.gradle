@@ -78,10 +78,10 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     entryFile: "index.js",
-    enableHermes: false,  // temporarily disabled due to build issues
-    bundleInDebug: true,  // Bundle JS in debug mode to avoid dev server issues
+    enableHermes: true,  // Enable Hermes for RN 0.76.1 compatibility
+    bundleInDebug: false,  // Allow dev server in debug mode
     bundleInRelease: true,
-    devDisabledInDebug: true,  // Disable dev mode in debug builds
+    devDisabledInDebug: false,  // Enable dev mode in debug builds
     devDisabledInRelease: true,
 ]
 
@@ -253,9 +253,8 @@ dependencies {
     // }
 
     if (enableHermes) {
-        def hermesPath = "../../node_modules/hermes-engine/android/";
-        debugImplementation files(hermesPath + "hermes-debug.aar")
-        releaseImplementation files(hermesPath + "hermes-release.aar")
+        // React Native 0.81.1 - Use Hermes from react-android
+        implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
     }

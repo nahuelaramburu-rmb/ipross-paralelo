@@ -1,0 +1,31 @@
+{
+  "buildFiles": [
+    "C:\\Users\\Lucas\\Desktop\\Proyects\\ipross-paralelo\\beneficiary-app-master-master\\mobile\\beneficiario\\node_modules\\react-native\\ReactAndroid\\cmake-utils\\default-app-setup\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Lucas\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\Lucas\\Desktop\\Proyects\\ipross-paralelo\\beneficiary-app-master-master\\mobile\\beneficiario\\android\\app\\.cxx\\Debug\\4h1l4z1c\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Lucas\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\Lucas\\Desktop\\Proyects\\ipross-paralelo\\beneficiary-app-master-master\\mobile\\beneficiario\\android\\app\\.cxx\\Debug\\4h1l4z1c\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "appmodules::@6890427a1f51a3e7e1df": {
+      "artifactName": "appmodules",
+      "abi": "x86_64",
+      "output": "C:\\Users\\Lucas\\Desktop\\Proyects\\ipross-paralelo\\beneficiary-app-master-master\\mobile\\beneficiario\\android\\app\\build\\intermediates\\cxx\\Debug\\4h1l4z1c\\obj\\x86_64\\libappmodules.so",
+      "runtimeFiles": [
+        "C:\\Users\\Lucas\\.gradle\\caches\\8.13\\transforms\\4589cc6e0b930df8190c155418a64bea\\transformed\\jetified-fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86_64\\libfbjni.so",
+        "C:\\Users\\Lucas\\.gradle\\caches\\8.13\\transforms\\3992fcfa3e7747a902a9ca372490e35a\\transformed\\jetified-react-android-0.76.9-debug\\prefab\\modules\\jsi\\libs\\android.x86_64\\libjsi.so",
+        "C:\\Users\\Lucas\\.gradle\\caches\\8.13\\transforms\\3992fcfa3e7747a902a9ca372490e35a\\transformed\\jetified-react-android-0.76.9-debug\\prefab\\modules\\reactnative\\libs\\android.x86_64\\libreactnative.so"
+      ]
+    }
+  }
+}

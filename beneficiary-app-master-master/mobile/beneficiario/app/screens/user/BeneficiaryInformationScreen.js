@@ -31,7 +31,7 @@ const PlanModalContent = ({ plans }) => {
                     <Text style={[font_styles.primary_text_bold]}> - {item.insurancePlanType.name}</Text>
                 </Text>
 
-                <Text style={[font_styles.primary_text, { marginLeft: '1%' }]}>
+                <Text style={[font_styles.primary_text, styles.marginLeft]}>
                     {item.expirationDate
                         ? `Hasta ${moment(item.expirationDate).format('DD/MM/YYYY')}`
                         : 'Sin Vencimiento'}
@@ -43,7 +43,7 @@ const PlanModalContent = ({ plans }) => {
     return (
         <View style={styles.modalContainer}>
             <View style={styles.modalTitleContainer}>
-                <Text style={[font_styles.title_3, { textAlign: 'center' }]}>
+                <Text style={[font_styles.title_3, styles.textCenter]}>
                     {strings.beneficiaryInformation.beneficiary_plans}
                 </Text>
             </View>
@@ -118,7 +118,7 @@ class BeneficiaryInformationScreen extends PureComponent {
             .format('MMMM YYYY')
             .replace(/^\w/, (c) => c.toUpperCase());
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.flex}>
                 <View style={styles.container}>
                     {!update_data_loading ? (
                         <React.Fragment>
@@ -128,10 +128,10 @@ class BeneficiaryInformationScreen extends PureComponent {
                             <Text style={[font_styles.title_2_header, styles.generalInformationTitle]}>
                                 {strings.beneficiaryInformation.beneficiary_info}
                             </Text>
-                            <View style={{ flex: 1 }}>
+                            <View style={styles.flex}>
                                 <ScrollView
                                     scrollEventThrottle={16}
-                                    style={{ flex: 1, width: width }}
+                                    style={styles.scrollView}
                                     contentContainerStyle={styles.scrollViewContent}>
                                     <DecoratedCard
                                         image={statusIcon}
@@ -399,7 +399,33 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    // New styles for inline fixes
+    marginLeft: {
+        marginLeft: '1%',
+    },
+    textCenter: {
+        textAlign: 'center',
+    },
+    flex: {
+        flex: 1,
+    },
+    scrollView: {
+        flex: 1,
+        width: width,
+    },
 });
+
+// PropTypes
+PlanModalContent.propTypes = {
+    plans: PropTypes.array,
+};
+
+BeneficiaryInformationScreen.propTypes = {
+    navigation: PropTypes.object,
+    beneficiary: PropTypes.object,
+    update_data_loading: PropTypes.bool,
+    selectedUserCharge: PropTypes.number,
+};
 
 function mapStateToProps(state) {
     return {

@@ -14,15 +14,15 @@ const librariesNeedingNamespace = [
     'react-native-reanimated',
     'react-native-gesture-handler',
     'react-native-safe-area-context',
-    'react-native-screens'
+    'react-native-screens',
 ];
 
 function patchLibraryNamespace(libraryName) {
     const buildGradlePath = path.join(__dirname, 'node_modules', libraryName, 'android', 'build.gradle');
-    
+
     if (fs.existsSync(buildGradlePath)) {
         let content = fs.readFileSync(buildGradlePath, 'utf8');
-        
+
         // Verificar si ya tiene namespace
         if (!content.includes('namespace ')) {
             // Buscar la sección android{}
@@ -31,7 +31,7 @@ function patchLibraryNamespace(libraryName) {
                 const insertIndex = androidMatch.index + androidMatch[0].length;
                 const namespace = `\n    namespace '${getNamespaceForLibrary(libraryName)}'`;
                 content = content.slice(0, insertIndex) + namespace + content.slice(insertIndex);
-                
+
                 fs.writeFileSync(buildGradlePath, content);
                 console.log(`Patched namespace for ${libraryName}`);
             }
@@ -56,7 +56,7 @@ function getNamespaceForLibrary(libraryName) {
         'react-native-reanimated': 'com.swmansion.reanimated',
         'react-native-gesture-handler': 'com.swmansion.gesturehandler.react',
         'react-native-safe-area-context': 'com.th3rdwave.safeareacontext',
-        'react-native-screens': 'com.swmansion.rnscreens'
+        'react-native-screens': 'com.swmansion.rnscreens',
     };
     return namespaceMap[libraryName] || `com.${libraryName.replace(/-/g, '.')}`;
 }

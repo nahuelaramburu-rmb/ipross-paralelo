@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { moderateScale, verticalScale } from '../../lib/size-normalizer';
 import ProfessionalForm from '../../components/professional/ProfessionalForm';
 import { getTypesSpecialty } from '../../actions/professionalAction';
+import * as Colors from '../../constants/Colors';
 
 class ProfessionalScreen extends PureComponent {
     constructor(props) {
@@ -24,7 +25,7 @@ class ProfessionalScreen extends PureComponent {
         if (loading) {
             return (
                 <SafeAreaView style={styles.safeAreaView}>
-                    <View style={[styles.container, { alignContent: 'center' }]}>
+                    <View style={styles.loadingContainer}>
                         <ActivityIndicator size='large' color={Colors.primaryText} />
                     </View>
                 </SafeAreaView>
@@ -32,7 +33,7 @@ class ProfessionalScreen extends PureComponent {
         }
 
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.safeAreaView}>
                 <KeyboardAwareScrollView
                     style={styles.container}
                     contentContainerStyle={styles.keyboardAwareContent}
@@ -57,6 +58,10 @@ const styles = StyleSheet.create({
     },
     safeAreaView: {
         flex: 1,
+    },
+    loadingContainer: {
+        flex: 1,
+        alignContent: 'center',
     },
     procedureTitle: {
         paddingLeft: moderateScale(16),

@@ -9,7 +9,6 @@ import ProfessionalItem from '../../components/professional/ProfessionalItem';
 import PropTypes from 'prop-types';
 
 const ProfessionalListScreen = ({ route }) => {
-
     const dispatch = useDispatch();
 
     const { onScroll } = useAnimatableHeader();
@@ -28,17 +27,15 @@ const ProfessionalListScreen = ({ route }) => {
     const idtown = route.params?.idTown ?? null;
 
     const getProffesionals = useCallback(
-        
         (isRefresh = false, filters = null, link = null) => {
-            return dispatch(getProfessionalSpecialty(idSpecialty,idtown,isRefresh,link))
+            return dispatch(getProfessionalSpecialty(idSpecialty, idtown, isRefresh, link));
         },
-        [dispatch]
+        [dispatch, idSpecialty, idtown]
     );
 
     useEffect(() => {
         getProffesionals();
     }, [getProffesionals]);
-
 
     const renderItem = ({ item: practitionerItem }) => {
         return <ProfessionalItem item={practitionerItem} />;

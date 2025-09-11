@@ -1,5 +1,4 @@
-import ProfessionalListScreen from './ProfessionalListScreen';
+import ProfessionalListScreen from './ProfessionalScreen';
 import ProfessionalScreen from './ProfessionalScreen';
 
-
-export { ProfessionalScreen,ProfessionalListScreen};
+export { ProfessionalScreen, ProfessionalListScreen };

@@ -1,0 +1,10 @@
+# ninja log v5
+2	71	0	C:/Users/Lucas/Desktop/Proyects/ipross-paralelo/beneficiary-app-master-master/mobile/beneficiario/android/app/.cxx/Debug/4h1l4z1c/x86_64/CMakeFiles/cmake.verify_globs	4f69d06e8e4cf677
+10	7595	7793199363022919	CMakeFiles/appmodules.dir/c17402c85bfe67a6d38f1965ee3c3853/generated/autolinking/src/main/jni/autolinking.cpp.o	9fd89c0f4f817987
+86	474	7793211689935960	build.ninja	94a140d91f0e9acc
+0	8161	7793199368589032	CMakeFiles/appmodules.dir/OnLoad.cpp.o	322a34f9a44f0c1c
+8162	8382	7793199370883292	C:/Users/Lucas/Desktop/Proyects/ipross-paralelo/beneficiary-app-master-master/mobile/beneficiario/android/app/build/intermediates/cxx/Debug/4h1l4z1c/obj/x86_64/libappmodules.so	5a46258d98ca02d0
+0	42	0	clean	709c9d05cdbe200a
+72	333	7793211689935960	build.ninja	94a140d91f0e9acc
+1	113	0	C:/Users/Lucas/Desktop/Proyects/ipross-paralelo/beneficiary-app-master-master/mobile/beneficiario/android/app/.cxx/Debug/4h1l4z1c/x86_64/CMakeFiles/cmake.verify_globs	4f69d06e8e4cf677
+0	43	0	clean	709c9d05cdbe200a
