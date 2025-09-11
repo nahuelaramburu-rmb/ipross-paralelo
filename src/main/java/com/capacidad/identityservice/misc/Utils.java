@@ -61,6 +61,7 @@ public class Utils {
         this.entityManager = entityManager;
     }
 
+    // busca un archivo dentro del classpath y devuelve su URL.
     public static URL getFileURL(String filename) {
         URL url = null;
         try {
@@ -71,42 +72,52 @@ public class Utils {
         return url;
     }
 
+    // abre un recurso desde el classpath como InputStream
     private static InputStream readResource(String resourceName) throws IOException {
         return ResourceUtils.getURL(StringUtils.join("classpath:", resourceName)).openStream();
     }
 
+    //devuelve un error HTTP en formato JSON
     public static void sendError(HttpServletResponse response, ResponseEntity responseEntity) throws IOException {
+
         String apiError = (String) responseEntity.getBody();
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(responseEntity.getStatusCodeValue());
+
         if (StringUtils.isNotBlank(apiError))
             response.getWriter().write(apiError);
     }
 
+    // permite identificar qué endpoints son de autenticación
     public static boolean isLoginOrLogoutEndpoint(HttpServletRequest request) {
         return StringUtils.equals(StringUtils.join(request.getContextPath(), ENDPOINT_LOGIN), request.getRequestURI())
                 || StringUtils.equals(StringUtils.join(request.getContextPath(), ENDPOINT_LOGOUT), request.getRequestURI());
     }
 
+    // permite identificar qué endpoints son de autenticación
     public static boolean isOAuthEndpoint(HttpServletRequest request) {
         return StringUtils.startsWithIgnoreCase(request.getRequestURI(), StringUtils.join(request.getContextPath(), ENDPOINT_OAUTH));
     }
 
+    // limpia el sufijo "Exception" de un nombre de excepción.
     public static String processExceptionSimpleName(String exceptionSimpleName) {
         return StringUtils.remove(exceptionSimpleName, "Exception");
     }
 
+    // ajusta el issuer del JWT dependiendo del perfil (prod, dev, etc.)
     public static String buildJwtIssuer(String iss, String activeProfile) {
         if (StringUtils.equals(activeProfile, "prod"))
             return iss;
         if (StringUtils.contains(iss, "https"))
             return StringUtils.replace(iss, "https://", StringUtils.join("https://", activeProfile, "-"));
+
         return StringUtils.replace(iss, "http://", StringUtils.join("http://", activeProfile, "-"));
     }
 
 
     // TODO , REVISAR registeredClient.getClientSettings().getSettings().get(key)
     // TODO , YA QUE DEBO ENCOTRAR DONDE SE CREA EL USER , Y POR ELLO , DONDE SE SETEAN SUS VALORES (KEY)
+    //extrae metadatos adicionales de un cliente OAuth2 (ej. tenant, entorno "DEV/PROD/TEST")
     public static Optional<String> getClientAdditionalInformation(String key, RegisteredClient registeredClient) {
 
         if (registeredClient != null && registeredClient.getClientSettings() != null) {
@@ -123,29 +134,33 @@ public class Utils {
         return Optional.empty();
     }
 
-
+    //devuelve el Group del usuario autenticado
     public static Group getAuthenticatedAuthorityGroup() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication instanceof BaseAuthenticationToken ? ((BaseAuthenticationToken) authentication).getGroup()
                 : null;
     }
 
+    //obtiene el principal (usuario/identificador)
     public static String getAuthenticatedAuthorityPrincipal() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication instanceof BaseAuthenticationToken ? (String) authentication.getPrincipal()
                 : null;
     }
 
+    //obtiene un UUID ligado al token JWT
     public static UUID getAuthenticatedResourceId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication instanceof JWTAuthenticationToken ? ((JWTAuthenticationToken) authentication).getResourceId()
                 : null;
     }
 
+    // devuelve el tenant actual desde TenantContext
     public static UUID getContextTenantId() {
         return TenantContext.getTenant() != null ? TenantContext.getTenant().getTenantId() : null;
     }
 
+    //devuelve el rol del usuario autenticado (prefijado con ROLE_...
     public static String getAuthenticatedAuthorityRoleName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getAuthorities().stream()
@@ -155,12 +170,14 @@ public class Utils {
                 .orElse(null);
     }
 
+    // construye una respuesta nombreTenant:tenantId
     public static String buildTenantResponse(Tenant tenant) {
         if (tenant == null)
             return "";
         return String.join(COLON, tenant.getName(), tenant.getTenantId().toString());
     }
 
+    // obtiene el tenantName y tenantId de un cliente OAuth2 (RegisteredClient) y los concatena
     public static String buildTenantResponse(RegisteredClient registeredClient) {
         String tenantName = getClientAdditionalInformation(TENANT_NAME, registeredClient).orElse("");
         String tenantId = getClientAdditionalInformation(TENANT_ID, registeredClient).orElse("");
@@ -169,10 +186,12 @@ public class Utils {
         return "";
     }
 
+    // genera un scope con el formato operacion:recurso
     public static String buildScope(String operation, String resource) {
         return String.join(COLON, operation.toLowerCase(), resource.toLowerCase());
     }
 
+    // carga un recurso JSON y lo convierte a un JsonNode usando Jackson.
     public Optional<JsonNode> readResourceToJsonNode(String resourceName) {
         try (InputStream resourceStream = readResource(resourceName)) {
             return Optional.of(objectMapper.readTree(resourceStream));
@@ -182,10 +201,14 @@ public class Utils {
         return Optional.empty();
     }
 
+
+    // obtiene una referencia a una entidad de JPA sin necesidad de cargarla completamente (proxy con EntityManager
     public <T extends BaseEntity<I>, I extends Serializable> T getEntityReference(Class<T> entityClass, Long primaryKey) {
         return entityManager.getReference(entityClass, primaryKey);
     }
 
+
+    //busca dinámicamente un metodo handle<NombreDeLaExcepcion> en el GlobalExceptionHandler y lo invoca, para resolver la excepción específica
     public static Optional<ResponseEntity<Object>> resolveException(GlobalExceptionHandler handler, HttpServletRequest request, Exception ex) {
         String baseHandlerName = "handle";
         String handlerName = StringUtils.join(baseHandlerName, ex.getClass().getSimpleName());

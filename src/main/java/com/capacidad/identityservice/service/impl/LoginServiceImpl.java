@@ -2,13 +2,14 @@ package com.capacidad.identityservice.service.impl;
 
 import com.capacidad.identityservice.config.TenantContext;
 import com.capacidad.identityservice.exception.InvalidUserStateException;
-import com.capacidad.identityservice.misc.securityutils.SecurityUtils;
+
 import com.capacidad.identityservice.model.CustomUserDetails;
 import com.capacidad.identityservice.model.Login;
 import com.capacidad.identityservice.model.LoginEvent;
 import com.capacidad.identityservice.model.projection.LoginViewDTO;
 import com.capacidad.identityservice.repository.LoginRepository;
 import com.capacidad.identityservice.service.LoginService;
+import  com.capacidad.identityservice.misc.securityutils.SecurityUtils;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
