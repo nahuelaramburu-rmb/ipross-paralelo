@@ -26,18 +26,18 @@ const ProcedureScreen = () => {
     }, [dispatch]);
 
     let view = null;
-    
+
     if (proceduresLoading) {
         view = <ActivityIndicator size='large' color={Colors.primaryText} testID='procedures-loading' />;
     } else {
         view = (
             <React.Fragment>
                 <OpenProceduresList
-                    style={{ flex: 1 }}
+                    style={styles.openProceduresList}
                     procedures={get(openedProcedures, '_embedded.procedures', [])}
                 />
                 <ClosedProceduresList
-                    style={{ flex: 2 }}
+                    style={styles.closedProceduresList}
                     procedures={get(closedProcedures, '_embedded.procedures', [])}
                 />
             </React.Fragment>
@@ -45,18 +45,27 @@ const ProcedureScreen = () => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>{view}</View>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: Platform.OS === 'android' ? NAV_BAR_HEIGHT_ANDROID : NAV_BAR_HEIGHT_IOS,
+    },
+    openProceduresList: {
+        flex: 1,
+    },
+    closedProceduresList: {
+        flex: 2,
     },
 });
 

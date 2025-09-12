@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { DropDownHolder } from '../../components/DropDownHolder';
 import strings from '../../constants/Strings';
@@ -8,7 +9,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { moderateScale, verticalScale } from '../../lib/size-normalizer';
 import AppointmentForm from '../../components/appointment/AppointmentForm';
-import { createAppointment,getDelegations,getAppointmentEnabled, getDelegationSector,getAppointments } from '../../actions/appointmentAction';
+import {
+    createAppointment,
+    getDelegations,
+    getAppointmentEnabled,
+    getDelegationSector,
+    getAppointments,
+} from '../../actions/appointmentAction';
 
 class NewAppointmentScreen extends PureComponent {
     constructor(props) {
@@ -44,9 +51,9 @@ class NewAppointmentScreen extends PureComponent {
 
     render() {
         const { loading } = this.state;
-        
+
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.container}>
                 <KeyboardAwareScrollView
                     style={styles.container}
                     contentContainerStyle={styles.keyboardAwareContent}
@@ -64,6 +71,15 @@ class NewAppointmentScreen extends PureComponent {
         );
     }
 }
+
+NewAppointmentScreen.propTypes = {
+    navigation: PropTypes.shape({
+        setParams: PropTypes.func.isRequired,
+        navigate: PropTypes.func.isRequired,
+    }).isRequired,
+    createAppointment: PropTypes.func.isRequired,
+    getAppointments: PropTypes.func.isRequired,
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -86,15 +102,15 @@ function mapStateToProps(state) {
         sectors: state.appointment.sectors.items.data ?? [],
         sectorsLoading: state.appointment.sectors.loading,
         appointments_enabled: state.appointment.appointments_enabled.items.data ?? [],
-        turnosLoading: state.appointment.appointments_enabled.loading,       
-        afiliado_id: state.appointment.applicant_id, 
+        turnosLoading: state.appointment.appointments_enabled.loading,
+        afiliado_id: state.appointment.applicant_id,
     };
 }
 
 export default connect(mapStateToProps, {
     createAppointment,
-    getAppointmentEnabled, 
-    getDelegations, 
+    getAppointmentEnabled,
+    getDelegations,
     getDelegationSector,
-    getAppointments
+    getAppointments,
 })(NewAppointmentScreen);

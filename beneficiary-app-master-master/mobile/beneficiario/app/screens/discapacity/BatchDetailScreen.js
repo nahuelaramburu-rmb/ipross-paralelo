@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Text, StyleSheet, View, ActivityIndicator, Dimensions } from 'react-native';
+import PropTypes from 'prop-types';
 import * as Colors from '../../constants/Colors';
 import { font_styles } from '../../lib/default-styles';
 import { verticalScale, moderateScale } from '../../lib/size-normalizer';
@@ -12,7 +13,7 @@ import { getBatch } from '../../actions/batchAction';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BatchDetailItemScreen from './BatchDetailItemScreen';
 
-const { width, height } = Dimensions.get('screen');
+const { width } = Dimensions.get('screen');
 
 class BatchDetailScreen extends PureComponent {
     constructor(props) {
@@ -32,7 +33,7 @@ class BatchDetailScreen extends PureComponent {
 
         if (batchLoading || !batch.id) {
             return (
-                <SafeAreaView style={{ flex: 1 }}>
+                <SafeAreaView style={styles.safeArea}>
                     <View style={styles.loadingContainer}>
                         <ActivityIndicator color={Colors.primaryText} size='large' />
                         <Text style={[font_styles.secondary_text, { marginTop: verticalScale(5) }]}>
@@ -44,7 +45,7 @@ class BatchDetailScreen extends PureComponent {
         }
 
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.safeArea}>
                 <View style={styles.container}>
                     <View style={styles.header}>
                         <View style={styles.headerContainer}>
@@ -76,11 +77,7 @@ class BatchDetailScreen extends PureComponent {
                                     {moment(batch.dateTo).format('D/M/YYYY')}
                                 </Text>
                             </View>
-                            <View
-                                style={[
-                                    styles.descriptionItem,
-                                    { flexDirection: 'column', alignItems: 'flex-start' },
-                                ]}>
+                            <View style={[styles.descriptionItem, styles.diagnosisContainer]}>
                                 <Text style={[font_styles.primary_text, { marginBottom: verticalScale(6) }]}>
                                     {'Diagnósticos'}:{' '}
                                 </Text>
@@ -101,6 +98,22 @@ class BatchDetailScreen extends PureComponent {
         );
     }
 }
+
+BatchDetailScreen.propTypes = {
+    route: PropTypes.shape({
+        params: PropTypes.shape({
+            batchLink: PropTypes.string,
+            batchId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        }),
+    }).isRequired,
+    batch: PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        dateFrom: PropTypes.string,
+        dateTo: PropTypes.string,
+    }).isRequired,
+    batchLoading: PropTypes.bool.isRequired,
+    getBatch: PropTypes.func.isRequired,
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -145,6 +158,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         paddingBottom: verticalScale(6),
+    },
+    safeArea: {
+        flex: 1,
+    },
+    diagnosisContainer: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
     },
 });
 

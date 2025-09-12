@@ -1,16 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-    StyleSheet,
-    Text,
-    View,
-    Dimensions,
-    ActivityIndicator,
-    SectionList,
-    Platform,
-    StatusBar,
-} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ActivityIndicator, SectionList, Platform } from 'react-native';
 import * as Colors from '../../constants/Colors';
 import { font_styles } from '../../lib/default-styles';
 import { moderateScale, verticalScale } from '../../lib/size-normalizer';
@@ -27,6 +18,9 @@ class CoinsuranceChargeScreen extends Component {
     static propTypes = {
         charges: PropTypes.shape({
             charges: PropTypes.object,
+            _embedded: PropTypes.shape({
+                charges: PropTypes.array,
+            }),
         }).isRequired,
         charges_loading: PropTypes.bool.isRequired,
         charges_loading_more: PropTypes.bool.isRequired,
@@ -189,7 +183,7 @@ class CoinsuranceChargeScreen extends Component {
         }
 
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.safeArea}>
                 <View style={styles.container}>{mainView}</View>
             </SafeAreaView>
         );
@@ -197,6 +191,9 @@ class CoinsuranceChargeScreen extends Component {
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         alignItems: 'center',

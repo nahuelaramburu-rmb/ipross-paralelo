@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { ActivityIndicator, StyleSheet, View, Dimensions, Text, AppState } from 'react-native';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as Colors from '../../constants/Colors';
 import ProcedureForm from '../../components/procedure/ProcedureForm';
@@ -83,9 +84,9 @@ class ProcedureDetailScreen extends PureComponent {
         const procedureId = this.props.route.params?.procedureId ?? null;
         const procedureType = this.props.route.params?.procedureType ?? null;
         if (
-            parseInt(prevProps.route.params?.procedureId) !== parseInt(procedureId) &&
+            parseInt(prevProps.route.params?.procedureId, 10) !== parseInt(procedureId, 10) &&
             procedureType !== prevProps.route.params?.procedureType &&
-            parseInt(procedureId) !== this.props.selectedProcedure.id
+            parseInt(procedureId, 10) !== this.props.selectedProcedure.id
         ) {
             this.props.getProcedureById({ procedureId, procedureType });
         }
@@ -161,7 +162,7 @@ class ProcedureDetailScreen extends PureComponent {
 
         if (selectedProcedureLoading) {
             mainView = (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={styles.loadingContainer}>
                     <ActivityIndicator size='large' color={Colors.primaryText} />
                 </View>
             );
@@ -195,7 +196,7 @@ class ProcedureDetailScreen extends PureComponent {
         }
 
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.safeArea}>
                 <KeyboardAwareScrollView
                     style={styles.container}
                     contentContainerStyle={styles.keyboardAwareContent}
@@ -209,9 +210,50 @@ class ProcedureDetailScreen extends PureComponent {
     }
 }
 
+ProcedureDetailScreen.propTypes = {
+    route: PropTypes.shape({
+        params: PropTypes.shape({
+            procedureLink: PropTypes.string,
+            procedureId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            procedureType: PropTypes.string,
+            type: PropTypes.string,
+        }),
+    }).isRequired,
+    navigation: PropTypes.shape({
+        setParams: PropTypes.func.isRequired,
+        navigate: PropTypes.func.isRequired,
+    }).isRequired,
+    getProcedureById: PropTypes.func.isRequired,
+    updateProcedure: PropTypes.func.isRequired,
+    selectedProcedure: PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        type: PropTypes.string,
+        description: PropTypes.string,
+        messages: PropTypes.array,
+        _links: PropTypes.shape({
+            self: PropTypes.shape({
+                href: PropTypes.string,
+            }),
+        }),
+    }),
+    selectedProcedureLoading: PropTypes.bool,
+    selectedProcedureFiles: PropTypes.shape({
+        filter: PropTypes.func,
+        findIndex: PropTypes.func,
+    }),
+};
+
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
+    },
+    loadingContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     scrollViewcontainer: {
         flexGrow: 1,

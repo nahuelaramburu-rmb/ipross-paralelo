@@ -1,5 +1,5 @@
 import SInfo from 'react-native-sensitive-info';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getVersion } from 'react-native-device-info';
 
 export const authenticateUser = async (credentials) => _authenticateUser(credentials);

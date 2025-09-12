@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { Text, View, Dimensions, Platform } from 'react-native';
+import { Text, View, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { getBatchItems } from '../../actions/batchAction';
@@ -17,7 +17,7 @@ const periodTranslate = {
     YEARLY: 'Anual',
 };
 
-const { width, height } = Dimensions.get('screen');
+const { width } = Dimensions.get('screen');
 
 const BatchDetailItemScreen = () => {
     const dispatch = useDispatch();
@@ -61,7 +61,7 @@ const BatchDetailItemScreen = () => {
         return (
             <View style={[styles.itemCard]}>
                 <View style={styles.cardHeader}>
-                    <View style={{ flex: 0.9, alignItems: 'flex-start', justifyContent: 'center' }}>
+                    <View style={styles.cardContent}>
                         <Text
                             numberOfLines={1}
                             ellipsizeMode='tail'
@@ -72,24 +72,24 @@ const BatchDetailItemScreen = () => {
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.cardDetail}>
-                    <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-                        <Text style={[font_styles.primary_text]}>{`Periodo: `}</Text>
+                    <View style={styles.infoRow}>
+                        <Text style={[font_styles.primary_text]}>{'Periodo: '}</Text>
                         <Text style={[font_styles.primary_text_bold]}>{periodTranslate[item.period]}</Text>
                     </View>
-                    <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-                        <Text style={[font_styles.primary_text]}>{`Cantidad asignada: `}</Text>
+                    <View style={styles.infoRow}>
+                        <Text style={[font_styles.primary_text]}>{'Cantidad asignada: '}</Text>
                         <Text style={[font_styles.primary_text_bold]}>{item.amount}</Text>
                     </View>
                 </View>
                 {medicalCenters.length !== 0 && (
                     <View style={[styles.cardHeader, { paddingVertical: verticalScale(4) }]}>
-                        <Text style={[font_styles.primary_text]}>{`Centros Médicos: `}</Text>
+                        <Text style={[font_styles.primary_text]}>{'Centros Médicos: '}</Text>
                     </View>
                 )}
                 {medicalCenters.map((i) => {
                     return (
                         <View style={[styles.cardDetail]}>
-                            <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
+                            <View style={styles.infoRow}>
                                 <Text numberOfLines={1}>
                                     <Text style={[font_styles.primary_text_bold]}>{i.name}</Text>
                                 </Text>
@@ -99,13 +99,13 @@ const BatchDetailItemScreen = () => {
                 })}
                 {practitioners.length !== 0 && (
                     <View style={[styles.cardHeader, { paddingVertical: verticalScale(4) }]}>
-                        <Text style={[font_styles.primary_text]}>{`Médicos: `}</Text>
+                        <Text style={[font_styles.primary_text]}>{'Médicos: '}</Text>
                     </View>
                 )}
                 {practitioners.map((i) => {
                     return (
                         <View style={[styles.cardDetail]}>
-                            <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
+                            <View style={styles.infoRow}>
                                 <Text numberOfLines={1}>
                                     <Text
                                         style={[
@@ -123,9 +123,7 @@ const BatchDetailItemScreen = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <List
-                contentContainerStyle={{
-                    paddingTop: Platform.OS === 'ios' ? 0 : moderateScale(10),
-                }}
+                contentContainerStyle={styles.listContainer}
                 contentOffset={{ x: 0, y: 0 }}
                 onScroll={onScroll}
                 loading={batchItemsLoading}
@@ -162,6 +160,16 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         flexDirection: 'row',
     },
+    cardContent: {
+        flex: 0.9,
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+    },
+    infoRow: {
+        flexDirection: 'row',
+        display: 'flex',
+        alignItems: 'center',
+    },
     cardDetail: {
         width: '100%',
         flexDirection: 'row',
@@ -177,6 +185,9 @@ const styles = StyleSheet.create({
     },
     safeArea: {
         flex: 1,
+    },
+    listContainer: {
+        paddingTop: moderateScale(10),
     },
 });
 

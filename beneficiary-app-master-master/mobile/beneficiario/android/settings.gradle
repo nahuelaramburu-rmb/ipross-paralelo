@@ -1,6 +1,5 @@
 rootProject.name = 'IprossVEM'
 include ':app'
-includeBuild('../node_modules/@react-native/gradle-plugin')
 
 // React Native modules
 include ':react-native-config'
@@ -37,6 +36,5 @@ project(':react-native-image-picker').projectDir = new File(rootProject.projectD
 include ':react-native-date-picker'
 project(':react-native-date-picker').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-date-picker/android')
 
-// Use React Native autolinking - DISABLED for manual configuration
-// apply from: file("../native_modules.gradle")
-// applyNativeModulesSettingsGradle(settings)
+// Use React Native autolinking
+apply from: file("../native_modules.gradle"); applyNativeModulesSettingsGradle(settings)

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Text, View, Dimensions, Platform, TouchableOpacity } from 'react-native';
+import { Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import List from '../../components/list';
 import { useAnimatableHeader } from '../../hooks/utils';
@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/core';
 
 import { getMedicalCoordinates } from '../../actions/professionalAction';
 
-const { width, height } = Dimensions.get('screen');
+const { width } = Dimensions.get('screen');
 
 const ProfessionalDetailItemScreen = () => {
     const { onScroll } = useAnimatableHeader();
@@ -21,46 +21,34 @@ const ProfessionalDetailItemScreen = () => {
 
     const dispatch = useDispatch();
 
-    const { medicalCenters, medicalCentersLoading, medicalCentersLink, medicalCoordinates } = useSelector(
+    const { medicalCenters, medicalCentersLoading, medicalCentersLink } = useSelector(
         (state) => ({
             medicalCenters: state.professional.medicalCenters.items ?? [],
             medicalCentersLoading: state.professional.medicalCenters.loading,
             medicalCentersLink: state.professional.items._link ?? {},
-            medicalCoordinates: state.professional.medicalCoordinates.items ?? [],
         }),
         shallowEqual
     );
 
-    const goToMap = useCallback((city, street, streetNumber) => {
-        dispatch(getMedicalCoordinates(city, street, streetNumber));
+    const goToMap = useCallback(
+        (city, street, streetNumber) => {
+            dispatch(getMedicalCoordinates(city, street, streetNumber));
 
-        navigation.navigate('ProfessionalMaps');
-    }, []);
+            navigation.navigate('ProfessionalMaps');
+        },
+        [dispatch, navigation]
+    );
 
     const renderItem = ({ item, index }) => {
         return (
             <View style={styles.container}>
-                <View style={{ ...styles.itemCard, marginTop: 10 }}>
+                <View style={styles.itemCardWithMargin}>
                     <View style={styles.cardHeader}>
-                        <View
-                            style={{
-                                flex: 1,
-                                alignItems: 'flex-start',
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                padding: verticalScale(5),
-                            }}>
+                        <View style={[styles.flexContainer, styles.contentContainer]}>
                             <Text
                                 numberOfLines={0}
                                 ellipsizeMode='tail'
-                                style={[
-                                    font_styles.title_3_bold,
-                                    {
-                                        marginBottom: verticalScale(12),
-                                        padding: 5,
-                                        color: Colors.accent,
-                                    },
-                                ]}>
+                                style={[font_styles.title_3_bold, styles.titleText]}>
                                 {item.name}
                             </Text>
                             <TouchableOpacity
@@ -77,32 +65,32 @@ const ProfessionalDetailItemScreen = () => {
                         </View>
                     </View>
                     <View style={styles.cardDetail}>
-                        <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-                            <Text style={[font_styles.primary_text]}>{`Dirección: `}</Text>
+                        <View style={styles.rowContainer}>
+                            <Text style={[font_styles.primary_text]}>{'Dirección: '}</Text>
                             <Text numberOfLines={0} style={[font_styles.primary_text_bold]}>
-                                {item.address.street == undefined ? 'Sin Datos' : item.address.street}
+                                {item.address.street === undefined ? 'Sin Datos' : item.address.street}
                             </Text>
                         </View>
-                        <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
+                        <View style={styles.rowContainer}>
                             <Text style={[font_styles.primary_text]}>Nro.: </Text>
                             <Text style={[font_styles.primary_text_bold]}>
-                                {item.address.streetNumber == undefined ? '0' : item.address.streetNumber}
+                                {item.address.streetNumber === undefined ? '0' : item.address.streetNumber}
                             </Text>
                         </View>
                     </View>
                     <View style={styles.cardDetail}>
-                        <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-                            <Text style={[font_styles.primary_text]}>{`Localidad: `}</Text>
+                        <View style={styles.rowContainer}>
+                            <Text style={[font_styles.primary_text]}>{'Localidad: '}</Text>
                             <Text numberOfLines={0} style={[font_styles.primary_text_bold]}>
-                                {item.address.city.name == undefined ? 'Sin Datos' : item.address.city.name}
+                                {item.address.city.name === undefined ? 'Sin Datos' : item.address.city.name}
                             </Text>
                         </View>
                     </View>
                     <View style={styles.cardDetail}>
-                        <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
+                        <View style={styles.rowContainer}>
                             <Text style={[font_styles.primary_text]}>C.P: </Text>
                             <Text style={[font_styles.primary_text_bold]}>
-                                {item.address.city.postalCode == undefined
+                                {item.address.city.postalCode === undefined
                                     ? 'Sin Datos'
                                     : item.address.city.postalCode}
                             </Text>
@@ -166,6 +154,45 @@ const styles = StyleSheet.create({
     },
     safeArea: {
         flex: 1,
+    },
+    itemCardWithMargin: {
+        flex: 1,
+        backgroundColor: Colors.white,
+        borderRadius: moderateScale(10),
+        width: width - moderateScale(30),
+        elevation: 1,
+        shadowColor: Colors.primaryText,
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.18,
+        shadowRadius: 1.0,
+        marginBottom: 5,
+        marginTop: 10,
+    },
+    flexContainer: {
+        flex: 1,
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    contentContainer: {
+        marginBottom: verticalScale(12),
+        padding: 5,
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    titleText: {
+        marginBottom: verticalScale(12),
+        padding: 5,
+        color: Colors.accent,
+    },
+    mapButton: {
+        padding: moderateScale(5),
     },
 });
 

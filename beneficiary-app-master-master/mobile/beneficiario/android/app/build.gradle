@@ -1,5 +1,4 @@
 apply plugin: "com.android.application"
-apply plugin: "com.facebook.react"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 import com.android.build.OutputFile
 
@@ -78,33 +77,14 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     entryFile: "index.js",
-    enableHermes: true,  // Enable Hermes for RN 0.76.1 compatibility
+    enableHermes: true,  // Enable Hermes for better performance with RN 0.72
     bundleInDebug: false,  // Allow dev server in debug mode
     bundleInRelease: true,
     devDisabledInDebug: false,  // Enable dev mode in debug builds
     devDisabledInRelease: true,
 ]
 
-// Simplified React configuration for React Native 0.81.1
-react {
-    root = file("../../")
-    reactNativeDir = file("../../node_modules/react-native")
-    codegenDir = file("../../node_modules/react-native/ReactAndroid/build/generated/source/codegen")
-}
-
-// Disable problematic autolinking task
-afterEvaluate {
-    tasks.findByName('generateAutolinkingPackageList')?.enabled = false
-    tasks.findByName('generateReactNativeEntryPoint')?.enabled = false
-    // Disable Reanimated new architecture assertion
-    project.gradle.allprojects { proj ->
-        proj.tasks.withType(org.gradle.api.Task).configureEach { task ->
-            if (task.name == 'assertNewArchitectureEnabledTask') {
-                task.enabled = false
-            }
-        }
-    }
-}
+apply from: "../../node_modules/react-native/react.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -230,9 +210,6 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.google.android.gms:play-services-base:17.0.0"
 
-    // React Native Core - ESSENTIAL for React classes
-    implementation "com.facebook.react:react-android"
-    
     // Additional React Native dependencies
     implementation "com.facebook.soloader:soloader:0.10.5"
 
@@ -253,8 +230,15 @@ dependencies {
     // }
 
     if (enableHermes) {
-        // React Native 0.81.1 - Use Hermes from react-android
-        implementation("com.facebook.react:hermes-android")
+        // React Native 0.70.x - Use Hermes from react-native
+        def hermesPath = "../../node_modules/react-native/sdks/hermes"
+        def hermesAAR = "$hermesPath/hermes-debug.aar"
+        if (file(hermesAAR).exists()) {
+            implementation files(hermesAAR)
+        } else {
+            // Fallback para hermes incluido en react-native
+            implementation("com.facebook.react:react-native:+") // This includes hermes
+        }
     } else {
         implementation jscFlavor
     }
@@ -272,4 +256,4 @@ apply plugin: 'com.google.gms.google-services'
 
 // Apply React Native autolinking - DISABLED for manual configuration
 // apply from: file("../../native_modules.gradle")
-// applyNativeModulesAppBuildGradle(project)
+apply from: file("../../native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

@@ -8,7 +8,7 @@ import AppContainer from './components/Router';
 import { navigate } from './lib/NavigationService';
 import Firebase from '@react-native-firebase/app';
 import PushNotification from 'react-native-push-notification';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import strings from './constants/Strings';
 import { enableScreens } from 'react-native-screens';
 import {
