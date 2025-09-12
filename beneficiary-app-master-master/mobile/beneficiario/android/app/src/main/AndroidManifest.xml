@@ -39,6 +39,12 @@
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
 
+    <!-- Declare camera hardware as optional -->
+    <uses-feature android:name="android.hardware.camera"
+                  android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus"
+                  android:required="false" />
+
     <queries>
     <intent>
         <action android:name="android.media.action.IMAGE_CAPTURE" />

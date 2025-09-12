@@ -1,4 +1,4 @@
-package com.capacidad.beneficiaryapp;
+package com.ipross.beneficiario;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
