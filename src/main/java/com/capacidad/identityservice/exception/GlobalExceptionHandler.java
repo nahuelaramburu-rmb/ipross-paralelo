@@ -74,24 +74,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return null;
     }
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        HttpServletRequest req = ((HttpServletRequest) ((ServletWebRequest) request).getNativeRequest());
-        List<FieldError> errorList = ex.getBindingResult().getFieldErrors();
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (FieldError fieldError : errorList) {
-            sb.append(fieldError.getField());
-            sb.append(" - ");
-            sb.append(fieldError.getDefaultMessage());
-            if (i + 1 != errorList.size())
-                sb.append(" | ");
-            i++;
-        }
-        String message = sb.toString();
-        log.error(LOG_ERROR_MESSAGE_TEMPLATE, message, ex.getClass(), ex.getMessage());
-        return buildErrorResponse(ObjectNotValidException.class.getSimpleName(), "", message, status, req.getRequestURI());
-    }
+//    @Override
+//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        HttpServletRequest req = ((HttpServletRequest) ((ServletWebRequest) request).getNativeRequest());
+//        List<FieldError> errorList = ex.getBindingResult().getFieldErrors();
+//        StringBuilder sb = new StringBuilder();
+//        int i = 0;
+//        for (FieldError fieldError : errorList) {
+//            sb.append(fieldError.getField());
+//            sb.append(" - ");
+//            sb.append(fieldError.getDefaultMessage());
+//            if (i + 1 != errorList.size())
+//                sb.append(" | ");
+//            i++;
+//        }
+//        String message = sb.toString();
+//        log.error(LOG_ERROR_MESSAGE_TEMPLATE, message, ex.getClass(), ex.getMessage());
+//        return buildErrorResponse(ObjectNotValidException.class.getSimpleName(), "", message, status, req.getRequestURI());
+//    }
 
     @ExceptionHandler(ObjectNotFoundException.class)
     public ResponseEntity<Object> handleObjectNotFoundException(HttpServletRequest request, ObjectNotFoundException ex) {

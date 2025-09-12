@@ -24,7 +24,7 @@ Spring Security la invoca cada vez que alguien intenta autenticarse (ej: login c
 El metodo clave es loadUserByUsername(String username) → tiene que devolver un UserDetails (CustomUserDetail)
 *
 *
-* Este servicio es el puente entre tu base de datos y Spring Security:
+* Este servicio es el puente entre la base de datos y Spring Security:
 
     Recibe el username (o email) cuando un usuario intenta loguearse.
     Busca en la base de datos el ApplicationUser  correspondiente (usando ApplicationUserContextService).

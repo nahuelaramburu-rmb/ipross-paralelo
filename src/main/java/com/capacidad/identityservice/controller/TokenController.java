@@ -10,6 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.capacidad.identityservice.misc.constant.ControllerEndpoints.ENDPOINT_OAUTH;
 
+
+/*
+* Este controlador expone un endpoint para que otros servicios o clientes puedan verificar si un JWT es válido.
+
+Si el token es válido, devuelve 204 No Content (token aceptado).
+
+Si el token es inválido o expirado, devuelve un error (excepciones en TokenVerifierImpl).
+*
+*
+* */
+
+
 @RestController
 @RequestMapping(value = ENDPOINT_OAUTH)
 public class TokenController {

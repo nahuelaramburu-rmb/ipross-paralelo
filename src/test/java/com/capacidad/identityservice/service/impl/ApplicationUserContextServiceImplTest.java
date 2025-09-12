@@ -29,7 +29,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.ClientDetails;
+
+
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 
 import java.util.*;
 
@@ -44,7 +46,7 @@ import static org.mockito.Mockito.*;
 public class ApplicationUserContextServiceImplTest {
 
     @Mock
-    private ClientDetails clientDetails;
+    private RegisteredClient registeredClient;
     @Mock
     private ApplicationUserContextRepository userContextRepository;
     @Mock
@@ -613,7 +615,7 @@ public class ApplicationUserContextServiceImplTest {
 
     @Test
     public void testCheckOperationalStateDoNothingWhenClientIdIsNull() {
-        userContextService.checkOperationalState(new ApplicationUser(), new ApplicationUserContext(), clientDetails);
+        userContextService.checkOperationalState(new ApplicationUser(), new ApplicationUserContext(), registeredClient);
         verify(roleService, never()).validateClientRoleAccess(any(Role.class), any());
     }
 
@@ -638,9 +640,9 @@ public class ApplicationUserContextServiceImplTest {
 
         Set<String> scope = new HashSet<>();
 
-        when(clientDetails.getScope()).thenReturn(scope);
+        when(registeredClient.getScopes()).thenReturn(scope);
 
-        userContextService.checkOperationalState(user, userContext, clientDetails);
+        userContextService.checkOperationalState(user, userContext, registeredClient);
 
         verify(roleService, times(1)).validateClientRoleAccess(role, scope);
     }
