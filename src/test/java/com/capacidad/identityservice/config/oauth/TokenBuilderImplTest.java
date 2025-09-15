@@ -1,7 +1,5 @@
 package com.capacidad.identityservice.config.oauth;
 
-//package com.capacidad.identityservice.config.token;
-
 import com.capacidad.identityservice.config.token.TokenBuilderImpl;
 import com.capacidad.identityservice.exception.TokenSigningException;
 import com.capacidad.identityservice.misc.ApplicationProperties;
@@ -13,16 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,7 +32,6 @@ class TokenBuilderImplTest {
     private PermissionGroupService permissionGroupService;
     private ApplicationProperties applicationProperties;
     private JwtEncoder jwtEncoder;
-
     private TokenBuilderImpl tokenBuilder;
 
     @BeforeEach
@@ -45,8 +42,8 @@ class TokenBuilderImplTest {
         applicationProperties = mock(ApplicationProperties.class);
         jwtEncoder = mock(JwtEncoder.class);
 
-        when(applicationProperties.getJwtIssuer()).thenReturn("issuer");
-        when(applicationProperties.getActiveProfile()).thenReturn("test");
+        when(applicationProperties.getJwtIssuer()).thenReturn("test-issuer");
+        when(applicationProperties.getActiveProfile()).thenReturn("test-profile");
 
         tokenBuilder = new TokenBuilderImpl(
                 userContextService,
@@ -58,83 +55,109 @@ class TokenBuilderImplTest {
     }
 
     @Test
-    void testBuildAccessToken_UserAuthentication() {
-        // Mocks
-        Authentication authentication = mock(Authentication.class);
+    void buildAccessToken_withUserAuthentication_shouldIncludeUserClaims() {
+        // Mock Authentication
+        Authentication auth = mock(Authentication.class);
         CustomUserDetails userDetails = mock(CustomUserDetails.class);
         ApplicationUser user = new ApplicationUser();
-        user.setUsername("testUser");
-        user.setEmail("test@example.com");
+        user.setUsername("john");
+        user.setEmail("john@test.com");
         user.setEmailVerified(true);
-        userDetails.setApplicationUser(user);
+        user.setResourceId(UUID.randomUUID());
 
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(authentication.getName()).thenReturn("testUser");
+        when(auth.getPrincipal()).thenReturn(userDetails);
+        when(auth.getName()).thenReturn("john");
+        when(userDetails.getApplicationUser()).thenReturn(user);
+        when(userDetails.getTenantId()).thenReturn("tenant1");
 
-        RegisteredClient registeredClient = mock(RegisteredClient.class);
-        when(registeredClient.getClientId()).thenReturn("clientId");
-        when(registeredClient.getScopes()).thenReturn(Set.of("read", "write"));
-        when(registeredClient.getTokenSettings()).thenReturn(mock(RegisteredClient.TokenSettings.class));
-        when(registeredClient.getTokenSettings().getAccessTokenTimeToLive()).thenReturn(Duration.ofHours(1));
+        // Mock RegisteredClient
+        RegisteredClient client = RegisteredClient.withId("1")
+                .clientId("client1")
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofHours(1))
+                        .build())
+                .scopes(scopes -> scopes.add("read"))
+                .build();
 
+        // Mock tenant and permissions
         ApplicationUserContext context = new ApplicationUserContext();
+        context.setTenant(new Tenant("tenant1", "Tenant One"));
         context.setRole(new Role("ADMIN"));
-        context.setTenant(new Tenant(1L, "TenantName"));
-        when(tenantService.validateTenant(user, registeredClient, null)).thenReturn(context);
-        when(permissionGroupService.findAllBasedOnContextAttributes(context)).thenReturn(Collections.emptySet());
+
+        PermissionSuggestion suggestion = new PermissionSuggestion();
+        suggestion.setId(42L);
+        context.setPermissionSuggestion(suggestion);
+
+        when(tenantService.validateTenant(any(), any(), any())).thenReturn(context);
+        when(permissionGroupService.findAllBasedOnContextAttributes(any())).thenReturn(Set.of());
 
         Jwt jwt = mock(Jwt.class);
-        when(jwt.getTokenValue()).thenReturn("tokenValue");
+        when(jwt.getTokenValue()).thenReturn("signed-token");
         when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(jwt);
 
-        // Ejecución
-        String token = tokenBuilder.buildAccessToken(authentication, registeredClient);
+        String token = tokenBuilder.buildAccessToken(auth, client);
 
-        // Verificación
-        assertNotNull(token);
-        assertEquals("tokenValue", token);
-        verify(jwtEncoder, times(1)).encode(any(JwtEncoderParameters.class));
+        assertEquals("signed-token", token);
+
+        // Verifica claims
+        ArgumentCaptor<JwtEncoderParameters> captor = ArgumentCaptor.forClass(JwtEncoderParameters.class);
+        verify(jwtEncoder).encode(captor.capture());
+
+        Map<String, Object> claims = captor.getValue().getClaims().getClaims();
+
+        assertEquals("john", claims.get("username"));
+        assertEquals("john@test.com", claims.get("email"));
+        assertEquals("admin", claims.get("role"));
     }
 
     @Test
-    void testBuildAccessToken_ClientOnly() {
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn("anonymous");
-        when(authentication.getName()).thenReturn("client");
+    void buildAccessToken_withClientOnly_shouldIncludeClientClaims() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.getPrincipal()).thenReturn("anonymous");
+        when(auth.getName()).thenReturn("client");
 
-        RegisteredClient registeredClient = mock(RegisteredClient.class);
-        when(registeredClient.getClientId()).thenReturn("clientId");
-        when(registeredClient.getScopes()).thenReturn(Set.of("read"));
-        when(registeredClient.getTokenSettings()).thenReturn(mock(RegisteredClient.TokenSettings.class));
-        when(registeredClient.getTokenSettings().getAccessTokenTimeToLive()).thenReturn(Duration.ofHours(1));
+        RegisteredClient client = RegisteredClient.withId("1")
+                .clientId("client1")
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofHours(1))
+                        .build())
+                .scopes(scopes -> scopes.add("read"))
+                .build();
 
         Jwt jwt = mock(Jwt.class);
-        when(jwt.getTokenValue()).thenReturn("clientToken");
+        when(jwt.getTokenValue()).thenReturn("client-token");
         when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(jwt);
 
-        String token = tokenBuilder.buildAccessToken(authentication, registeredClient);
+        String token = tokenBuilder.buildAccessToken(auth, client);
 
-        assertNotNull(token);
-        assertEquals("clientToken", token);
-        verify(jwtEncoder, times(1)).encode(any(JwtEncoderParameters.class));
+        assertEquals("client-token", token);
+
+        ArgumentCaptor<JwtEncoderParameters> captor = ArgumentCaptor.forClass(JwtEncoderParameters.class);
+        verify(jwtEncoder).encode(captor.capture());
+
+        Map<String, Object> claims = captor.getValue().getClaims().getClaims();
+
+        assertEquals("client", claims.get("username"));
+        assertEquals("client", claims.get("role"));
     }
 
     @Test
-    void testBuildAccessToken_ThrowsTokenSigningException() {
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn("anonymous");
-        when(authentication.getName()).thenReturn("client");
+    void buildAccessToken_jwtEncoderThrows_shouldThrowTokenSigningException() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.getPrincipal()).thenReturn("anonymous");
+        when(auth.getName()).thenReturn("client");
 
-        RegisteredClient registeredClient = mock(RegisteredClient.class);
-        when(registeredClient.getClientId()).thenReturn("clientId");
-        when(registeredClient.getScopes()).thenReturn(Set.of("read"));
-        when(registeredClient.getTokenSettings()).thenReturn(mock(RegisteredClient.TokenSettings.class));
-        when(registeredClient.getTokenSettings().getAccessTokenTimeToLive()).thenReturn(Duration.ofHours(1));
+        RegisteredClient client = RegisteredClient.withId("1")
+                .clientId("client1")
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofHours(1))
+                        .build())
+                .scopes(scopes -> scopes.add("read"))
+                .build();
 
-        when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenThrow(new RuntimeException("error"));
+        when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenThrow(new RuntimeException("fail"));
 
         assertThrows(TokenSigningException.class,
-                () -> tokenBuilder.buildAccessToken(authentication, registeredClient));
+                () -> tokenBuilder.buildAccessToken(auth, client));
     }
 }
-

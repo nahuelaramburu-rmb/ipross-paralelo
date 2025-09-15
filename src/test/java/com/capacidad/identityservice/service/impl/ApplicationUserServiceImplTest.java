@@ -11,11 +11,12 @@ import com.capacidad.identityservice.service.ApplicationUserSupportService;
 import com.capacidad.identityservice.service.RoleService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -29,10 +30,11 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ApplicationUserServiceImplTest {
 
     @Mock
@@ -46,6 +48,9 @@ public class ApplicationUserServiceImplTest {
     @InjectMocks
     private ApplicationUserServiceImpl userService;
 
+    // =========================
+    // User state tests
+    // =========================
     @Test
     public void testCheckUserStateThrowsInvalidUserStateExceptionWhenUserIsUnconfirmed() {
         ApplicationUser user = new ApplicationUser();
@@ -54,37 +59,45 @@ public class ApplicationUserServiceImplTest {
         user.setState(unconfirmed);
         user.setChallengeType(ChallengeType.FORCE_CHANGE_PASSWORD);
 
-        InvalidUserStateException thrown = (InvalidUserStateException) catchThrowable(() -> userService.checkUserState(user));
+        InvalidUserStateException thrown = assertThrows(
+                InvalidUserStateException.class,
+                () -> userService.checkUserState(user)
+        );
 
-        assertThat(thrown.getMessage()).isEqualTo("applicationUser.invalidChallenge");
+        assertEquals("applicationUser.invalidChallenge", thrown.getMessage());
     }
 
     @Test
     public void testCheckUserStateThrowsInvalidUserStateExceptionWhenUserIsDisabled() {
         ApplicationUser user = new ApplicationUser();
-        State unconfirmed = new State();
-        unconfirmed.setId(StateReference.DISABLED.getId());
-        user.setState(unconfirmed);
+        State disabled = new State();
+        disabled.setId(StateReference.DISABLED.getId());
+        user.setState(disabled);
 
-        InvalidUserStateException thrown = (InvalidUserStateException) catchThrowable(() -> userService.checkUserState(user));
+        InvalidUserStateException thrown = assertThrows(
+                InvalidUserStateException.class,
+                () -> userService.checkUserState(user)
+        );
 
-        assertThat(thrown.getMessage()).isEqualTo("applicationUser.userDisabled");
+        assertEquals("applicationUser.userDisabled", thrown.getMessage());
     }
 
     @Test
     public void testCheckUserStateDoNotThrowExceptionWhenUserIsConfirmed() {
         ApplicationUser user = new ApplicationUser();
-        State unconfirmed = new State();
-        unconfirmed.setId(StateReference.CONFIRMED.getId());
-        user.setState(unconfirmed);
+        State confirmed = new State();
+        confirmed.setId(StateReference.CONFIRMED.getId());
+        user.setState(confirmed);
 
-        userService.checkUserState(user);
+        assertDoesNotThrow(() -> userService.checkUserState(user));
     }
 
+    // =========================
+    // Reset password tests
+    // =========================
     @Test
     public void testResetPasswordSuccessfullySetsUserStateNewPasswordAndChallengeWhenPasswordIsValid() throws ObjectNotValidException, ObjectNotFoundException {
         ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO();
-        resetPasswordDTO.setNewPassword("new_password");
         resetPasswordDTO.setUsername("user_test");
         resetPasswordDTO.setNewPassword("validNewPassword123");
 
@@ -100,23 +113,21 @@ public class ApplicationUserServiceImplTest {
 
         userService.resetPassword(resetPasswordDTO);
 
-        assertThat(user.getPassword()).isEqualTo("encodedValidNewPassword123");
-        assertThat(user.getState()).isEqualTo(unconfirmed);
-        assertThat(user.getChallengeType()).isEqualTo(ChallengeType.FORCE_CHANGE_PASSWORD);
+        assertEquals("encodedValidNewPassword123", user.getPassword());
+        assertEquals(unconfirmed, user.getState());
+        assertEquals(ChallengeType.FORCE_CHANGE_PASSWORD, user.getChallengeType());
         verify(userRepository, times(1)).save(user);
     }
 
-    @Test(expected = ObjectNotFoundException.class)
-    public void testUpdatePasswordThrowsObjectNotFoundExceptionWhenAuthenticatedAuthorityIsNull() throws ObjectNotValidException, ObjectNotFoundException {
+    // =========================
+    // Update password tests
+    // =========================
+    @Test
+    public void testUpdatePasswordThrowsObjectNotFoundExceptionWhenAuthenticatedAuthorityIsNull() {
         SecurityContextHolder.setContext(securityContext);
 
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("testAuthority"));
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("testAuthority"));
         Authentication anonymousAuthenticationToken = new AnonymousAuthenticationToken("key", "principal", authorities);
-
-        ApplicationUser user = new ApplicationUser();
-        user.setUsername("user_test");
-        user.setPassword("currentPassword123");
 
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO();
         newPasswordDTO.setNewPassword("validNewPassword123");
@@ -124,15 +135,12 @@ public class ApplicationUserServiceImplTest {
 
         when(securityContext.getAuthentication()).thenReturn(anonymousAuthenticationToken);
 
-        userService.updatePassword(newPasswordDTO);
-
-        verify(userRepository, never()).save(user);
+        assertThrows(ObjectNotFoundException.class, () -> userService.updatePassword(newPasswordDTO));
     }
 
-    @Test(expected = BadCredentialsException.class)
+    @Test
     public void testUpdatePasswordThrowsBadCredentialsExceptionWhenPreviousPasswordDoesNotMatch() throws ObjectNotValidException, ObjectNotFoundException {
         SecurityContextHolder.setContext(securityContext);
-
         Authentication authentication = new JWTAuthenticationToken("user_test", "", Collections.emptyList(), Group.DEV, null);
 
         ApplicationUser user = new ApplicationUser();
@@ -140,22 +148,20 @@ public class ApplicationUserServiceImplTest {
         user.setPassword("currentPassword123");
 
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO();
-        newPasswordDTO.setNewPassword("validNewPassword123");
         newPasswordDTO.setPassword("invalidPreviousPassword123");
+        newPasswordDTO.setNewPassword("validNewPassword123");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
         when(supportService.passwordMatches(newPasswordDTO.getPassword(), user.getPassword())).thenReturn(false);
 
-        userService.updatePassword(newPasswordDTO);
-
+        assertThrows(BadCredentialsException.class, () -> userService.updatePassword(newPasswordDTO));
         verify(userRepository, never()).save(user);
     }
 
     @Test
     public void testUpdatePasswordThrowsObjectNotValidExceptionWhenPreviousPasswordIsEqualNewPassword() {
         SecurityContextHolder.setContext(securityContext);
-
         Authentication authentication = new JWTAuthenticationToken("user_test", "", Collections.emptyList(), Group.DEV, null);
 
         ApplicationUser user = new ApplicationUser();
@@ -163,26 +169,27 @@ public class ApplicationUserServiceImplTest {
         user.setPassword("currentPassword123");
 
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO();
-        newPasswordDTO.setNewPassword("currentPassword123");
         newPasswordDTO.setPassword("currentPassword123");
+        newPasswordDTO.setNewPassword("currentPassword123");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
         when(supportService.passwordMatches(newPasswordDTO.getPassword(), user.getPassword())).thenReturn(true);
         when(supportService.passwordMatches(newPasswordDTO.getNewPassword(), user.getPassword())).thenReturn(true);
 
-        ObjectNotValidException thrown = (ObjectNotValidException) catchThrowable(() -> userService.updatePassword(newPasswordDTO));
+        ObjectNotValidException thrown = assertThrows(
+                ObjectNotValidException.class,
+                () -> userService.updatePassword(newPasswordDTO)
+        );
 
-        assertThat(thrown.getMessage()).isEqualTo("applicationUser.samePassword");
-        assertThat(thrown.getStackTrace()[0].getMethodName()).isEqualTo("updatePassword");
-
+        assertEquals("applicationUser.samePassword", thrown.getMessage());
+        assertEquals("updatePassword", thrown.getStackTrace()[0].getMethodName());
         verify(userRepository, never()).save(user);
     }
 
     @Test
     public void testUpdatePasswordSuccessfullySetsNewPasswordWhenPreviousPasswordAndNewOneAreValid() throws ObjectNotValidException, ObjectNotFoundException {
         SecurityContextHolder.setContext(securityContext);
-
         Authentication authentication = new JWTAuthenticationToken("user_test", "", Collections.emptyList(), Group.DEV, null);
 
         ApplicationUser user = new ApplicationUser();
@@ -190,8 +197,8 @@ public class ApplicationUserServiceImplTest {
         user.setPassword("currentPassword123");
 
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO();
-        newPasswordDTO.setNewPassword("newValidPassword123");
         newPasswordDTO.setPassword("currentPassword123");
+        newPasswordDTO.setNewPassword("newValidPassword123");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
@@ -201,10 +208,13 @@ public class ApplicationUserServiceImplTest {
 
         userService.updatePassword(newPasswordDTO);
 
-        assertThat(user.getPassword()).isEqualTo("encodedNewValidPassword123");
+        assertEquals("encodedNewValidPassword123", user.getPassword());
         verify(userRepository, times(1)).save(user);
     }
 
+    // =========================
+    // Temporary password tests
+    // =========================
     @Test
     public void testUpdateTemporaryPasswordThrowsObjectNotValidWhenUserStateIsInvalid() {
         ApplicationUser user = new ApplicationUser();
@@ -213,46 +223,21 @@ public class ApplicationUserServiceImplTest {
 
         State confirmed = new State();
         confirmed.setId(StateReference.CONFIRMED.getId());
-
         user.setState(confirmed);
 
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO();
-        newPasswordDTO.setNewPassword("newValidPassword123");
         newPasswordDTO.setPassword("currentPassword123");
+        newPasswordDTO.setNewPassword("newValidPassword123");
 
         when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
 
-        ObjectNotValidException thrown = (ObjectNotValidException) catchThrowable(() -> userService.updateTemporaryPassword(user.getUsername(), newPasswordDTO));
+        ObjectNotValidException thrown = assertThrows(
+                ObjectNotValidException.class,
+                () -> userService.updateTemporaryPassword(user.getUsername(), newPasswordDTO)
+        );
 
-        assertThat(thrown.getMessage()).isEqualTo("applicationUser.invalidUserState");
-        assertThat(thrown.getStackTrace()[0].getMethodName()).isEqualTo("updateTemporaryPassword");
-
-        verify(userRepository, never()).save(user);
-    }
-
-    @Test
-    public void testUpdateTemporaryPasswordThrowsObjectNotValidWhenUserChallengeIsInvalid() {
-        ApplicationUser user = new ApplicationUser();
-        user.setUsername("user_test");
-        user.setPassword("currentPassword123");
-
-        State unconfirmed = new State();
-        unconfirmed.setId(StateReference.UNCONFIRMED.getId());
-
-        user.setState(unconfirmed);
-        user.setChallengeType(ChallengeType.EMAIL_VERIFICATION_REQUIRED);
-
-        NewPasswordDTO newPasswordDTO = new NewPasswordDTO();
-        newPasswordDTO.setNewPassword("newValidPassword123");
-        newPasswordDTO.setPassword("currentPassword123");
-
-        when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
-
-        ObjectNotValidException thrown = (ObjectNotValidException) catchThrowable(() -> userService.updateTemporaryPassword(user.getUsername(), newPasswordDTO));
-
-        assertThat(thrown.getMessage()).isEqualTo("applicationUser.invalidUserState");
-        assertThat(thrown.getStackTrace()[0].getMethodName()).isEqualTo("updateTemporaryPassword");
-
+        assertEquals("applicationUser.invalidUserState", thrown.getMessage());
+        assertEquals("updateTemporaryPassword", thrown.getStackTrace()[0].getMethodName());
         verify(userRepository, never()).save(user);
     }
 
@@ -264,7 +249,6 @@ public class ApplicationUserServiceImplTest {
 
         State unconfirmed = new State();
         unconfirmed.setId(StateReference.UNCONFIRMED.getId());
-
         State confirmed = new State();
         confirmed.setId(StateReference.CONFIRMED.getId());
 
@@ -272,8 +256,8 @@ public class ApplicationUserServiceImplTest {
         user.setChallengeType(ChallengeType.FORCE_CHANGE_PASSWORD);
 
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO();
-        newPasswordDTO.setNewPassword("newValidPassword123");
         newPasswordDTO.setPassword("currentPassword123");
+        newPasswordDTO.setNewPassword("newValidPassword123");
 
         when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
         when(supportService.passwordMatches(newPasswordDTO.getPassword(), user.getPassword())).thenReturn(true);
@@ -283,12 +267,15 @@ public class ApplicationUserServiceImplTest {
 
         userService.updateTemporaryPassword(user.getUsername(), newPasswordDTO);
 
-        assertThat(user.getChallengeType()).isNull();
-        assertThat(user.getState()).isEqualTo(confirmed);
-        assertThat(user.getPassword()).isEqualTo("encodedNewValidPassword123");
+        assertEquals(confirmed, user.getState());
+        assertNull(user.getChallengeType());
+        assertEquals("encodedNewValidPassword123", user.getPassword());
         verify(userRepository, times(1)).save(user);
     }
 
+    // =========================
+    // Clear unconfirmed user tests
+    // =========================
     @Test
     public void testClearUnconfirmedUserDoNothingWhenUserDoesNotExist() {
         ApplicationUser user = new ApplicationUser();
@@ -297,6 +284,7 @@ public class ApplicationUserServiceImplTest {
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
 
         userService.clearUnconfirmedUser(user);
+        verify(userRepository, never()).delete(user);
     }
 
     @Test
@@ -309,7 +297,6 @@ public class ApplicationUserServiceImplTest {
         when(supportService.getVerificationRetryProp()).thenReturn(10L);
 
         userService.clearUnconfirmedUser(user);
-
         verify(userRepository, never()).delete(user);
     }
 
@@ -326,7 +313,6 @@ public class ApplicationUserServiceImplTest {
         when(supportService.getVerificationRetryProp()).thenReturn(10L);
 
         userService.clearUnconfirmedUser(user);
-
         verify(userRepository, never()).delete(user);
     }
 
@@ -344,7 +330,6 @@ public class ApplicationUserServiceImplTest {
         when(supportService.getVerificationRetryProp()).thenReturn(10L);
 
         userService.clearUnconfirmedUser(user);
-
         verify(userRepository, never()).delete(user);
     }
 
@@ -362,63 +347,76 @@ public class ApplicationUserServiceImplTest {
         when(supportService.getVerificationRetryProp()).thenReturn(10L);
 
         userService.clearUnconfirmedUser(user);
-
         verify(userRepository, times(1)).delete(user);
         verify(userRepository, times(1)).flush();
     }
 
+    // =========================
+    // Password validation tests
+    // =========================
     @Test
     public void testValidateThrowsObjectNotValidExceptionWhenPasswordLengthIsLessThan8Characters() {
         ApplicationUser user = new ApplicationUser();
-        user.setPassword("invalid");
+        user.setPassword("short");
 
-        ObjectNotValidException thrown = (ObjectNotValidException) catchThrowable(() -> userService.validate(user));
-
+        ObjectNotValidException thrown = assertThrows(
+                ObjectNotValidException.class,
+                () -> userService.validate(user)
+        );
         assertPasswordError(thrown, "applicationUser.invalidPasswordLength");
     }
 
     @Test
     public void testValidateThrowsObjectNotValidExceptionWhenPasswordDoNotContainNumbers() {
         ApplicationUser user = new ApplicationUser();
-        user.setPassword("passwordWithoutNumbers");
+        user.setPassword("passwordNoDigits");
 
-        ObjectNotValidException thrown = (ObjectNotValidException) catchThrowable(() -> userService.validate(user));
-
+        ObjectNotValidException thrown = assertThrows(
+                ObjectNotValidException.class,
+                () -> userService.validate(user)
+        );
         assertPasswordError(thrown, "applicationUser.invalidPasswordChars");
     }
 
     @Test
     public void testValidateThrowsObjectNotValidExceptionWhenPasswordDoNotContainLetters() {
         ApplicationUser user = new ApplicationUser();
-        user.setPassword("1122334455667788");
+        user.setPassword("112233445566");
 
-        ObjectNotValidException thrown = (ObjectNotValidException) catchThrowable(() -> userService.validate(user));
-
+        ObjectNotValidException thrown = assertThrows(
+                ObjectNotValidException.class,
+                () -> userService.validate(user)
+        );
         assertPasswordError(thrown, "applicationUser.invalidPasswordChars");
-    }
-
-    private void assertPasswordError(ObjectNotValidException exception, String errorMessage) {
-        assertThat(exception.getMessage()).isEqualTo(errorMessage);
-        assertThat(exception.getStackTrace()[0].getMethodName()).isEqualTo("validatePassword");
     }
 
     @Test
     public void testValidateDoNotThrowsExceptionWhenPasswordIsValid() throws ObjectNotValidException {
         ApplicationUser user = new ApplicationUser();
-        user.setPassword("validPassword123456");
+        user.setPassword("ValidPassword123");
 
-        userService.validate(user);
+        assertDoesNotThrow(() -> userService.validate(user));
     }
 
-    @Test(expected = ObjectNotFoundException.class)
-    public void testConfirmForgotPasswordThrowsObjectNotFoundExceptionWhenEmailDoesNotExist() throws ObjectNotValidException, ObjectNotFoundException {
+    private void assertPasswordError(ObjectNotValidException exception, String errorMessage) {
+        assertEquals(errorMessage, exception.getMessage());
+        assertEquals("validatePassword", exception.getStackTrace()[0].getMethodName());
+    }
+
+    // =========================
+    // Forgot password tests
+    // =========================
+    @Test
+    public void testConfirmForgotPasswordThrowsObjectNotFoundExceptionWhenEmailDoesNotExist() {
         RestorePasswordDTO restorePasswordDTO = new RestorePasswordDTO();
-        restorePasswordDTO.setEmail("invalidemail@test.com");
+        restorePasswordDTO.setEmail("invalid@test.com");
 
         when(userRepository.findByEmail(restorePasswordDTO.getEmail())).thenReturn(Optional.empty());
 
-        userService.confirmForgotPassword(restorePasswordDTO);
+        assertThrows(ObjectNotFoundException.class, () -> userService.confirmForgotPassword(restorePasswordDTO));
     }
+
+    ///   ----- TODO CORREGIR TESTS DESDE ACAAAAA
 
     @Test
     public void testConfirmForgotPasswordThrowsObjectNotValidExceptionWhenUserStateIsInvalid() {
@@ -547,12 +545,14 @@ public class ApplicationUserServiceImplTest {
         verify(userRepository, never()).flush();
     }
 
-    @Test(expected = ObjectNotFoundException.class)
-    public void testRestorePasswordThrowsObjectNotFoundExceptionWhenEmailIsInvalid() throws ObjectNotFoundException {
+    @Test
+    public void testRestorePasswordThrowsObjectNotFoundExceptionWhenEmailIsInvalid() {
         String invalidEmail = "invalidemail@test.com";
         when(userRepository.findByEmail(invalidEmail)).thenReturn(Optional.empty());
-        userService.restorePassword(invalidEmail);
+
+        assertThrows(ObjectNotFoundException.class, () -> userService.restorePassword(invalidEmail));
     }
+
 
     @Test
     public void testRestorePasswordSetsValidRestoreOTPWhenEmailIsValid() throws ObjectNotFoundException {

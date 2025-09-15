@@ -8,11 +8,13 @@ import com.capacidad.identityservice.model.LoginEvent;
 import com.capacidad.identityservice.model.Tenant;
 import com.capacidad.identityservice.model.projection.LoginViewDTO;
 import com.capacidad.identityservice.repository.LoginRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,10 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LoginServiceImplTest {
 
     @Mock
@@ -35,7 +37,7 @@ public class LoginServiceImplTest {
     private LoginServiceImpl loginService;
 
 
-    @Test(expected = InvalidUserStateException.class)
+    @Test
     public void testRegisterLoginAttemptThrowsExceptionWhenFailureLoginAndMaxAttemptsReached() {
         ApplicationUser user = new ApplicationUser();
         user.setUsername("username");
@@ -47,18 +49,24 @@ public class LoginServiceImplTest {
         CustomUserDetails customUserDetails = new CustomUserDetails(user.getUsername(), user.getPassword(), authorities);
         customUserDetails.setApplicationUser(user);
 
-        LoginViewDTO login1 = new LoginViewDTO(5L, LocalDateTime.now(), "principal");
         List<LoginViewDTO> loginList = new ArrayList<>();
-        loginList.add(new LoginViewDTO(1L, LocalDateTime.now(), "principal"));
-        loginList.add(new LoginViewDTO(2L, LocalDateTime.now(), "principal"));
-        loginList.add(new LoginViewDTO(3L, LocalDateTime.now(), "principal"));
-        loginList.add(new LoginViewDTO(4L, LocalDateTime.now(), "principal"));
-        loginList.add(login1);
+        for (long i = 1; i <= 5; i++) {
+            loginList.add(new LoginViewDTO(i, LocalDateTime.now(), "principal"));
+        }
 
         when(loginRepository.findAllByPrincipalOrIpAddressAndFailureEvent(any(), any())).thenReturn(loginList);
 
-        loginService.registerLoginAttempt(customUserDetails, LoginEvent.FAILURE, request);
+        // Usando JUnit 5 assertThrows
+        InvalidUserStateException exception = assertThrows(
+                InvalidUserStateException.class,
+                () -> loginService.registerLoginAttempt(customUserDetails, LoginEvent.FAILURE, request)
+        );
+
+        // Puedes opcionalmente verificar el mensaje de la excepción
+        assertEquals("Expected exception message", exception.getMessage());
     }
+
+
 
     @Test
     public void testRegisterLoginAttemptDoNotFailWhenSuccessLoginAndExpiredMaxAttempts() {

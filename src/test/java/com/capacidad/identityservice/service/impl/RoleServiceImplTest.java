@@ -4,11 +4,11 @@ import com.capacidad.identityservice.model.Role;
 import com.capacidad.identityservice.repository.RoleRepository;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,10 +23,11 @@ import static com.capacidad.identityservice.misc.constant.ApplicationConstants.C
 import static com.capacidad.identityservice.misc.constant.ScopeConstants.CREATE;
 import static com.capacidad.identityservice.misc.constant.SecurityConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RoleServiceImplTest {
 
     @Mock
@@ -36,7 +37,7 @@ public class RoleServiceImplTest {
     @InjectMocks
     private RoleServiceImpl roleService;
 
-    @Test(expected = InsufficientAuthenticationException.class)
+    @Test
     public void testValidateAuthorityRoleAccessThrowsExceptionWhenAuthorityAccessLevelIsEqualLevelButDifferentRole() throws ObjectNotFoundException {
         SecurityContextHolder.setContext(securityContext);
 
@@ -57,10 +58,11 @@ public class RoleServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(roleRepository.findByNameIgnoreCase(MEDICAL_CENTER)).thenReturn(Optional.of(medicalCenter));
 
-        roleService.validateAuthorityRoleAccess(practitioner, CREATE);
+        assertThrows(InsufficientAuthenticationException.class, () ->
+                roleService.validateAuthorityRoleAccess(practitioner, CREATE));
     }
 
-    @Test(expected = InsufficientAuthenticationException.class)
+    @Test
     public void testValidateAuthorityRoleAccessThrowsExceptionWhenAuthorityAccessLevelIsLowerLevelAndDifferentRole() throws ObjectNotFoundException {
         SecurityContextHolder.setContext(securityContext);
 
@@ -81,10 +83,11 @@ public class RoleServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(roleRepository.findByNameIgnoreCase(FUNDER)).thenReturn(Optional.of(funder));
 
-        roleService.validateAuthorityRoleAccess(admin, CREATE);
+        assertThrows(InsufficientAuthenticationException.class, () ->
+                roleService.validateAuthorityRoleAccess(admin, CREATE));
     }
 
-    @Test(expected = InsufficientAuthenticationException.class)
+    @Test
     public void testValidateAuthorityRoleAccessThrowsExceptionWhenAuthorityAccessLevelIsEqualLevelAndDifferentRoleAndNoScope() throws ObjectNotFoundException {
         SecurityContextHolder.setContext(securityContext);
 
@@ -105,7 +108,8 @@ public class RoleServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(roleRepository.findByNameIgnoreCase(CLIENT)).thenReturn(Optional.of(client));
 
-        roleService.validateAuthorityRoleAccess(practitioner, CREATE);
+        assertThrows(InsufficientAuthenticationException.class, () ->
+                roleService.validateAuthorityRoleAccess(practitioner, CREATE));
     }
 
     @Test
@@ -176,10 +180,9 @@ public class RoleServiceImplTest {
         roleService.validateAuthorityRoleAccess(medicalCenter, CREATE);
     }
 
-    @Test(expected = InsufficientAuthenticationException.class)
+    @Test
     public void testValidateClientRoleAccessThrowsExceptionWhenClientDoesNotContainTokenPermissionForRequestedRole() {
         Set<String> clientScopes = new HashSet<>();
-
         clientScopes.add("token:beneficiary");
         clientScopes.add("token:practitioner");
 
@@ -188,13 +191,13 @@ public class RoleServiceImplTest {
         medicalCenter.setName(MEDICAL_CENTER);
         medicalCenter.setAccessLevel(10);
 
-        roleService.validateClientRoleAccess(medicalCenter, clientScopes);
+        assertThrows(InsufficientAuthenticationException.class, () ->
+                roleService.validateClientRoleAccess(medicalCenter, clientScopes));
     }
 
     @Test
     public void testValidateClientRoleAccessDoNotThrowsExceptionWhenClientContainsTokenPermissionForRequestedRole() {
         Set<String> clientScopes = new HashSet<>();
-
         clientScopes.add("token:beneficiary");
         clientScopes.add("token:practitioner");
         clientScopes.add("token:medical_center");
@@ -210,7 +213,6 @@ public class RoleServiceImplTest {
     @Test
     public void testValidateClientRoleAccessDoNotThrowsExceptionWhenClientContainsAllPermission() {
         Set<String> clientScopes = new HashSet<>();
-
         clientScopes.add("token:all");
 
         Role medicalCenter = new Role();
@@ -230,9 +232,7 @@ public class RoleServiceImplTest {
         role2.setName(FUNDER);
 
         List<String> roleNames = Arrays.asList(role1.getName(), role2.getName());
-        List<Role> roleList = new ArrayList<>();
-        roleList.add(role1);
-        roleList.add(role2);
+        List<Role> roleList = Arrays.asList(role1, role2);
 
         when(roleRepository.findAllByNameIn(any())).thenReturn(roleList);
 

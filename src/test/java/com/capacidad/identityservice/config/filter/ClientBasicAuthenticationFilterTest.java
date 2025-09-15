@@ -7,11 +7,12 @@ import com.capacidad.identityservice.service.TenantService;
 import com.capacidad.utils.exception.ApiError;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +21,16 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.NoSuchClientException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -37,13 +40,13 @@ import static com.capacidad.identityservice.misc.constant.ControllerEndpoints.EN
 import static com.capacidad.identityservice.misc.constant.SecurityConstants.TENANT_ID;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ClientBasicAuthenticationFilterTest {
 
     @Mock
     private TenantService tenantService;
     @Mock
-    private ClientDetailsService clientDetailsService;
+    private RegisteredClientRepository clientDetailsService;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -53,7 +56,7 @@ public class ClientBasicAuthenticationFilterTest {
     @Mock
     private HttpServletResponse response;
     @Mock
-    private ClientDetails clientDetails;
+    private RegisteredClient clientDetails;
     @Mock
     private PrintWriter responseWriter;
     @Mock
@@ -71,7 +74,7 @@ public class ClientBasicAuthenticationFilterTest {
         when(request.getContextPath()).thenReturn("/v1");
         clientBasicAuthenticationFilter.doFilterInternal(request, response, chain);
 
-        verify(clientDetailsService, never()).loadClientByClientId(anyString());
+        verify(clientDetailsService, never()).findByClientId(anyString());
     }
 
     @Test
@@ -82,7 +85,7 @@ public class ClientBasicAuthenticationFilterTest {
         when(request.getContextPath()).thenReturn("/v1");
         clientBasicAuthenticationFilter.doFilterInternal(request, response, chain);
 
-        verify(clientDetailsService, never()).loadClientByClientId(anyString());
+        verify(clientDetailsService, never()).findByClientId(anyString());
     }
 
     @Test
@@ -91,7 +94,7 @@ public class ClientBasicAuthenticationFilterTest {
 
         clientBasicAuthenticationFilter.doFilterInternal(request, response, chain);
 
-        verify(clientDetailsService, never()).loadClientByClientId(anyString());
+        verify(clientDetailsService, never()).findByClientId(anyString());
     }
 
     @Test
@@ -103,7 +106,7 @@ public class ClientBasicAuthenticationFilterTest {
         ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "", "Authorization", "/path", "");
         ResponseEntity<Object> responseEntity = new ResponseEntity<>(apiError.getJsonObject(), HttpStatus.UNAUTHORIZED);
 
-        when(clientDetailsService.loadClientByClientId("test")).thenThrow(new NoSuchClientException("no such client"));
+        when(clientDetailsService.findByClientId("test")).thenThrow(new OAuth2AuthenticationException("no such client"));
         when(exceptionHandler.handleAuthenticationException(any(HttpServletRequest.class), any(AuthenticationException.class))).thenReturn(responseEntity);
         when(response.getWriter()).thenReturn(responseWriter);
 
@@ -129,8 +132,8 @@ public class ClientBasicAuthenticationFilterTest {
 
         ObjectNotFoundException objectNotFoundException = new ObjectNotFoundException("tenant not found");
 
-        when(clientDetailsService.loadClientByClientId("test")).thenReturn(clientDetails);
-        when(clientDetails.getAdditionalInformation()).thenReturn(additionalInformation);
+        when(clientDetailsService.findByClientId("test")).thenReturn(clientDetails);
+        when(clientDetails.getClientSettings().getSettings()).thenReturn(additionalInformation);
         when(tenantService.findTenantById(tenantId)).thenThrow(objectNotFoundException);
         when(exceptionHandler.handleObjectNotFoundException(request, objectNotFoundException)).thenReturn(responseEntity);
         when(response.getWriter()).thenReturn(responseWriter);
@@ -155,8 +158,8 @@ public class ClientBasicAuthenticationFilterTest {
         Map<String, Object> additionalInformation = new HashMap<>();
         additionalInformation.put(TENANT_ID, tenantId.toString());
 
-        when(clientDetailsService.loadClientByClientId("test")).thenReturn(clientDetails);
-        when(clientDetails.getAdditionalInformation()).thenReturn(additionalInformation);
+        when(clientDetailsService.findByClientId("test")).thenReturn(clientDetails);
+        when(clientDetails.getClientSettings().getSettings()).thenReturn(additionalInformation);
         when(tenantService.findTenantById(tenantId)).thenReturn(new Tenant());
         when(exceptionHandler.handleAuthenticationException(any(HttpServletRequest.class), any(AuthenticationException.class))).thenReturn(responseEntity);
         when(response.getWriter()).thenReturn(responseWriter);
@@ -184,10 +187,10 @@ public class ClientBasicAuthenticationFilterTest {
         scope.add("read:beneficiaries");
         scope.add("write:beneficiaries");
 
-        when(clientDetailsService.loadClientByClientId("test")).thenReturn(clientDetails);
+        when(clientDetailsService.findByClientId("test")).thenReturn(clientDetails);
         when(clientDetails.getClientSecret()).thenReturn("test");
-        when(clientDetails.getAdditionalInformation()).thenReturn(additionalInformation);
-        when(clientDetails.getScope()).thenReturn(scope);
+        when(clientDetails.getClientSettings().getSettings()).thenReturn(additionalInformation);
+        when(clientDetails.getScopes()).thenReturn(scope);
         when(clientDetails.getClientId()).thenReturn("test");
         when(tenantService.findTenantById(tenantId)).thenReturn(new Tenant());
         when(passwordEncoder.matches("test", "test")).thenReturn(true);

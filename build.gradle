@@ -1,43 +1,21 @@
-buildscript {
-    ext {
-        lombokVersion = '1.18.8'
-    }
-}
-
 plugins {
-//    id 'org.springframework.boot' version "2.7.18"
-//    id 'io.spring.dependency-management' version "1.0.15.RELEASE"
-
-    id 'org.springframework.boot' version '3.5.5' // o la última estable
+    id 'org.springframework.boot' version '3.5.5'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'java'
     id 'idea'
     id 'jacoco'
 }
 
-bootJar {
-    archiveBaseName = 'identity-service'
-    archiveVersion = '0.0.1-SNAPSHOT'
-}
-
+group = 'com.capacidad.identityservice'
+version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
-
 
 repositories {
     mavenCentral()
 }
 
-configurations {
-    // exclude Tomcat
-    compile.exclude module: 'spring-boot-starter-tomcat'
-}
-
-
 dependencies {
-
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-undertow")
-
+    // Spring Boot starters
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-undertow"
     implementation "org.springframework.boot:spring-boot-starter-hateoas"
@@ -47,51 +25,48 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-mail"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springframework.boot:spring-boot-starter-validation"
 
-    // obsoleta
-    //implementation "org.springframework.security.oauth:spring-security-oauth2:2.5.1.RELEASE"
-
-    // nuevo stack OAuth2/JWT
+    // Spring Security OAuth2 / JWT
     implementation "org.springframework.security:spring-security-oauth2-jose"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation 'org.springframework.security:spring-security-oauth2-authorization-server:1.2.3'
-
-    // estos los maneja Boot, ( no usar versión explícita )
     implementation "org.springframework.security:spring-security-messaging"
     implementation "org.springframework:spring-messaging"
 
+    // Base de datos y utilidades
     implementation "org.flywaydb:flyway-core"
     implementation "org.apache.commons:commons-pool2:2.6.2"
-
-    // obsoletas
-//    implementation "com.auth0:java-jwt:3.13.0"
-//    implementation "com.auth0:jwks-rsa:0.15.0"
-//    implementation "com.nimbusds:nimbus-jose-jwt:9.5"
-
     implementation "com.warrenstrange:googleauth:1.5.0"
-    implementation 'org.postgresql:postgresql:42.7.7' // subido un poco
+    implementation 'org.postgresql:postgresql:42.7.7'
     implementation "org.modelmapper:modelmapper:2.3.5"
     implementation 'org.apache.commons:commons-lang3:3.18.0'
     implementation 'org.json:json:20231013'
 
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.assertj:assertj-core:3.23.1"
-
-    // soporte para JUnit 4
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:4.8.1'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.8.1'
-
-    // Librería local
-    implementation fileTree(include: ['utils-1.0-SNAPSHOT.jar'], dir: 'libs')
-
+    // Lombok
     compileOnly "org.projectlombok:lombok:1.18.30"
     annotationProcessor "org.projectlombok:lombok:1.18.30"
     testCompileOnly "org.projectlombok:lombok:1.18.30"
     testAnnotationProcessor "org.projectlombok:lombok:1.18.30"
 
+    // 🔥 Test dependencies (usando BOM para unificar versiones)
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+
+    // Starter de test de Spring Boot, pero EXCLUYENDO JUnit 4 y libs viejas
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: "junit", module: "junit"
+        exclude group: "org.mockito", module: "mockito-core"
+        exclude group: "org.assertj", module: "assertj-core"
+    }
+
+    // Librerías locales
+    implementation fileTree(include: ['utils-1.0-SNAPSHOT.jar'], dir: 'libs')
 }
 
 jacocoTestReport {
@@ -102,22 +77,22 @@ jacocoTestReport {
     }
     getClassDirectories().setFrom(classDirectories.files.collect {
         fileTree(dir: it, exclude: [
-                'com/capacidad/identityservice/config/oauth/BaseTokenServices.class',
+                'com/capacidad/identityservice/config/oauth/**',
                 'com/capacidad/identityservice/config/security/**',
-                'com/capacidad/identityservice/config/oauth/ExceptionTranslatorConfig**',
-                'com/capacidad/identityservice/config/oauth/OAuthServerConfig**',
-                'com/capacidad/identityservice/config/oauth/TokenStoreConfig**',
                 'com/capacidad/identityservice/functional/**',
                 'com/capacidad/identityservice/model/**',
                 'com/capacidad/identityservice/exception/**',
                 'com/capacidad/identityservice/repository/**',
-                'com/capacidad/identityservice/service/impl/AuthenticatorImpl.class',
-                'com/capacidad/identityservice/service/impl/EmailServiceImpl.class',
-                'com/capacidad/identityservice/service/impl/CustomUserDetailsService.class',
-                'com/capacidad/identityservice/service/impl/TemplateServiceImpl.class',
-                'com/capacidad/identityservice/service/impl/NotificationServiceImpl.class',
-                'com/capacidad/identityservice/specification/**',
-                'com/capacidad/identityservice/repository/base/JpaSpecificationExecutorWithProjectionImpl.class'
+                'com/capacidad/identityservice/service/impl/**',
+                'com/capacidad/identityservice/specification/**'
         ])
     })
+}
+
+// Configuración de tests
+test {
+    useJUnitPlatform() // Muy importante para detectar JUnit 5
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }

@@ -6,31 +6,37 @@ import com.capacidad.identityservice.misc.Utils;
 import com.capacidad.identityservice.model.ApplicationUser;
 import com.capacidad.identityservice.model.ApplicationUserContext;
 import com.capacidad.identityservice.model.Tenant;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import static com.capacidad.identityservice.misc.constant.SecurityConstants.TENANT_ID;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TenantServiceImplTest {
 
     @Mock
-    private ClientDetails clientDetails;
+    private RegisteredClient clientDetails;
 
     @InjectMocks
     private TenantServiceImpl tenantService;
+
+    @BeforeEach
+    public void setup() {
+        TenantContext.clearContext(); // Limpiar contexto antes de cada test
+    }
 
     @Test
     public void testValidateTenantFailsWhenMultitenantAndNoHeaderSpecified() {
@@ -53,7 +59,8 @@ public class TenantServiceImplTest {
         user.getContextSet().add(context1);
         user.getContextSet().add(context2);
 
-        UnspecifiedTenantException exception = (UnspecifiedTenantException) catchThrowable(() -> tenantService.validateTenant(user, clientDetails, ""));
+        UnspecifiedTenantException exception = (UnspecifiedTenantException) catchThrowable(() ->
+                tenantService.validateTenant(user, clientDetails, ""));
 
         assertThat(exception).hasMessageContaining(Utils.buildTenantResponse(tenant1));
         assertThat(exception).hasMessageContaining(Utils.buildTenantResponse(tenant2));
@@ -68,7 +75,7 @@ public class TenantServiceImplTest {
         tenant1.setTenantId(UUID.randomUUID());
 
         Tenant tenant2 = new Tenant();
-        tenant2.setName("tenant1");
+        tenant2.setName("tenant2");
         tenant2.setTenantId(UUID.randomUUID());
 
         ApplicationUserContext context1 = new ApplicationUserContext();
@@ -80,7 +87,8 @@ public class TenantServiceImplTest {
         user.getContextSet().add(context1);
         user.getContextSet().add(context2);
 
-        InsufficientAuthenticationException exception = (InsufficientAuthenticationException) catchThrowable(() -> tenantService.validateTenant(user, clientDetails, "invalidTenantId"));
+        InsufficientAuthenticationException exception = (InsufficientAuthenticationException) catchThrowable(() ->
+                tenantService.validateTenant(user, clientDetails, "invalidTenantId"));
 
         assertThat(exception).hasMessage("tenant.invalidTenantUser");
     }
@@ -94,7 +102,7 @@ public class TenantServiceImplTest {
         tenant1.setTenantId(UUID.randomUUID());
 
         Tenant tenant2 = new Tenant();
-        tenant2.setName("tenant1");
+        tenant2.setName("tenant2");
         tenant2.setTenantId(UUID.randomUUID());
 
         ApplicationUserContext context1 = new ApplicationUserContext();
@@ -109,9 +117,10 @@ public class TenantServiceImplTest {
         Map<String, Object> additionalInfo = new HashMap<>();
         additionalInfo.put(TENANT_ID, "invalidTenant");
 
-        when(clientDetails.getAdditionalInformation()).thenReturn(additionalInfo);
+        when(clientDetails.getClientSettings().getSettings()).thenReturn(additionalInfo);
 
-        InsufficientAuthenticationException exception = (InsufficientAuthenticationException) catchThrowable(() -> tenantService.validateTenant(user, clientDetails, tenant1.getTenantId().toString()));
+        InsufficientAuthenticationException exception = (InsufficientAuthenticationException) catchThrowable(() ->
+                tenantService.validateTenant(user, clientDetails, tenant1.getTenantId().toString()));
 
         assertThat(exception).hasMessage("tenant.clientCannotOperate");
     }
@@ -125,7 +134,7 @@ public class TenantServiceImplTest {
         tenant1.setTenantId(UUID.randomUUID());
 
         Tenant tenant2 = new Tenant();
-        tenant2.setName("tenant1");
+        tenant2.setName("tenant2");
         tenant2.setTenantId(UUID.randomUUID());
 
         ApplicationUserContext context1 = new ApplicationUserContext();
@@ -140,7 +149,7 @@ public class TenantServiceImplTest {
         Map<String, Object> additionalInfo = new HashMap<>();
         additionalInfo.put(TENANT_ID, tenant1.getTenantId().toString());
 
-        when(clientDetails.getAdditionalInformation()).thenReturn(additionalInfo);
+        when(clientDetails.getClientSettings().getSettings()).thenReturn(additionalInfo);
 
         ApplicationUserContext result = tenantService.validateTenant(user, clientDetails, tenant1.getTenantId().toString());
 
@@ -166,5 +175,4 @@ public class TenantServiceImplTest {
         assertThat(result).isEqualTo(context2);
         assertThat(TenantContext.getTenant()).isEqualTo(tenant2);
     }
-
 }

@@ -1,15 +1,15 @@
 package com.capacidad.identityservice.misc;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -19,7 +19,7 @@ import static com.capacidad.identityservice.misc.constant.ScopeConstants.USERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UtilsTest {
 
     @Mock
@@ -75,8 +75,6 @@ public class UtilsTest {
         assertThat(result).isTrue();
     }
 
-    //
-
     @Test
     public void testIsOAuthEndpointReturnsFalseOnAnyEndpoint() {
         when(request.getRequestURI()).thenReturn(StringUtils.join("/v1", ENDPOINT_USERS));
@@ -112,5 +110,4 @@ public class UtilsTest {
         String result = Utils.buildScope(READ, USERS);
         assertThat(result).isEqualTo("read:users");
     }
-
 }

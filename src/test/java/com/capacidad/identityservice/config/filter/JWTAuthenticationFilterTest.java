@@ -9,21 +9,22 @@ import com.capacidad.utils.exception.InvalidTokenException;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.UUID;
@@ -34,7 +35,7 @@ import static com.capacidad.utils.Constants.AUTHORIZATION_BEARER_PREFIX;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JWTAuthenticationFilterTest {
 
     @Mock

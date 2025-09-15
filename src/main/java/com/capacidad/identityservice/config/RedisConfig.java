@@ -1,6 +1,9 @@
 package com.capacidad.identityservice.config;
 
 import com.capacidad.identityservice.misc.ApplicationProperties;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.ReadFrom;
 import io.lettuce.core.resource.ClientResources;
@@ -16,6 +19,9 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 
 @Configuration
 public class RedisConfig {
@@ -59,4 +65,28 @@ public class RedisConfig {
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }
+
+
+    @Bean
+    public RedisTemplate<String, OAuth2Authorization> redisOAuth2AuthorizationTemplate(
+            RedisConnectionFactory redisConnectionFactory) {
+
+        RedisTemplate<String, OAuth2Authorization> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+
+        Jackson2JsonRedisSerializer<OAuth2Authorization> serializer =
+                new Jackson2JsonRedisSerializer<>(OAuth2Authorization.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        objectMapper.findAndRegisterModules();
+        serializer.setObjectMapper(objectMapper);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
 }

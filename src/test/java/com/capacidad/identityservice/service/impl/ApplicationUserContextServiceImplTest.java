@@ -14,12 +14,11 @@ import com.capacidad.identityservice.service.RoleService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -29,8 +28,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 
 import java.util.*;
@@ -42,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ApplicationUserContextServiceImplTest {
 
     @Mock
@@ -399,15 +396,21 @@ public class ApplicationUserContextServiceImplTest {
         assertThat(result.getTenant().getName()).isEqualTo(tenant.getName());
     }
 
-    @Test(expected = ObjectNotFoundException.class)
-    public void testDeleteThrowsObjectNotFoundWhenUserDoesNotExist() throws ObjectNotFoundException, ObjectNotValidException {
+    @Test
+    public void testDeleteThrowsObjectNotFoundWhenUserDoesNotExist() throws ObjectNotValidException {
         Tenant tenant = new Tenant();
         tenant.setTenantId(UUID.randomUUID());
         TenantContext.setTenant(tenant);
 
-        when(userContextRepository.findByUserUsernameAndTenantTenantId("test", tenant.getTenantId())).thenReturn(Optional.empty());
+        when(userContextRepository.findByUserUsernameAndTenantTenantId("test", tenant.getTenantId()))
+                .thenReturn(Optional.empty());
 
-        userContextService.delete("test");
+        ObjectNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                ObjectNotFoundException.class,
+                () -> userContextService.delete("test")
+        );
+
+        assertThat(exception.getMessage()).isEqualTo("applicationUserContext.subNotFound");
     }
 
     @Test

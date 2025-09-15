@@ -3,19 +3,19 @@ package com.capacidad.identityservice.config.token;
 import com.capacidad.identityservice.misc.ApplicationProperties;
 import com.capacidad.utils.exception.ExpiredTokenException;
 import com.capacidad.utils.exception.InvalidTokenException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.when;
 
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TokenVerifierImplTest {
 
     @Mock
@@ -23,24 +23,29 @@ public class TokenVerifierImplTest {
     @InjectMocks
     private TokenVerifierImpl tokenVerifier;
 
-    @Before
+    @BeforeEach
     public void init() {
+        // Configuración inicial si fuera necesaria
     }
 
-    @Test(expected = InvalidTokenException.class)
+    @Test
     public void testVerifyThrowsInvalidTokenExceptionWhenKidDoesNotExist() {
         String invalidJwt = "eyJraWQiOiJ0ZXN0IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIxMjM0" +
                 "NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.rkHiTfufnSIJ2VSfZtkD4SHGQj4Uqe1dwOz6NAiUcGE";
 
-        tokenVerifier.verify(invalidJwt);
+        InvalidTokenException thrown = (InvalidTokenException) catchThrowable(() -> tokenVerifier.verify(invalidJwt));
+
+        assertThat(thrown).isInstanceOf(InvalidTokenException.class);
     }
 
-    @Test(expected = InvalidTokenException.class)
+    @Test
     public void testVerifyThrowsInvalidTokenExceptionWhenKidExistButJwtHeadersAreInvalid() {
         String invalidJwt = "eyJraWQiOiJXMTVpWFhKTExFRXBMMkI0SjNZdVpqUkhXeklrT2lzdE9sNHpJV2s9IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ" +
                 ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc3MiOiJpbnZhbGlkX2lzc3VlciJ9.5YrNMkDdCY8lsWatXoyO4b3rJso2F4vg4M5Gj24HOZU";
 
-        tokenVerifier.verify(invalidJwt);
+        InvalidTokenException thrown = (InvalidTokenException) catchThrowable(() -> tokenVerifier.verify(invalidJwt));
+
+        assertThat(thrown).isInstanceOf(InvalidTokenException.class);
     }
 
     @Test
@@ -62,7 +67,7 @@ public class TokenVerifierImplTest {
         assertThat(thrown.getMessage()).isEqualTo("tokenVerifier.generalError");
     }
 
-    @Test(expected = ExpiredTokenException.class)
+    @Test
     public void testVerifyThrowsExpiredTokenExceptionWhenJwtIsExpired() {
         String expiredJwt = "eyJraWQiOiI4MGFiZWNkMi1mOWI4LTQyNjAtYmIxNi02MmIzNDFiZDA1NmUiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdW" +
                 "IiOiJhODQxNTZhOC0zNTUwLTRmN2UtOTJmNS1kODZiZDM4ZGI4NDciLCJyb2xlIjoiYWRtaW4iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0" +
@@ -73,7 +78,8 @@ public class TokenVerifierImplTest {
                 "Ze1SyHLTYIyfxYHBfRK8Tgl8DX6LXg52SR5ktZC4hA6O2kNzxJxfqEswvQFKxSMPZMugZJUcp2kFoLD1z6G5nX3gHU5brzsflX9p7ohpq7AB5KDVyyoHZ11fgkE" +
                 "mF6YcHHlrrQqr3VGpyRM8LL6xOPRCg-6OijTbJmWB7YyD0XdctJnNVyF39YoELGGFjw_YeojnYNggNbytpDPSY0IRb3ldr2UVYtVUodfDoDq9kljdbQFjcmUP6Ox3g";
 
-        tokenVerifier.verify(expiredJwt);
-    }
+        ExpiredTokenException thrown = (ExpiredTokenException) catchThrowable(() -> tokenVerifier.verify(expiredJwt));
 
+        assertThat(thrown).isInstanceOf(ExpiredTokenException.class);
+    }
 }

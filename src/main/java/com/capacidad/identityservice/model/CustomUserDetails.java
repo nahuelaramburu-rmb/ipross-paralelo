@@ -30,6 +30,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     private final String tenantId;
 
 
+
     public String getTenantId() {
         return tenantId;
     }
@@ -47,6 +48,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     }
 
 
+
+
     /**
      * Calls the more complex constructor with all boolean arguments set to {@code true}.
      */
@@ -54,6 +57,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
                              Collection<? extends GrantedAuthority> authorities, String tenantId) {
         this(username, password, true, true, true, true, authorities, tenantId);
     }
+
+
 
     /**
      * Construct the <code>User</code> with the details required by
@@ -92,6 +97,13 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
         this.accountNonLocked = accountNonLocked;
         this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
     }
+
+
+    public CustomUserDetails(ApplicationUser appUser, String tenantId) {
+        this(appUser.getUsername(), appUser.getPassword(), AuthorityUtils.NO_AUTHORITIES, tenantId);
+        this.applicationUser = appUser;
+    }
+
 
     // ~ Methods
     // ========================================================================================================

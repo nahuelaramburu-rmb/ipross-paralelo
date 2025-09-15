@@ -64,4 +64,7 @@ public class Tenant extends BaseEntity<Long> implements Serializable {
     @Column(columnDefinition = "uuid", nullable = false, unique = true)
     private UUID tenantId;
 
+    public Tenant(String tenant1, String tenantOne) {
+        super();
+    }
 }

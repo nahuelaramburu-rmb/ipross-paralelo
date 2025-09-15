@@ -5,11 +5,14 @@ import com.capacidad.identityservice.model.ScopeRole;
 import com.capacidad.identityservice.model.Tenant;
 import com.capacidad.identityservice.model.projection.ScopeRoleViewDTO;
 import com.capacidad.identityservice.repository.ScopeRoleRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,7 +23,7 @@ import static com.capacidad.identityservice.misc.constant.SecurityConstants.ADMI
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ScopeRoleServiceImplTest {
 
     @Mock
