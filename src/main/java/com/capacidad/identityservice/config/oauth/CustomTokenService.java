@@ -83,4 +83,3 @@ public class CustomTokenService {
         return createAccessToken(currentUserAuth, registeredClient);
     }
 }
-
