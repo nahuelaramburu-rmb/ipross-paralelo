@@ -19,8 +19,10 @@ import {
 } from '../constants/ActionTypes';
 import { apiUrls } from '../configs/api';
 
-export const getValidations = (isRefresh = false, queryFilter = null, link = null) => (dispatch, getState) =>
-    _getValidations(isRefresh, queryFilter, link, dispatch, getState);
+export const getValidations =
+    (isRefresh = false, queryFilter = null, link = null) =>
+    (dispatch, getState) =>
+        _getValidations(isRefresh, queryFilter, link, dispatch, getState);
 const _getValidations = async (isRefresh, queryFilter, link, dispatch, getState) => {
     const token = getState().profile.token;
 
@@ -173,10 +175,10 @@ const _rankAuthorization = async (id, ranks, dispatch, getState) => {
     }
 };
 
-export const getPreAuthorizations = (isRefresh = false, queryFilter = null, link = null) => (
-    dispatch,
-    getState
-) => _getPreAuthorizations(isRefresh, queryFilter, link, dispatch, getState);
+export const getPreAuthorizations =
+    (isRefresh = false, queryFilter = null, link = null) =>
+    (dispatch, getState) =>
+        _getPreAuthorizations(isRefresh, queryFilter, link, dispatch, getState);
 const _getPreAuthorizations = async (isRefresh, queryFilter, link, dispatch, getState) => {
     const token = getState().profile.token;
     if (!isRefresh && !link) dispatch({ type: FETCHING_PREAUTHORIZATIONS });
@@ -222,8 +224,10 @@ const _getPreAuthorizations = async (isRefresh, queryFilter, link, dispatch, get
     }
 };
 
-export const getPreAuthorizationById = (preAuthId, isRefresh = false) => (dispatch, getState) =>
-    _getPreAuthorizationById(preAuthId, isRefresh, dispatch, getState);
+export const getPreAuthorizationById =
+    (preAuthId, isRefresh = false) =>
+    (dispatch, getState) =>
+        _getPreAuthorizationById(preAuthId, isRefresh, dispatch, getState);
 const _getPreAuthorizationById = async (preAuthId, isRefresh, dispatch, getState) => {
     const token = getState().profile.token;
 

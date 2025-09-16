@@ -12,10 +12,10 @@ import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import { apiUrls } from '../configs/api';
 
-export const getPrescriptions = (isRefresh = false, queryFilter = null, link = null) => (
-    dispatch,
-    getState
-) => _getPrescriptions(isRefresh, queryFilter, link, dispatch, getState);
+export const getPrescriptions =
+    (isRefresh = false, queryFilter = null, link = null) =>
+    (dispatch, getState) =>
+        _getPrescriptions(isRefresh, queryFilter, link, dispatch, getState);
 const _getPrescriptions = async (isRefresh, queryFilter, link, dispatch, getState) => {
     const token = getState().profile.token;
 
@@ -50,13 +50,11 @@ const _getPrescriptions = async (isRefresh, queryFilter, link, dispatch, getStat
                 prescriptions: json,
             });
         }
-        
+
         return dispatch({
             type: FETCH_PRESCRIPTIONS_SUCCESS,
             prescriptions: json,
         });
-
-
     } catch (err) {
         console.log(err);
         dispatch({ type: ERROR, error: err });

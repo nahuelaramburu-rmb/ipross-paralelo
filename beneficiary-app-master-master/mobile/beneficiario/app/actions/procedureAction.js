@@ -20,7 +20,6 @@ import {
 } from '../constants/ActionTypes';
 import { apiUrls } from '../configs/api';
 
-
 const procedureTranslate = {
     CUDProcedure: 'cud',
     DisabilityProcedure: 'disability',
@@ -38,7 +37,7 @@ const _getProcedures = async (isRefresh = false, dispatch, getState) => {
         const response = await fetch(
             encodeURI(
                 apiUrls['api'] +
-                    `procedures?page=1&size=20&groups=opened-status:{name=EN REVISION},closed-status!{name=EN REVISION},`
+                    'procedures?page=1&size=20&groups=opened-status:{name=EN REVISION},closed-status!{name=EN REVISION},'
             ),
             {
                 method: 'GET',
@@ -49,8 +48,7 @@ const _getProcedures = async (isRefresh = false, dispatch, getState) => {
                 },
             }
         );
-        
-        
+
         const json = await response.json();
 
         if (!response.ok) {
@@ -102,7 +100,7 @@ const _getCertificateTypes = async (dispatch, getState) => {
     dispatch({ type: FETCHING_CERTIFICATE_TYPES });
 
     try {
-        const response = await fetch(apiUrls['api'] + `procedures/certificate/certificate-types`, {
+        const response = await fetch(apiUrls['api'] + 'procedures/certificate/certificate-types', {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -112,7 +110,7 @@ const _getCertificateTypes = async (dispatch, getState) => {
         });
 
         const json = await response.json();
-        
+
         if (!response.ok) {
             dispatch({ type: ERROR, error: json });
             return;
@@ -125,8 +123,10 @@ const _getCertificateTypes = async (dispatch, getState) => {
     }
 };
 
-export const createProcedure = (data, images = []) => (dispatch, getState) =>
-    _createProcedure(data, images, dispatch, getState);
+export const createProcedure =
+    (data, images = []) =>
+    (dispatch, getState) =>
+        _createProcedure(data, images, dispatch, getState);
 const _createProcedure = async (data, images, dispatch, getState) => {
     const token = getState().profile.token;
     dispatch({ type: CREATING_PROCEDURE });
@@ -159,11 +159,10 @@ const _createProcedure = async (data, images, dispatch, getState) => {
         }
 
         dispatch({ type: CREATE_PROCEDURE_SUCCESS });
-        
-        return response.headers.get('location');
 
+        return response.headers.get('location');
     } catch (err) {
-        console.log("Error Aaaaaaaaaaaaaaaa");
+        console.log('Error Aaaaaaaaaaaaaaaa');
         console.log(err);
 
         dispatch({ type: ERROR, error: err });
@@ -171,12 +170,14 @@ const _createProcedure = async (data, images, dispatch, getState) => {
     }
 };
 
-export const getProcedureById = ({ link, procedureId, procedureType }) => (dispatch, getState) =>
-    _getProcedureById({ link, procedureId, procedureType }, dispatch, getState);
+export const getProcedureById =
+    ({ link, procedureId, procedureType }) =>
+    (dispatch, getState) =>
+        _getProcedureById({ link, procedureId, procedureType }, dispatch, getState);
 const _getProcedureById = async ({ link, procedureId, procedureType }, dispatch, getState) => {
     const token = getState().profile.token;
     dispatch({ type: FETCHING_PROCEDURE_BY_ID });
-    
+
     let url = link;
     if (!url) url = getProcedureUrl(procedureId, procedureType);
 

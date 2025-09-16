@@ -78,7 +78,7 @@ class Drawer extends Component {
                     icon: 'ios-medical-outline',
                     action: () => props.navigation.navigate('Professional'),
                     key: 'professional',
-                },                
+                },
             ],
             app_version: null,
         };
@@ -99,7 +99,7 @@ class Drawer extends Component {
             }
         });
     }
-    
+
     _openProfessional() {
         Linking.canOpenURL(apiUrls['general-api']).then((supported) => {
             if (supported) {

@@ -9,22 +9,20 @@ import HeaderWrapper, { STATUS_BAR_IOS } from './HeaderWrapper';
 import { StyleSheet, Platform, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 
-const ProfessionalDetailScreenHeader = ({pop}) => {
-    
+const ProfessionalDetailScreenHeader = ({ pop }) => {
     const navigation = useNavigation();
 
     let leftButton = null;
 
-        leftButton = (
-            <TopNavigationButton
-                type='LEFT'
-                testID='back-nav-button'
-                image={<Icon name='ios-arrow-back' color={Colors.primaryText} size={moderateScale(24)} />}
-                action={() => navigation.navigate('Professional')}
-                // action={ pop }
-            />
-        );
-    
+    leftButton = (
+        <TopNavigationButton
+            type='LEFT'
+            testID='back-nav-button'
+            image={<Icon name='ios-arrow-back' color={Colors.primaryText} size={moderateScale(24)} />}
+            action={() => navigation.navigate('Professional')}
+            // action={ pop }
+        />
+    );
 
     return (
         <HeaderWrapper style={styles.shadow}>

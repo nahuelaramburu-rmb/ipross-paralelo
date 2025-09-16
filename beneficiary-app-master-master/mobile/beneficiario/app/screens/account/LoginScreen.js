@@ -14,7 +14,7 @@ import TextField from '../../components/TextField';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
-import { lightItalic, regular } from '../../constants/Fonts';
+import { regular } from '../../constants/Fonts';
 
 const LoginSchema = Yup.object().shape({
     username: Yup.string().required(strings.errors.required),

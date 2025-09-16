@@ -25,7 +25,7 @@ import ProcedureDetailScreen from '../screens/procedure/ProcedureDetailScreen';
 import ProcedureMessagesScreen from '../screens/procedure/ProcedureMessagesScreen';
 import BatchScreen from '../screens/discapacity/BatchScreen';
 import BatchDetailScreen from '../screens/discapacity/BatchDetailScreen';
-import AppointmentScreen  from '../screens/appointment/AppointmentScreen';
+import AppointmentScreen from '../screens/appointment/AppointmentScreen';
 import NewAppointmentScreen from '../screens/appointment/NewAppointmentScreen';
 import AppointmentDetail from './appointment/AppointmentDetail';
 import PrescriptionDetail from './prescription/PrescriptionDetail';
@@ -98,7 +98,7 @@ const MainAppStackScreens = () => {
             <MainAppStack.Screen name='ProfessionalList' component={ProfessionalListScreen} />
             <MainAppStack.Screen name='ProfessionalDetail' component={ProfessionalDetailScreen} />
             <MainAppStack.Screen name='ProfessionalMaps' component={ProfessionalMapsScreen} />
-            
+
             <MainAppStack.Screen
                 name='FilterModal'
                 component={FilterModal}

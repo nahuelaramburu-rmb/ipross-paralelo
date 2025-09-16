@@ -142,7 +142,6 @@ const ProcedureForm = ({
     const handleCertificateTypeChange = (text) => {
         setFieldValue('certificateType', text);
     };
-       
 
     const pickAnImage = () => {
         ImagePicker.showImagePicker(options, (response) => {
@@ -182,7 +181,6 @@ const ProcedureForm = ({
         imagesCopy.splice(indx, 1);
         setFieldValue('images', imagesCopy);
     };
-    
 
     return (
         <View style={styles.container}>

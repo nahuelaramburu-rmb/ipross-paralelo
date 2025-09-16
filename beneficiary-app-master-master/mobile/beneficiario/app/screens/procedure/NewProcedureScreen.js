@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import ProcedureForm from '../../components/procedure/ProcedureForm';
 import { DropDownHolder } from '../../components/DropDownHolder';
 import strings from '../../constants/Strings';
@@ -16,7 +17,7 @@ class NewProcedureScreen extends PureComponent {
         this.state = {
             loading: false,
         };
-        
+
         this._onConfirm = this._onConfirm.bind(this);
     }
 
@@ -42,13 +43,12 @@ class NewProcedureScreen extends PureComponent {
                 this.setState({ loading: false });
             });
     }
-    
-        
+
     render() {
         const { loading } = this.state;
 
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.container}>
                 <KeyboardAwareScrollView
                     style={styles.container}
                     contentContainerStyle={styles.keyboardAwareContent}
@@ -80,6 +80,15 @@ const styles = StyleSheet.create({
         padding: moderateScale(16),
     },
 });
+
+NewProcedureScreen.propTypes = {
+    navigation: PropTypes.shape({
+        setParams: PropTypes.func.isRequired,
+        navigate: PropTypes.func.isRequired,
+    }).isRequired,
+    createProcedure: PropTypes.func.isRequired,
+    getProcedures: PropTypes.func.isRequired,
+};
 
 function mapStateToProps(state) {
     return {

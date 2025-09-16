@@ -175,8 +175,7 @@ const RatingForm = ({ values, errors, touched, setFieldValue }) => {
                             disabled={cannotRate}
                             placeholder={strings.authorizationRanking.rating}
                             error={errors.attentionQuality}
-                            touched={touched.attentionQuality}
-                        >
+                            touched={touched.attentionQuality}>
                             {Object.values(ratings).map((it) => (
                                 <Option key={it.value} id={it.value}>
                                     {it.label}
@@ -199,8 +198,7 @@ const RatingForm = ({ values, errors, touched, setFieldValue }) => {
                             disabled={cannotRate}
                             placeholder={strings.authorizationRanking.rating}
                             error={errors.attentionTime}
-                            touched={touched.attentionTime}
-                        >
+                            touched={touched.attentionTime}>
                             {Object.values(ratings).map((it) => (
                                 <Option key={it.value} id={it.value}>
                                     {it.label}
@@ -223,8 +221,7 @@ const RatingForm = ({ values, errors, touched, setFieldValue }) => {
                             disabled={cannotRate}
                             placeholder={strings.authorizationRanking.rating}
                             error={errors.awaitingTime}
-                            touched={touched.awaitingTime}
-                        >
+                            touched={touched.awaitingTime}>
                             {Object.values(ratings).map((it) => (
                                 <Option key={it.value} id={it.value}>
                                     {it.label}
@@ -247,8 +244,7 @@ const RatingForm = ({ values, errors, touched, setFieldValue }) => {
                             disabled={cannotRate}
                             placeholder={strings.authorizationRanking.rating}
                             error={errors.extraBudget}
-                            touched={touched.extraBudget}
-                        >
+                            touched={touched.extraBudget}>
                             {Object.values(ratings)
                                 .filter((it) => it.rating === 5 || it.rating === 1)
                                 .map((it) => (

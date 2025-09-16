@@ -32,7 +32,6 @@ import ProfessionalListScreenHeader from './header/ProfessionalListScreenHeader'
 import ProfessionalDetailScreenHeader from './header/ProfessionalDetailScreenHeader';
 import ProfessionalMapsScreenHeader from './header/ProfessionalMapsScreenHeader';
 
-
 class TopNavigation extends PureComponent {
     constructor(props) {
         super(props);
@@ -66,12 +65,12 @@ class TopNavigation extends PureComponent {
 
     _getHeader() {
         const { currentScene } = this.state;
-        
+
         switch (currentScene) {
             case 'error-boundary':
                 return <ErrorBoundaryHeader />;
             case 'Appointment':
-                    return <AppointmentScreenHeader goBack={this._goBack} />;                
+                return <AppointmentScreenHeader goBack={this._goBack} />;
             case 'NewAppointment':
                 return <NewAppointmentScreenHeader pop={this._pop} />;
             case 'AppointmentDetail':
@@ -121,14 +120,14 @@ class TopNavigation extends PureComponent {
             case 'PreAuthorizationDetail':
                 return <PreAuthorizationDetailScreenHeader pop={this._pop} />;
             case 'Professional':
-                return <ProfessionalScreenHeader pop={this._pop} />;      
+                return <ProfessionalScreenHeader pop={this._pop} />;
             case 'ProfessionalList':
-                return <ProfessionalListScreenHeader pop={this._pop} />;      
+                return <ProfessionalListScreenHeader pop={this._pop} />;
             case 'ProfessionalDetail':
-                return <ProfessionalDetailScreenHeader pop={this._pop} />;      
+                return <ProfessionalDetailScreenHeader pop={this._pop} />;
             case 'ProfessionalMaps':
-                return <ProfessionalMapsScreenHeader pop={this._pop} />;      
-                
+                return <ProfessionalMapsScreenHeader pop={this._pop} />;
+
             case 'Login':
                 return null;
         }

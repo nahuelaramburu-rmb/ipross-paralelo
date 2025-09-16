@@ -13,7 +13,7 @@ Firebase.messaging().setBackgroundMessageHandler(async (remoteMessage) => {
     // SALE POR ACA CUANDO LA APP ESTÁ EN BACKGROUND O KILLED Y EN EL MESSAGE VIENE SOLO DATA (NO NOTIFICATION) -> ANDROID
     const { data } = remoteMessage;
     console.log(remoteMessage);
-    
+
     return Promise.resolve();
 });
 

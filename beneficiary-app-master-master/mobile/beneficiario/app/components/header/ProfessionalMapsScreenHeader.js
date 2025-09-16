@@ -9,8 +9,7 @@ import HeaderWrapper, { STATUS_BAR_IOS } from './HeaderWrapper';
 import { StyleSheet, Platform, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 
-const ProfessionalMapsScreenHeader = ({pop}) => {
-    
+const ProfessionalMapsScreenHeader = ({ pop }) => {
     const navigation = useNavigation();
 
     let leftButton = null;
@@ -24,7 +23,7 @@ const ProfessionalMapsScreenHeader = ({pop}) => {
             action={pop}
         />
     );
-    
+
     return (
         <HeaderWrapper style={styles.shadow}>
             {leftButton}

@@ -101,8 +101,7 @@ export default (state = initialState, action) => {
                     ...state.towns,
                     loading: true,
                 },
-        };
-
+            };
         case FETCH_TOWN_SUCCESS:
             return {
                 ...state,
@@ -112,7 +111,7 @@ export default (state = initialState, action) => {
                     items: action.towns,
                 },
             };
-                    
+
         case FETCHING_PROFESSIONALS:
             return {
                 ...state,
@@ -142,7 +141,7 @@ export default (state = initialState, action) => {
                     item: action.practitioner,
                 },
             };
-            
+
         case FETCHING_MORE_PROFESSIONALS:
             return {
                 ...state,
@@ -153,9 +152,7 @@ export default (state = initialState, action) => {
             };
 
         case FETCH_MORE_PROFESSIONALS_SUCCESS:
-            let _embedded = [
-                ...state.items._embedded.practitioners.concat(action.items._embedded.items),
-            ];
+            let _embedded = [...state.items._embedded.practitioners.concat(action.items._embedded.items)];
             let _links = action.items._links;
             let items = { ...state.items, _links, _embedded: { items: _embedded } };
             return {
@@ -201,7 +198,7 @@ export default (state = initialState, action) => {
                     items: action.medicalCoordinates,
                 },
             };
-                    
+
         case ERROR:
             return {
                 ...state,
@@ -255,7 +252,7 @@ function handleFetchProfessionalSuccess(state, action) {
     if (!state.items._embedded) return state;
 
     const alreadyLoadedPrescr = [...state.items._embedded.practitioners];
-    const indx = alreadyLoadedPrescr.findIndex(it => it.id === action.prescription.id);
+    const indx = alreadyLoadedPrescr.findIndex((it) => it.id === action.prescription.id);
     if (indx > -1) return state;
     alreadyLoadedPrescr.unshift(action.prescription);
 

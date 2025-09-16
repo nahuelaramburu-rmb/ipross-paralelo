@@ -17,7 +17,7 @@ import {
     registerUserDevice,
     checkUpdationNedded,
 } from './actions/profileAction';
-import { loginApiTurnos } from './actions/appointmentAction'
+import { loginApiTurnos } from './actions/appointmentAction';
 
 import { updateScene } from './actions/routerAction';
 import { getValidations } from './actions/validationAction';

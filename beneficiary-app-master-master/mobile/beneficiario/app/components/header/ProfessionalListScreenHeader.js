@@ -14,8 +14,7 @@ const ProfessionalListScreenHeader = ({ pop }) => {
     const route = useRoute();
     const insets = useSafeAreaInsets();
     return (
-        <HeaderWrapper
-            style={[styles.header, styles.shadow, { top: insets.top }]}>
+        <HeaderWrapper style={[styles.header, styles.shadow, { top: insets.top }]}>
             <TopNavigationTitle title={strings.header.professional_list} />
             <TopNavigationButton
                 image={<Icon name='ios-arrow-back' color={Colors.primaryText} size={moderateScale(24)} />}

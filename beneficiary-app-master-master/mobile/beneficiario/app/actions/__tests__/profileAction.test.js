@@ -128,7 +128,7 @@ describe('Login tests', () => {
     });
 
     it('Update temporary password correctly', () => {
-        fetchMock.putOnce(apiUrls['api'] + `users/password?username=tenchon`, {
+        fetchMock.putOnce(apiUrls['api'] + 'users/password?username=tenchon', {
             body: {},
             status: 204,
         });
@@ -155,7 +155,7 @@ describe('Login tests', () => {
     });
 
     it('Update temporary password with internet connection error', () => {
-        fetchMock.putOnce(apiUrls['api'] + `users/password?username=tenchon`, {
+        fetchMock.putOnce(apiUrls['api'] + 'users/password?username=tenchon', {
             throws: 'Network request failed',
         });
 
@@ -181,7 +181,7 @@ describe('Login tests', () => {
     });
 
     it('Update temporary password with server error', () => {
-        fetchMock.putOnce(apiUrls['api'] + `users/password?username=tenchon`, {
+        fetchMock.putOnce(apiUrls['api'] + 'users/password?username=tenchon', {
             status: 400,
             body: {
                 status: 400,

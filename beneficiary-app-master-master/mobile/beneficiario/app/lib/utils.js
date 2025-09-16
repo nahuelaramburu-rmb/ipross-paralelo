@@ -82,9 +82,9 @@ const posibleStatuses = {
     APPROVED: 'APROBADO', // Procedures - Auths
     CONFIRMADO: 'CONFIRMADO', //Turnos
     CANCELADO: 'CANCELADO', //Turnos
-    ASISTIO:'ASISTIÓ',   //Turnos,
-    NO_ASISTIO:'NO ASISTIÓ',   //Turnos,
-    ENESPERA:'EN ESPERA',   //Turnos
+    ASISTIO: 'ASISTIÓ',
+    NO_ASISTIO: 'NO ASISTIÓ',
+    ENESPERA: 'EN ESPERA',
     PARTIALLY_APPROVED: 'PARCIALMENTE APROBADO', // Auths
     REJECTED: 'RECHAZADO', // Procedures - Auths
     OPENED_SETTLEMENT: 'LIQUIDACION ABIERTA',

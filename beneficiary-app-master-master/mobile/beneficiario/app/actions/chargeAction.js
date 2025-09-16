@@ -33,7 +33,6 @@ const _getUserCharges = async (isRefresh, dispatch, getState) => {
         }
 
         dispatch({ type: FETCH_CHARGES_SUCCESS, charges: json, isRefresh: isRefresh });
-
     } catch (err) {
         console.log(err);
         dispatch({ type: ERROR, error: { error: err } });

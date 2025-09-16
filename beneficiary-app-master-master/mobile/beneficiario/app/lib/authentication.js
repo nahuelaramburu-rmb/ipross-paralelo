@@ -36,7 +36,6 @@ const _authenticateUser = async (credentials) => {
             },
             body: formData,
         });
-        
 
         const json = await response.json();
 
@@ -110,7 +109,7 @@ const _getUserData = async (token) => {
         });
 
         const json = await response.json();
-        
+
         if (!response.ok) {
             return { error: json };
         }

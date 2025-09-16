@@ -22,7 +22,7 @@ const CERTIFICATE_PROCEDURE = 'CertificateProcedure';
 
 const OpenProcedureCard = React.memo(({ item }) => {
     const navigation = useNavigation();
-    
+
     return (
         <View style={styles.container}>
             <View style={[styles.card, { borderColor: getStatusColor(item.status.name) }]}>

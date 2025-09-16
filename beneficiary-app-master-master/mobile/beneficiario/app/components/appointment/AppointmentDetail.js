@@ -30,60 +30,58 @@ const { width, height: iosHeight } = Dimensions.get('screen');
 
 const height = Platform.OS === 'ios' ? iosHeight : ExtraDimensions.getRealWindowHeight();
 
-const AppointmentDetail = ({route }) => {
-
+const AppointmentDetail = ({ route }) => {
     const turnoId = route.params?.turnoId;
     const insets = useSafeAreaInsets();
     const dispatch = useDispatch();
 
-    const { turno,selectedAppointmentLoading,profile } = useSelector(
+    const { turno, selectedAppointmentLoading, profile } = useSelector(
         (state) => ({
             turno: state.appointment.selectedAppointment.item,
             selectedAppointmentLoading: state.appointment.selectedAppointment.loading,
-            profile: state.profile ?? []
+            profile: state.profile ?? [],
         }),
         shallowEqual
     );
-    
+
     ejectCancel = () => {
         dispatch(cancelAppointment(turno.token));
-        DropDownHolder.alert('success', 'Éxito', "Cancelación Exitosa");
+        DropDownHolder.alert('success', 'Éxito', 'Cancelación Exitosa');
         dispatch(getAppointmentById(turnoId));
         dispatch(getAppointments());
-    }
+    };
 
     const handleCancel = () => {
         Alert.alert(
-            "Cancelar Turno",
-            "¿Desea Cancelar su Turno?",
+            'Cancelar Turno',
+            '¿Desea Cancelar su Turno?',
             [
                 {
-                    text: "NO",
-                    style: "cancel",
+                    text: 'NO',
+                    style: 'cancel',
                 },
                 {
-                  text: "SI",
-                  onPress: () => ejectCancel(),
-                  style: "default",
+                    text: 'SI',
+                    onPress: () => ejectCancel(),
+                    style: 'default',
                 },
             ],
             {
-              cancelable: false,
+                cancelable: false,
             }
-          );
-    }    
+        );
+    };
 
     useEffect(() => {
         dispatch(getAppointmentById(turnoId));
     }, []);
-       
+
     if (selectedAppointmentLoading) {
         return (
             <SafeAreaView style={[styles.safeAreaView, { paddingTop: insets.top }]}>
-                <View style={[styles.container, { alignContent:'center' }]}>
+                <View style={[styles.container, { alignContent: 'center' }]}>
                     <ActivityIndicator size='large' color={Colors.primaryText} />
                 </View>
-
             </SafeAreaView>
         );
     }
@@ -115,13 +113,11 @@ const AppointmentDetail = ({route }) => {
                                 header={strings.openedAppointments.delegation.toUpperCase()}
                                 title={get(turno, 'delegation', '')}
                                 style={{ width: '48%' }}
-                                image={
-                                    <Icon name='home' size={moderateScale(28)} color={Colors.logoText} />
-                                }
+                                image={<Icon name='home' size={moderateScale(28)} color={Colors.logoText} />}
                             />
                             <ImageCard
                                 header={strings.prescriptionDetail.beneficiary.toUpperCase()}
-                                title={`${profile.userData.lastName} ${profile.userData.name}`} 
+                                title={`${profile.userData.lastName} ${profile.userData.name}`}
                                 style={{ width: '48%' }}
                                 image={
                                     <Icon name='person' size={moderateScale(28)} color={Colors.logoText} />
@@ -150,17 +146,15 @@ const AppointmentDetail = ({route }) => {
                                         <Text style={font_styles.primary_text}>
                                             {strings.openedAppointments.delegation_address}:{' '}
                                         </Text>
-                                        <Text style={font_styles.primary_text_bold}>                                            
-                                            {get(turno, 'delegation_address', '')  ? get(turno, 'delegation_address', '')  : 'Sin datos'}
+                                        <Text style={font_styles.primary_text_bold}>
+                                            ? get(turno, 'delegation_address', '') : 'Sin datos'}
                                         </Text>
                                     </Text>
                                     <Text
                                         numberOfLines={1}
                                         ellipsizeMode='tail'
                                         style={{ marginVertical: moderateScale(4) }}>
-                                        <Text style={font_styles.primary_text}>
-                                            Día/Hora :{' '}
-                                        </Text>
+                                        <Text style={font_styles.primary_text}>Día/Hora : </Text>
                                         <Text style={font_styles.primary_text_bold}>
                                             {turno.fecha} - {turno.hora} hs.
                                         </Text>
@@ -172,11 +166,15 @@ const AppointmentDetail = ({route }) => {
                                         <Text style={font_styles.primary_text}>
                                             {strings.openedAppointments.attendance_description}:{' '}
                                         </Text>
-                                        <Text style={[font_styles.primary_text_bold, { color: getStatusColor(turno.attendance_descripcion)}]}>
+                                        <Text
+                                            style={[
+                                                font_styles.primary_text_bold,
+                                                { color: getStatusColor(turno.attendance_descripcion) },
+                                            ]}>
                                             {turno.attendance_descripcion}
                                         </Text>
                                     </Text>
-                                    {turno.status_id === 1 &&
+                                    {turno.status_id === 1 && (
                                         <View style={styles.containerButton}>
                                             <Button
                                                 title={strings.openedAppointments.cancel}
@@ -186,7 +184,7 @@ const AppointmentDetail = ({route }) => {
                                                 onPress={handleCancel}
                                             />
                                         </View>
-                                    }
+                                    )}
                                 </View>
                             </View>
                         </View>
@@ -296,4 +294,3 @@ const styles = StyleSheet.create({
 });
 
 export default React.memo(AppointmentDetail);
-

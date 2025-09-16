@@ -10,22 +10,18 @@ import { Linking, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BeneficiaryInformationScreenHeader = ({ openDrawer }) => {
-    
     const insets = useSafeAreaInsets();
-    
+
     const initiateWhatsApp = () => {
-        let url =
-          'whatsapp://send?text=' + 
-           '' +
-          '&phone=54' + 2920475511;
+        let url = 'whatsapp://send?text=' + '' + '&phone=54' + 2920475511;
         Linking.openURL(url)
-          .then((data) => {
-            console.log('WhatsApp Opened');
-          })
-          .catch(() => {
-            alert('Debe Tener Instalada la App Whatsapp!');
-          });
-      };
+            .then((data) => {
+                console.log('WhatsApp Opened');
+            })
+            .catch(() => {
+                alert('Debe Tener Instalada la App Whatsapp!');
+            });
+    };
 
     return (
         <HeaderWrapper style={[styles.shadow, { top: insets.top }]}>

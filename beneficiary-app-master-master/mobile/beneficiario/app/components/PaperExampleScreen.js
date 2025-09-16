@@ -15,25 +15,21 @@ const PaperExampleScreen = () => {
                     </Paragraph>
                 </Card.Content>
                 <Card.Actions>
-                    <Button mode="contained">Botón Principal</Button>
-                    <Button mode="outlined">Botón Outline</Button>
+                    <Button mode='contained'>Botón Principal</Button>
+                    <Button mode='outlined'>Botón Outline</Button>
                 </Card.Actions>
             </Card>
 
             <View style={styles.chipsContainer}>
-                <Chip icon="information" mode="outlined" style={styles.chip}>
+                <Chip icon='information' mode='outlined' style={styles.chip}>
                     Estado: Aprobado
                 </Chip>
-                <Chip icon="clock" mode="flat" style={styles.chip}>
+                <Chip icon='clock' mode='flat' style={styles.chip}>
                     Pendiente
                 </Chip>
             </View>
 
-            <FAB
-                style={styles.fab}
-                icon="plus"
-                onPress={() => console.log('FAB pressed')}
-            />
+            <FAB style={styles.fab} icon='plus' onPress={() => console.log('FAB pressed')} />
         </View>
     );
 };

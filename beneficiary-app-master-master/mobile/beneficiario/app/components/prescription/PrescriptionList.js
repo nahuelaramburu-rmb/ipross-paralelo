@@ -87,7 +87,7 @@ const PrescriptionList = ({ filters, onScroll }) => {
         },
         [dispatch]
     );
-    
+
     return (
         <List
             filters={filters}

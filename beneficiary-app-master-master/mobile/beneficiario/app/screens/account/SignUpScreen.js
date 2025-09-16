@@ -190,7 +190,7 @@ const AccountCreationForm = ({ identityValue, navigation, identityType }) => {
                 profile: {
                     name: validatedData.name,
                     last_name: validatedData.lastName,
-                    id_number: parseInt(identityValue),
+                    id_number: parseInt(identityValue, 10),
                     id_type: identityType.toUpperCase(),
                 },
             },

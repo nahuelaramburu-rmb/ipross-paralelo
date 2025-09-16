@@ -1,13 +1,11 @@
 /* @flow */
 
-import {
-
-} from '../constants/ActionTypes';
+import {} from '../constants/ActionTypes';
 
 //import apiConfig from '../configs/api';
 
 const initialState = {
-    status: "initializing",
+    status: 'initializing',
 };
 
 export default (state = initialState, action) => {

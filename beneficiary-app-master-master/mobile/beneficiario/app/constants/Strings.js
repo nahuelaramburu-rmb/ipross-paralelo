@@ -20,7 +20,7 @@ const strings = {
         searching_data: 'Buscando información...',
     },
     header: {
-        appointment:'Mis Turnos',
+        appointment: 'Mis Turnos',
         credential: 'Credencial Virtual',
         token_code: 'Código Token',
         qr_code: 'Código QR',
@@ -34,7 +34,7 @@ const strings = {
         trip_info: 'Información de Viajes',
         procedures: 'Trámites',
         new_procedure: 'Nuevo Trámite',
-        new_appointment:'Solicitar Turno',
+        new_appointment: 'Solicitar Turno',
         procedure_detail: 'Detalle de Trámite',
         batches: 'Módulos',
         batch_detail: 'Detalle de Módulo',
@@ -47,7 +47,7 @@ const strings = {
         unawareness_title: 'Desconocer Atención',
         preAuthorizations: 'Pre-Autorizaciones',
         preAuthorizationDetail: 'Detalle Pre-Autorización',
-        newAppointment:'Solicitar Turno'
+        newAppointment: 'Solicitar Turno',
     },
     beneficiaryInformation: {
         beneficiary_info: 'Información General',
@@ -87,7 +87,6 @@ const strings = {
         opt5: 'Módulos',
         opt6: 'Pre-Autorizaciones',
         opt7: 'Prestadores',
-
     },
     errorBoundary: {
         error_ocurred:
@@ -270,19 +269,19 @@ const strings = {
     },
     openedAppointments: {
         fecha: 'Fecha Turno',
-        delegation:'Delegación',
+        delegation: 'Delegación',
         sector: 'Sector',
         id: 'Turno N°',
         hora: 'Horario',
-        delegation_address:'Dirección',
-        status:'Estado',
-        turno:'Turnos Disponibles',
+        delegation_address: 'Dirección',
+        status: 'Estado',
+        turno: 'Turnos Disponibles',
         no_appointments: 'No se encontraron Turnos Pendientes',
         attendance_description: 'Estado Atención',
         cancel: 'Cancelar Turno',
-        status_general:'Estado General del Turno',
+        status_general: 'Estado General del Turno',
     },
-    
+
     newAppointment: {
         appointment_creation_success: 'El Turno se ha generado de manera exitosa',
     },

@@ -29,7 +29,7 @@ const _getTypesSpecialty = async (isRefresh = false, dispatch, getState) => {
     const token = getState().profile.token;
 
     try {
-        const response = await fetch(encodeURI(apiUrls['api'] + `general/medical-specialty-types`), {
+        const response = await fetch(encodeURI(apiUrls['api'] + 'general/medical-specialty-types'), {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -93,7 +93,7 @@ const _getTowns = async (isRefresh = false, dispatch, getState) => {
     const token = getState().profile.token;
 
     try {
-        const response = await fetch(encodeURI(apiUrls['api'] + `regions/provinces/15`), {
+        const response = await fetch(encodeURI(apiUrls['api'] + 'regions/provinces/15'), {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -115,10 +115,10 @@ const _getTowns = async (isRefresh = false, dispatch, getState) => {
     }
 };
 
-export const getProfessionalSpecialty = (specialtyId, townId, isRefresh = false, link = null) => (
-    dispatch,
-    getState
-) => _getProfessionalSpecialty(specialtyId, townId, isRefresh, link, dispatch, getState);
+export const getProfessionalSpecialty =
+    (specialtyId, townId, isRefresh = false, link = null) =>
+    (dispatch, getState) =>
+        _getProfessionalSpecialty(specialtyId, townId, isRefresh, link, dispatch, getState);
 const _getProfessionalSpecialty = async (specialtyId, townId, isRefresh, link, dispatch, getState) => {
     const token = getState().profile.token;
 

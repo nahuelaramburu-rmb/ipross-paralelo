@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, Text, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, Dimensions, Platform } from 'react-native';
 import * as Colors from '../constants/Colors';
 import AuthenticationWrapper from '../components/AuthenticationWrapper';
 import { font_styles } from '../lib/default-styles';
 import { verticalScale, moderateScale } from '../lib/size-normalizer';
 import ExtraDimensions from 'react-native-extra-dimensions-android';
 
-const { width, height: iosHeight } = Dimensions.get('window');
+const { height: iosHeight } = Dimensions.get('window');
 const height =
     Platform.OS === 'ios'
         ? iosHeight

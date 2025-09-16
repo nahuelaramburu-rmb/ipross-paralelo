@@ -1,7 +1,4 @@
-import {
-    UPDATING_CURRENT_SCENE,
-} from '../constants/ActionTypes';
-
+import { UPDATING_CURRENT_SCENE } from '../constants/ActionTypes';
 
 export const updateScene = (scene) => (dispatch) => _updateScene(scene, dispatch);
 const _updateScene = (scene, dispatch) => {

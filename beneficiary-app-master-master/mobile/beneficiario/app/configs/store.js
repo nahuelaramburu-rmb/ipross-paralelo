@@ -43,7 +43,6 @@ function authMiddleware({ dispatch, getState }) {
 
 const middleware = [authMiddleware, thunk];
 
-
 //Se  carga el Logger Redux
 if (__DEV__) middleware.push(createLogger());
 

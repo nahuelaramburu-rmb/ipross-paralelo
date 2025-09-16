@@ -27,7 +27,6 @@ const AppointmentScreenHeader = () => {
                 type='LEFT'
                 action={() => navigation.navigate('BeneficiaryInformation')}
             />
-            
         </HeaderWrapper>
     );
 };

@@ -12,11 +12,12 @@ import {
     ERROR,
 } from '../constants/ActionTypes';
 
-export const getBatches = (isRefresh = false, queryFilter = null, link = null) => (dispatch, getState) =>
-    _getBatches(isRefresh, queryFilter, link, dispatch, getState);
+export const getBatches =
+    (isRefresh = false, queryFilter = null, link = null) =>
+    (dispatch, getState) =>
+        _getBatches(isRefresh, queryFilter, link, dispatch, getState);
 const _getBatches = async (isRefresh, queryFilter, link, dispatch, getState) => {
     const token = getState().profile.token;
-
 
     if (!isRefresh && !link) dispatch({ type: FETCHING_BATCHES });
 
@@ -26,8 +27,7 @@ const _getBatches = async (isRefresh, queryFilter, link, dispatch, getState) => 
 
     const url = link ? link : selectedUser._links.batches.href;
 
-
-    console.log(token );
+    console.log(token);
 
     try {
         const response = await fetch(url, {
@@ -40,7 +40,7 @@ const _getBatches = async (isRefresh, queryFilter, link, dispatch, getState) => 
         });
 
         const json = await response.json();
-       
+
         if (!response.ok) {
             throw json;
         }

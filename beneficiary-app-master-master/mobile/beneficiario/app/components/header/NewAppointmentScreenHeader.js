@@ -17,7 +17,7 @@ const NewAppointmentScreenHeader = ({ pop }) => {
     const onConfirm = route.params?.onConfirm ?? null;
     const loading = route.params?.loading ?? null;
     const loadingCreation = route.params?.loadingCreation ?? null;
-    
+
     if (loading !== null && !loading) {
         if (!loadingCreation) {
             rightButton = (

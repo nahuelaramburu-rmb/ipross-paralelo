@@ -1,4 +1,3 @@
-
 //type AlertType = 'info' | 'warn' | 'error' | 'success'
 
 export class DropDownHolder {
@@ -13,6 +12,6 @@ export class DropDownHolder {
     }
 
     static alert(type, title, message, interval) {
-        this.dropDown.alertWithType(type, title, message, interval)
+        this.dropDown.alertWithType(type, title, message, interval);
     }
 }

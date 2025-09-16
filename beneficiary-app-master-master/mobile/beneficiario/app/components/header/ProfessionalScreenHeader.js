@@ -8,19 +8,17 @@ import TopNavigationTitle from '../TopNavigationTitle';
 import HeaderWrapper, { STATUS_BAR_IOS } from './HeaderWrapper';
 import { StyleSheet, Platform, StatusBar } from 'react-native';
 
-const ProfessionalScreenHeader = ({pop}) => {
-    
+const ProfessionalScreenHeader = ({ pop }) => {
     let leftButton = null;
 
-        leftButton = (
-            <TopNavigationButton
-                type='LEFT'
-                testID='back-nav-button'
-                image={<Icon name='ios-arrow-back' color={Colors.primaryText} size={moderateScale(24)} />}
-                action={pop}
-            />
-        );
-    
+    leftButton = (
+        <TopNavigationButton
+            type='LEFT'
+            testID='back-nav-button'
+            image={<Icon name='ios-arrow-back' color={Colors.primaryText} size={moderateScale(24)} />}
+            action={pop}
+        />
+    );
 
     return (
         <HeaderWrapper style={styles.shadow}>

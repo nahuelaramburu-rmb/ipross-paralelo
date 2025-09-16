@@ -1,6 +1,5 @@
-
 import React from 'react';
-import {Text,View} from 'react-native';
+import { Text, View } from 'react-native';
 import LottieView from 'lottie-react-native';
 
 import TopNavigation from './TopNavigation';
@@ -17,7 +16,7 @@ export default class ErrorBoundary extends React.Component {
 
     componentDidCatch(error, info) {
         let err = this._processError(error);
-        err = err.replace(/(\r\n|\n|\r)/gm, " ");
+        err = err.replace(/(\r\n|\n|\r)/gm, ' ');
         this.props.sendError(err);
         this.setState({ hasError: true });
     }
@@ -32,13 +31,16 @@ export default class ErrorBoundary extends React.Component {
         if (this.state.hasError) {
             return (
                 <View style={{ flex: 1 }}>
-                    <TopNavigation currentScene={"error-boundary"} />
+                    <TopNavigation currentScene={'error-boundary'} />
                     <View style={{ flex: 1, marginTop: 0 }}>
                         <View style={{ flex: 0.6, alignItems: 'center', justifyContent: 'center' }}>
-                            <LottieView source={require('../animations/warning.json')} autoPlay loop={true}/>
+                            <LottieView source={require('../animations/warning.json')} autoPlay loop={true} />
                         </View>
                         <View style={{ flex: 0.4, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ fontFamily: bold, fontSize: 15, textAlign: 'center', margin: '2%' }}>{strings.errorBoundary.error_ocurred}</Text>
+                            <Text
+                                style={{ fontFamily: bold, fontSize: 15, textAlign: 'center', margin: '2%' }}>
+                                {strings.errorBoundary.error_ocurred}
+                            </Text>
                         </View>
                     </View>
                 </View>

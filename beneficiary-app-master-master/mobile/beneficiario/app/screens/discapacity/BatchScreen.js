@@ -22,7 +22,7 @@ const BatchScreen = () => {
         }),
         shallowEqual
     );
-   
+
     const searchBatches = useCallback(
         (isRefresh = false, filters = null, link = null) => {
             return dispatch(getBatches(isRefresh, filters, link));
@@ -36,7 +36,7 @@ const BatchScreen = () => {
 
     const renderItem = ({ item: batchItem, index }) => {
         if (index === 0 && batchItem.status.name === posibleStatuses.ACTIVE) {
-            console.log("aca");
+            console.log('aca');
 
             return <ActiveBatchItem item={batchItem} />;
         }

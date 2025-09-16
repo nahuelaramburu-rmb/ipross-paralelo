@@ -22,7 +22,7 @@ const ProfessionalListScreen = ({ route }) => {
         }),
         shallowEqual
     );
-    
+
     const idSpecialty = route.params?.idSpecialty ?? null;
     const idtown = route.params?.idTown ?? null;
 
@@ -40,7 +40,7 @@ const ProfessionalListScreen = ({ route }) => {
     const renderItem = ({ item: practitionerItem }) => {
         return <ProfessionalItem item={practitionerItem} />;
     };
-    
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <List

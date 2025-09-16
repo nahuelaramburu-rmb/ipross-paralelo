@@ -85,7 +85,10 @@ const _updateUserData = async (dispatch, getState) => {
     }
 };
 
-export const logout = (responseError = null) => (dispatch) => _logout(responseError, dispatch);
+export const logout =
+    (responseError = null) =>
+    (dispatch) =>
+        _logout(responseError, dispatch);
 const _logout = async (responseError, dispatch) => {
     try {
         await Firebase.messaging().deleteToken();
@@ -398,7 +401,7 @@ const _findRelatives = async (dispatch, getState) => {
         if (!response.ok) {
             throw json;
         }
-        
+
         await AsyncStorage.setItem('relatives', JSON.stringify(json._embedded.relatives));
 
         dispatch({ type: FETCH_RELATIVES_SUCCESS, relatives: json._embedded.relatives });
@@ -481,7 +484,7 @@ const _registerUserDevice = async (deviceToken, dispatch, getState) => {
             throw json;
         }
 
-        /* guardo token para saber si ya fui contra el server de notifications (puede que haya habido un error al momento de hacer la request, 
+        /* guardo token para saber si ya fui contra el server de notifications (puede que haya habido un error al momento de hacer la request,
             entonces cada vez que la app levanta lo intento hasta que pueda) */
         await AsyncStorage.setItem('fcmToken', deviceToken);
 

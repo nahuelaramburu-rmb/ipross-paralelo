@@ -85,7 +85,7 @@ const DropdownModal = forwardRef(
 
         const renderItem = ({ item, index }) => {
             let selected = false;
-            
+
             if (item.props.id === value) selected = true;
             return cloneElement(item, { onItemSelect: handleItemSelect, index, selected });
         };
@@ -93,7 +93,6 @@ const DropdownModal = forwardRef(
         const filteredChildren = React.Children.map(children, (child) => {
             if (child && typeof child.type === 'function') return child;
         });
-
 
         return (
             <Modal
