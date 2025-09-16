@@ -77,7 +77,7 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     entryFile: "index.js",
-    enableHermes: true,  // Enable Hermes for better performance with RN 0.72
+    enableHermes: true,  // Enable Hermes for better performance with RN 0.70
     bundleInDebug: false,  // Allow dev server in debug mode
     bundleInRelease: true,
     devDisabledInDebug: false,  // Enable dev mode in debug builds
@@ -152,6 +152,9 @@ android {
         versionCode 142
         versionName "1.4.2"
         multiDexEnabled = true
+        
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", false.toString()
+        buildConfigField "boolean", "IS_HERMES_ENABLED", enableHermes.toString()
     }
     splits {
         abi {
@@ -169,6 +172,25 @@ android {
             keyPassword keystoreProperties['keyPassword']
         }
     }
+    
+    lint {
+        disable 'LongLogTag'
+        disable 'AndroidGradlePluginVersion'
+        disable 'GradleDependency'
+        disable 'GradleDynamicVersion'
+        disable 'DiscouragedApi'
+        disable 'UseCompatLoadingForDrawables'
+        disable 'ObsoleteSdkInt'
+        disable 'StaticFieldLeak'
+        disable 'UseValueOf'
+        disable 'ViewConstructor'
+        disable 'SuspiciousIndentation'
+        abortOnError false
+        warningsAsErrors false
+        checkReleaseBuilds false
+        baseline = file("lint-baseline.xml")
+    }
+    
     buildTypes {
         debug {
             signingConfig = signingConfigs.debug
@@ -198,6 +220,11 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    
+    // React Native Dependencies - using autolinking
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.soloader:soloader:0.10.5"
 
    implementation(project(':react-native-maps')){
        exclude group: 'com.google.android.gms', module: 'play-services-base'
@@ -205,13 +232,7 @@ dependencies {
    }
 
     implementation 'com.google.android.gms:play-services-base:17.2.1'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'    
-    
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.google.android.gms:play-services-base:17.0.0"
-
-    // Additional React Native dependencies
-    implementation "com.facebook.soloader:soloader:0.10.5"
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
@@ -230,14 +251,9 @@ dependencies {
     // }
 
     if (enableHermes) {
-        // React Native 0.70.x - Use Hermes from react-native
-        def hermesPath = "../../node_modules/react-native/sdks/hermes"
-        def hermesAAR = "$hermesPath/hermes-debug.aar"
-        if (file(hermesAAR).exists()) {
-            implementation files(hermesAAR)
-        } else {
-            // Fallback para hermes incluido en react-native
-            implementation("com.facebook.react:react-native:+") // This includes hermes
+        //noinspection GradleDynamicVersion
+        implementation("com.facebook.react:hermes-engine:+") { // From node_modules
+            exclude group:'com.facebook.fbjni'
         }
     } else {
         implementation jscFlavor

@@ -1,10 +1,6 @@
 /* @flow */
 
-import {
-    ERROR,
-    CLEAR_ERROR,
-    ERROR_REPORTERED
-} from '../constants/ActionTypes';
+import { ERROR, CLEAR_ERROR, ERROR_REPORTERED } from '../constants/ActionTypes';
 
 import { DropDownHolder } from '../components/DropDownHolder';
 import errorCodes from '../constants/ErrorCodes';
@@ -12,7 +8,7 @@ import errorCodes from '../constants/ErrorCodes';
 const initialState = {
     data: [],
     status: null,
-    notify: false
+    notify: false,
 };
 
 /*
@@ -28,14 +24,14 @@ export default (state = initialState, action) => {
         case ERROR_REPORTERED:
             return {
                 ...state,
-                data: []
+                data: [],
             };
         case CLEAR_ERROR:
             return {
                 ...state,
                 data: {},
                 status: null,
-                notify: false
+                notify: false,
             };
         default:
             return state;

@@ -26,7 +26,7 @@ const appReducer = combineReducers({
     procedure,
     prescription,
     appointment,
-    professional
+    professional,
 });
 
 const rootReducer = (state, action) => {

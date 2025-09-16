@@ -75,7 +75,7 @@ function handleFetchPrescriptionSuccess(state, action) {
     if (!state.items._embedded) return state;
 
     const alreadyLoadedPrescr = [...state.items._embedded.prescriptions];
-    const indx = alreadyLoadedPrescr.findIndex(it => it.id === action.prescription.id);
+    const indx = alreadyLoadedPrescr.findIndex((it) => it.id === action.prescription.id);
     if (indx > -1) return state;
     alreadyLoadedPrescr.unshift(action.prescription);
 

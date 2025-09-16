@@ -1,16 +1,13 @@
 /* @flow */
 
-import {
-    FETCHING_TRIPS,
-    FETCH_TRIPS_SUCCESS
-} from '../constants/ActionTypes';
+import { FETCHING_TRIPS, FETCH_TRIPS_SUCCESS } from '../constants/ActionTypes';
 
 const initialState = {
     trips: {
         // TRIPS DEL USUARIO SELECCIONADO EN REDUCER DE PROFILE (RELATIVES)
         items: {},
-        loading: false
-    }
+        loading: false,
+    },
 };
 
 export default (state = initialState, action) => {
@@ -20,8 +17,8 @@ export default (state = initialState, action) => {
                 ...state,
                 trips: {
                     ...state.trips,
-                    loading: true
-                }
+                    loading: true,
+                },
             };
         case FETCH_TRIPS_SUCCESS:
             return {
@@ -29,8 +26,8 @@ export default (state = initialState, action) => {
                 trips: {
                     ...state.trips,
                     loading: false,
-                    items: { ...action.trips }
-                }
+                    items: { ...action.trips },
+                },
             };
         default:
             return state;

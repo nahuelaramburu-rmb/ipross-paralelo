@@ -16,12 +16,11 @@ import {
     FETCHING_MEDICAL_CENTER,
     FETCH_MEDICAL_CENTER_SUCCESS,
     FETCHING_MEDICAL_COORDINATES,
-    FETCH_MEDICAL_COORDINATES_SUCCESS,        
-    ERROR
+    FETCH_MEDICAL_COORDINATES_SUCCESS,
+    ERROR,
 } from '../constants/ActionTypes';
 
 const initialState = {
-    
     items: {},
     loading: false,
     loadingMore: false,
@@ -35,20 +34,18 @@ const initialState = {
     specialties: {
         items: [],
         loading: false,
-
     },
     //TOWN = LOCALIDAD
     towns: {
         items: [],
         loading: false,
     },
-    
+
     //PROFESIONALES PRACTITIONER
-    
     selectedPractitioner: {
         item: {},
         loading: false,
-    },    
+    },
 
     medicalCenters: {
         items: {},
@@ -58,13 +55,10 @@ const initialState = {
         items: {},
         loading: false,
     },
-
 };
 
 export default (state = initialState, action) => {
-    
     switch (action.type) {
-        
         case FETCHING_TYPE_SPECIALTY:
             return {
                 ...state,
@@ -141,13 +135,13 @@ export default (state = initialState, action) => {
             };
         case FETCH_PROFESSIONAL_SUCCESS:
             return {
-                    ...state,
-                    selectedPractitioner: {
-                        ...state.selectedPractitioner,
-                        loading: false,
-                        item: action.practitioner
-                    },
-                };
+                ...state,
+                selectedPractitioner: {
+                    ...state.selectedPractitioner,
+                    loading: false,
+                    item: action.practitioner,
+                },
+            };
             
         case FETCHING_MORE_PROFESSIONALS:
             return {
@@ -172,73 +166,68 @@ export default (state = initialState, action) => {
                     loadingMore: false,
                 },
             };
-            case FETCHING_MEDICAL_CENTER:
-                return {
-                    ...state,
-                    medicalCenters: {
-                        ...state.medicalCenters,
-                        loading: true,
-                    },
-                };
-            case FETCH_MEDICAL_CENTER_SUCCESS:
-                return {
-                    ...state,
-                    medicalCenters: {
-                        ...state.medicalCenters,
-                        loading: false,
-                        items: action.medicalCenters,
-                    },
-                };
-
-            case FETCHING_MEDICAL_COORDINATES:
-                return {
-                    ...state,
-                    medicalCoordinates: {
-                        ...state.medicalCoordinates,
-                        loading: true,
-                    },
-                };
-            case FETCH_MEDICAL_COORDINATES_SUCCESS:
-                return {
-                    ...state,
-                    medicalCoordinates: {
-                        ...state.medicalCoordinates,
-                        loading: false,
-                        items: action.medicalCoordinates,
-                    },
-                };
-                    
-            case ERROR:
-                return {
-                    ...state,
+        case FETCHING_MEDICAL_CENTER:
+            return {
+                ...state,
+                medicalCenters: {
+                    ...state.medicalCenters,
                     loading: true,
+                },
+            };
+        case FETCH_MEDICAL_CENTER_SUCCESS:
+            return {
+                ...state,
+                medicalCenters: {
+                    ...state.medicalCenters,
+                    loading: false,
+                    items: action.medicalCenters,
+                },
+            };
 
-                    typesSpecialty: {
-                        ...state.typesSpecialty,
-                        loading: false,
-                    },
-                    specialties: {
-                        ...state.specialties,
-                        loading: false,
-                    },
-                    towns: {
-                        ...state.towns,
-                        loading: false,
-                    },
-                    specialties: {
-                        ...state.specialties,
-                        loading: false,
-                    },
+        case FETCHING_MEDICAL_COORDINATES:
+            return {
+                ...state,
+                medicalCoordinates: {
+                    ...state.medicalCoordinates,
+                    loading: true,
+                },
+            };
+        case FETCH_MEDICAL_COORDINATES_SUCCESS:
+            return {
+                ...state,
+                medicalCoordinates: {
+                    ...state.medicalCoordinates,
+                    loading: false,
+                    items: action.medicalCoordinates,
+                },
+            };
+                    
+        case ERROR:
+            return {
+                ...state,
+                loading: true,
 
-                    selectedPractitioner: {
-                        ...state.selectedPractitioner,
-                        loading: false,
-                    },
-                    medicalCenters: {
-                        ...state.medicalCenters,
-                        loading: false,
-                    },                    
-                };            
+                typesSpecialty: {
+                    ...state.typesSpecialty,
+                    loading: false,
+                },
+                specialties: {
+                    ...state.specialties,
+                    loading: false,
+                },
+                towns: {
+                    ...state.towns,
+                    loading: false,
+                },
+                selectedPractitioner: {
+                    ...state.selectedPractitioner,
+                    loading: false,
+                },
+                medicalCenters: {
+                    ...state.medicalCenters,
+                    loading: false,
+                },
+            };
         default:
             return state;
     }
