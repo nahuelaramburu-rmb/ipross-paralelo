@@ -172,13 +172,15 @@ const _hasToUpdateApp = async () => {
             json.data.beneficiaryApp
                 .split('.')
                 .map((item) => (item.length === 1 ? `0${item}` : item))
-                .join('')
+                .join(''),
+            10
         );
         const currentInstalledVersion = Number.parseInt(
             getVersion()
                 .split('.')
                 .map((item) => (item.length === 1 ? `0${item}` : item))
-                .join('')
+                .join(''),
+            10
         );
 
         return currentInstalledVersion < mobileVersionSupported;

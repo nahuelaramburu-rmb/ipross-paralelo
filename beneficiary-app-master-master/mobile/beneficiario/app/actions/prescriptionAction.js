@@ -67,7 +67,7 @@ export const selectPrescription = (prescriptionId) => (dispatch, getState) =>
 const _selectPrescription = async (prescriptionId, dispatch, getState) => {
     const selectedPrescription =
         get(getState(), 'prescription.prescriptionList.items._embedded.prescriptions', []).find(
-            (item) => item.id === parseInt(prescriptionId)
+            (item) => item.id === parseInt(prescriptionId, 10)
         ) || {};
 
     if (!isEmpty(selectedPrescription)) {

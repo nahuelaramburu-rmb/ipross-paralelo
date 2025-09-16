@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 
 import * as Colors from '../../constants/Colors';
-import { moderateScale, verticalScale } from '../../lib/size-normalizer';
+import { verticalScale } from '../../lib/size-normalizer';
 import { useNavigation } from '@react-navigation/native';
-import { DropDownHolder } from '../DropDownHolder';
 import strings from '../../constants/Strings';
-import TextField from '../../components/TextField';
 import Dropdown, { Option } from '../../components/dropdown';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
@@ -33,7 +31,6 @@ const AppointmentForm = ({
     hora = '',
     box_id = '',
     applicant_id = '',
-
 }) => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -62,11 +59,10 @@ const AppointmentForm = ({
             afiliado_id: state.appointment.applicant.id ?? null,
         }),
         shallowEqual
-
+    );
 
     const handleConfirm = (values) => {
-
-            const data = {
+        const data = {
             sector_id: values.sector_id,
             fecha: values.fecha,
             hora: values.hora,
@@ -105,7 +101,7 @@ const AppointmentForm = ({
     );
     useEffect(() => {
         todasDelegaciones();
-    }, []);
+    }, [todasDelegaciones]);
 
     const handleDelegationChange = (text) => {
         setFieldValue('delegation', text);
@@ -119,8 +115,7 @@ const AppointmentForm = ({
     };
 
     const handleTurnoChange = (text) => {
-
-            setFieldValue('turno', text);
+        setFieldValue('turno', text);
 
         const datosTurno = appointments_enabled.filter((it) => it.order_key === text);
 

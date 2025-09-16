@@ -29,7 +29,7 @@ const ProfessionalItem = ({ item }) => {
             practitionerLink: medico._links.medicalCenters.href,
             practitionerId: medico.idNumber,
         });
-    }, [medico.idNumber, medico._links, getPractitioner, getMedicalCenters]);
+    }, [dispatch, medico.id, medico.idNumber, medico._links, navigation]);
 
     return (
         <ListItem

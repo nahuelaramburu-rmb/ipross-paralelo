@@ -92,7 +92,7 @@ const AppointmentList = ({ filters, onScroll = true }) => {
 
     useEffect(() => {
         searchTurnos();
-    }, []);
+    }, [searchTurnos]);
 
     return (
         <List

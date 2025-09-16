@@ -44,7 +44,7 @@ const AppointmentDetail = ({ route }) => {
         shallowEqual
     );
 
-    ejectCancel = () => {
+    const ejectCancel = () => {
         dispatch(cancelAppointment(turno.token));
         DropDownHolder.alert('success', 'Éxito', 'Cancelación Exitosa');
         dispatch(getAppointmentById(turnoId));
@@ -74,7 +74,7 @@ const AppointmentDetail = ({ route }) => {
 
     useEffect(() => {
         dispatch(getAppointmentById(turnoId));
-    }, []);
+    }, [dispatch, turnoId]);
 
     if (selectedAppointmentLoading) {
         return (

@@ -569,9 +569,6 @@ describe('profile reducer tests', () => {
             account: {
                 ...initialState.account,
                 loading: false,
-            },
-            account: {
-                ...initialState.account,
                 validating_data: false,
                 creating_account: false,
             },

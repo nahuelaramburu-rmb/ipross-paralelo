@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise, no-sequences, no-useless-escape, no-undef */
 /*
  A JavaScript implementation of the SHA family of hashes, as
  defined in FIPS PUB 180-2 as well as the corresponding HMAC implementation

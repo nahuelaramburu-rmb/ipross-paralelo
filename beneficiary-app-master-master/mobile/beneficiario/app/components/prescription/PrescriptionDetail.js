@@ -80,7 +80,7 @@ const PrescriptionDetail = ({ route }) => {
 
     useEffect(() => {
         dispatch(selectPrescription(prescriptionId));
-    }, []);
+    }, [dispatch, prescriptionId]);
 
     const renderPrescriptionItem = ({ item, index }) => {
         return <PrescriptionItem item={item} index={index} />;
