@@ -187,7 +187,7 @@ const AppointmentForm = ({
                 </Dropdown>
             </View>
 
-            <View style={{ flex: 2 }}></View>
+            <View style={{ flex: 2 }} />
         </View>
     );
 };
