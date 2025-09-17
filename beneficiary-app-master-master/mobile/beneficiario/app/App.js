@@ -1,301 +1,383 @@
-import React, { PureComponent } from 'react';
-import { Alert, AppState, Linking, BackHandler, Platform } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { connect } from 'react-redux';
-import DropdownAlertMessage from './components/DropdownAlertMessage';
-import ErrorBoundary from './components/ErrorBoundary';
-import AppContainer from './components/Router';
-import { navigate } from './lib/NavigationService';
-import Firebase from '@react-native-firebase/app';
-import PushNotification from 'react-native-push-notification';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import strings from './constants/Strings';
-import { enableScreens } from 'react-native-screens';
+import React, { Component } from 'react';
 import {
-    getSavedData,
-    updateUserData,
-    registerUserDevice,
-    checkUpdationNedded,
-} from './actions/profileAction';
-import { loginApiTurnos } from './actions/appointmentAction';
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StatusBar,
+    ActivityIndicator,
+} from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
 
-import { updateScene } from './actions/routerAction';
-import { getValidations } from './actions/validationAction';
-import { getUserCharges } from './actions/chargeAction';
-import { reportErrors, sendError } from './actions/errorAction';
-import { getPrescriptions } from './actions/prescriptionAction';
-
-import moment from 'moment';
-import 'moment/locale/es-us';
-import NoInternetConnection from './components/NoInternetConnection';
-moment.locale('es-us');
-
-enableScreens();
-
-const notificationHandler = (notification) => {
-    const { data } = notification;
-    switch (data.type) {
-        case 'VALIDATION_UPDATE':
-            navigate('ValidationStatus', {
-                valId: data.authorizationId,
-            });
-            break;
-        case 'PROCEDURE_NEW_MESSAGE':
-            navigate('ProcedureDetail', {
-                procedureId: data.procedureId,
-                procedureType: data.procedureType,
-                type: 'NEW_MESSAGE',
-                key: 'APage' + Math.random() * 10000, // EL KEY ESTÁ PARA QUE ME UPDATEE LOS PARAMS EN EL COMPONENTE DESTINO
-            });
-            break;
-        case 'PROCEDURE_UPDATE':
-            navigate('ProcedureDetail', {
-                procedureId: data.procedureId,
-                procedureType: data.procedureType,
-            });
-            break;
-        case 'NEW_PRESCRIPTION':
-            navigate('PrescriptionDetail', {
-                prescriptionId: data.prescriptionId,
-            });
-            break;
-        case 'CAMPAIGN':
-            setTimeout(() => {
-                Linking.openURL(data.url).catch((err) => console.error('An error occurred', err));
-            }, 500);
-            break;
-        default:
-            break;
-    }
-};
-
-PushNotification.configure({
-    onNotification: function (notification) {
-        // Solo handleo notis que se generan local (es decir, aquellas que se generan en foreground)
-        if (notification.foreground) notificationHandler(notification);
-    },
-});
-
-class App extends PureComponent {
+class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            status: 'initializing',
-            appState: AppState.currentState,
-            checkingUpdation: false,
+            username: '',
+            password: '',
+            isLoading: false,
+            showPassword: false,
         };
-
-        this.notificationListener = null;
-        this.messageListener = null;
-        this.notificationOpenedListener = null;
-        this.updateTokenListener = null;
-
-        this._handleAppStateChange = this._handleAppStateChange.bind(this);
-        this._handleBackButton = this._handleBackButton.bind(this);
-        this._checkUpdation = this._checkUpdation.bind(this);
-        this._showUpdationModal = this._showUpdationModal.bind(this);
-        this._createLocalNotification = this._createLocalNotification.bind(this);
     }
 
-    async componentDidMount() {
-        AppState.addEventListener('change', this._handleAppStateChange);
-        BackHandler.addEventListener('hardwareBackPress', this._handleBackButton);
-        if (this.state.status === 'initializing') {
-            const updationNedded = await this._checkUpdation();
-            if (!updationNedded) this.props.getSavedData();
+    handleLogin = async () => {
+        const { username, password } = this.state;
+
+        if (!username.trim() || !password.trim()) {
+            Alert.alert('Error', 'Por favor ingrese usuario y contraseña');
+            return;
         }
-    }
 
-    async _checkUpdation() {
-        if (this.state.checkingUpdation) return;
+        this.setState({ isLoading: true });
+
         try {
-            this.setState({ checkingUpdation: true });
-            const updationNedded = await this.props.checkUpdationNedded();
-            if (updationNedded) this._showUpdationModal();
-            return updationNedded;
-        } catch (err) {
-            console.log(err);
-            return false;
-        } finally {
-            this.setState({ checkingUpdation: false });
-        }
-    }
+            // Configuración real basada en el código original encontrado
+            const identityHost = 'http://localhost:8080'; // Cambiar por la URL real del servidor
+            const endpoint = `${identityHost}/identity-service/v1/oauth/token`;
+            
+            const loginData = new URLSearchParams({
+                username: username.trim(),
+                password: password.trim(),
+                grant_type: 'password',
+                client_id: 'client', // Credenciales encontradas en application-test.properties
+                client_secret: 'secret', // Credenciales encontradas en application-test.properties
+            });
 
-    _showUpdationModal() {
-        Alert.alert(
-            strings.general.updation_needed,
-            strings.general.updation_needed_description,
-            [
-                {
-                    text: strings.general.go_to_playstore,
-                    onPress: () => {
-                        const url =
-                            Platform.OS === 'android'
-                                ? 'market://details?id=com.capacidad.beneficiaryapp'
-                                : 'itms-apps://itunes.apple.com/us/app/apple-store/id1511226661?';
-                        Linking.openURL(url).catch((err) => console.error('An error occurred', err));
-                    },
+            const response = await axios.post(endpoint, loginData, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            ],
-            { cancelable: false }
-        );
-    }
+                timeout: 10000, // 10 segundos de timeout
+            });
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.status !== this.state.status && this.state.status === 'logged_in') {
-            this._checkFirebasePermission();
-            this._createNotificationListeners();
-            this._createFirebaseChannel(); // To display notifications
-            this._createUpdateTokenListener();
-            this.props.getValidations(false);
-            this.props.getUserCharges(false);
-            this.props.getPrescriptions({});
-        }
-    }
+            if (response.data && response.data.access_token) {
+                this.setState({ isLoading: false });
+                // Guardar el token para futuras peticiones
+                Alert.alert('Éxito', `Bienvenido ${username} a IPROSS`);
+                console.log('Token obtenido:', response.data.access_token);
+            } else {
+                throw new Error('No se recibió token de acceso');
+            }
 
-    componentWillUnmount() {
-        AppState.removeEventListener('change', this._handleAppStateChange);
-        BackHandler.removeEventListener('hardwareBackPress', this._handleBackButton);
-        if (this.notificationListener) this.notificationListener();
-        if (this.notificationOpenedListener) this.notificationOpenedListener();
-        if (this.updateTokenListener) this.updateTokenListener();
-    }
-
-    static getDerivedStateFromProps(props, state) {
-        if (props.status !== state.status) return { status: props.status };
-
-        return null;
-    }
-
-    _handleBackButton() {
-        if (this.props.currentScene === 'BeneficiaryInformation' || this.props.currentScene === 'Login') {
-            BackHandler.exitApp();
-            return true;
-        }
-    }
-
-    async _handleAppStateChange(nextAppState) {
-        if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-            this._checkUpdation();
-            if (this.state.status === 'initializing') return;
-            if (this.state.status === 'logged_in') {
-                this.props.updateUserData();
+        } catch (error) {
+            this.setState({ isLoading: false });
+            console.error('Login error:', error);
+            
+            if (error.code === 'ECONNABORTED') {
+                Alert.alert('Error', 'Tiempo de espera agotado. Verifique su conexión.');
+            } else if (error.response?.status === 401) {
+                Alert.alert('Error', 'Usuario y/o contraseña incorrectos');
+            } else if (error.response?.status >= 500) {
+                Alert.alert('Error', 'Error del servidor. Intente más tarde.');
+            } else {
+                Alert.alert('Error', 'No se pudo conectar con el servidor. Verifique su conexión a internet.');
             }
         }
+    };
 
-        this.setState({ appState: nextAppState });
-    }
-
-    async _getFirebaseToken() {
-        /* solo devuelvo el token cuando no lo tengo en local storage, eso quiere decir que no registré el device en el notification service */
-        let fcmToken = await AsyncStorage.getItem('fcmToken');
-        if (!fcmToken) {
-            fcmToken = await Firebase.messaging().getToken();
-            return fcmToken;
-        }
-    }
-
-    async _requestFirebasePermission() {
-        try {
-            await Firebase.messaging().requestPermission();
-            return await this._getFirebaseToken();
-        } catch (error) {
-            console.log('permission rejected');
-        }
-    }
-
-    async _checkFirebasePermission() {
-        const enabled = await Firebase.messaging().hasPermission();
-        let token = null;
-        if (enabled) {
-            token = await this._getFirebaseToken();
-        } else {
-            token = await this._requestFirebasePermission();
-        }
-
-        /* Veo si ya fui contra el server de notifications, en caso de que no, voy */
-        if (typeof token !== 'undefined') this.props.registerUserDevice(token);
-    }
-
-    async _createNotificationListeners() {
-        this.notificationOpenedListener = Firebase.messaging().onNotificationOpenedApp((notificationOpen) => {
-            // SALE POR ACA CUANDO TAPPEO EL BANNER DE LA NOTIFICACIÓN Y LA APP ESTABA FOREGROUND O BACKGROUND
-            notificationHandler(notificationOpen);
-        });
-
-        const notificationOpen = await Firebase.messaging().getInitialNotification();
-        if (notificationOpen) {
-            // SALE POR ACA CUANDO TAPPEO EL BANNER DE LA NOTIFICACIÓN Y LA APP ESTABA KILLED
-            notificationHandler(notificationOpen);
-        }
-
-        this.messageListener = Firebase.messaging().onMessage((message) => {
-            // SALE POR ACA CUANDO LA APP ESTÁ EN FOREGROUND Y EN EL MESSAGE VIENE SOLO DATA (NO NOTIFICATION)
-            this._createLocalNotification(message);
-        });
-    }
-
-    _createLocalNotification(message) {
-        const { notification, data } = message;
-        PushNotification.localNotification({
-            mesageId: message.messageId,
-            title: notification.title,
-            message: notification.body || '',
-            channelId: 'notification-channel',
-            color: '#000000',
-            userInfo: data,
-        });
-    }
-
-    _createFirebaseChannel() {
-        PushNotification.createChannel(
-            {
-                channelId: 'notification-channel',
-                channelName: 'Notification Channel',
-                channelDescription: 'Channel for displaying notifications',
-                importance: 4,
-            },
-            (created) => console.log(`createChannel returned '${created}'`)
-        );
-    }
-
-    _createUpdateTokenListener() {
-        this.updateTokenListener = Firebase.messaging().onTokenRefresh((fcmToken) => {
-            this.props.registerUserDevice(fcmToken);
-        });
-    }
+    togglePasswordVisibility = () => {
+        this.setState(prevState => ({
+            showPassword: !prevState.showPassword
+        }));
+    };
 
     render() {
-        const { status } = this.state;
+        const { username, password, isLoading, showPassword } = this.state;
+
         return (
             <SafeAreaProvider>
-                <ErrorBoundary sendError={(err) => this.props.sendError(err)}>
-                    <NoInternetConnection />
-                    <AppContainer status={status} />
-                </ErrorBoundary>
-                <DropdownAlertMessage />
+                <StatusBar barStyle="light-content" backgroundColor="#1a365d" />
+                <SafeAreaView style={styles.container}>
+                    <KeyboardAvoidingView
+                        style={styles.keyboardContainer}
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    >
+                        <ScrollView 
+                            contentContainerStyle={styles.scrollContainer}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {/* Header con logo */}
+                            <View style={styles.headerContainer}>
+                                <View style={styles.logoContainer}>
+                                    <View style={styles.logoCircle}>
+                                        <Text style={styles.logoText}>I</Text>
+                                    </View>
+                                    <Text style={styles.appTitle}>IPROSS</Text>
+                                    <Text style={styles.appSubtitle}>Instituto Provincial de Obra Social</Text>
+                                </View>
+                            </View>
+
+                            {/* Formulario de login */}
+                            <View style={styles.formContainer}>
+                                <View style={styles.welcomeContainer}>
+                                    <Text style={styles.welcomeTitle}>Bienvenido</Text>
+                                    <Text style={styles.welcomeSubtitle}>
+                                        Ingrese sus credenciales para acceder a su cuenta
+                                    </Text>
+                                </View>
+
+                                <View style={styles.inputsContainer}>
+                                    <View style={styles.inputWrapper}>
+                                        <Text style={styles.inputLabel}>Número de Beneficiario</Text>
+                                        <View style={styles.inputContainer}>
+                                            <TextInput
+                                                style={styles.input}
+                                                value={username}
+                                                onChangeText={(text) => this.setState({ username: text })}
+                                                placeholder='Ingrese su número de beneficiario'
+                                                placeholderTextColor='#9ca3af'
+                                                autoCapitalize='none'
+                                                autoCorrect={false}
+                                                keyboardType='numeric'
+                                                returnKeyType='next'
+                                                onSubmitEditing={() => this.passwordInput?.focus()}
+                                            />
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.inputWrapper}>
+                                        <Text style={styles.inputLabel}>Contraseña</Text>
+                                        <View style={styles.inputContainer}>
+                                            <TextInput
+                                                ref={ref => this.passwordInput = ref}
+                                                style={[styles.input, { paddingRight: 50 }]}
+                                                value={password}
+                                                onChangeText={(text) => this.setState({ password: text })}
+                                                placeholder='Ingrese su contraseña'
+                                                placeholderTextColor='#9ca3af'
+                                                secureTextEntry={!showPassword}
+                                                returnKeyType='done'
+                                                onSubmitEditing={this.handleLogin}
+                                            />
+                                            <TouchableOpacity 
+                                                style={styles.eyeButton}
+                                                onPress={this.togglePasswordVisibility}
+                                            >
+                                                <Text style={styles.eyeIcon}>
+                                                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+
+                                <TouchableOpacity
+                                    style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+                                    onPress={this.handleLogin}
+                                    disabled={isLoading}
+                                    activeOpacity={0.8}
+                                >
+                                    {isLoading ? (
+                                        <View style={styles.loadingContainer}>
+                                            <ActivityIndicator size="small" color="#ffffff" />
+                                            <Text style={styles.loginButtonText}>Ingresando...</Text>
+                                        </View>
+                                    ) : (
+                                        <Text style={styles.loginButtonText}>Ingresar</Text>
+                                    )}
+                                </TouchableOpacity>
+
+                                <View style={styles.footerContainer}>
+                                    <TouchableOpacity style={styles.forgotPasswordButton}>
+                                        <Text style={styles.forgotPasswordText}>
+                                            ¿Olvidaste tu contraseña?
+                                        </Text>
+                                    </TouchableOpacity>
+                                    
+                                    <View style={styles.registerContainer}>
+                                        <Text style={styles.registerText}>¿No tienes una cuenta? </Text>
+                                        <TouchableOpacity>
+                                            <Text style={styles.registerLink}>Regístrate aquí</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+                </SafeAreaView>
             </SafeAreaProvider>
         );
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        status: state.profile.status,
-        currentScene: state.router.currentScene,
-    };
-}
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f8fafc',
+    },
+    keyboardContainer: {
+        flex: 1,
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingHorizontal: 24,
+        paddingVertical: 32,
+    },
+    headerContainer: {
+        alignItems: 'center',
+        marginBottom: 48,
+    },
+    logoContainer: {
+        alignItems: 'center',
+    },
+    logoCircle: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: '#2563eb',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+        shadowColor: '#2563eb',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    logoText: {
+        fontSize: 36,
+        fontWeight: 'bold',
+        color: '#ffffff',
+    },
+    appTitle: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#1e293b',
+        marginBottom: 4,
+    },
+    appSubtitle: {
+        fontSize: 16,
+        color: '#64748b',
+        textAlign: 'center',
+    },
+    formContainer: {
+        backgroundColor: '#ffffff',
+        borderRadius: 16,
+        padding: 24,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    welcomeContainer: {
+        alignItems: 'center',
+        marginBottom: 32,
+    },
+    welcomeTitle: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#1e293b',
+        marginBottom: 8,
+    },
+    welcomeSubtitle: {
+        fontSize: 16,
+        color: '#64748b',
+        textAlign: 'center',
+        lineHeight: 24,
+    },
+    inputsContainer: {
+        marginBottom: 24,
+    },
+    inputWrapper: {
+        marginBottom: 20,
+    },
+    inputLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: 8,
+    },
+    inputContainer: {
+        position: 'relative',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#d1d5db',
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        fontSize: 16,
+        backgroundColor: '#f9fafb',
+        color: '#1f2937',
+    },
+    eyeButton: {
+        position: 'absolute',
+        right: 12,
+        top: '50%',
+        transform: [{ translateY: -12 }],
+        padding: 4,
+    },
+    eyeIcon: {
+        fontSize: 20,
+    },
+    loginButton: {
+        backgroundColor: '#2563eb',
+        borderRadius: 12,
+        paddingVertical: 16,
+        alignItems: 'center',
+        marginBottom: 24,
+        shadowColor: '#2563eb',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    loginButtonDisabled: {
+        backgroundColor: '#9ca3af',
+        shadowOpacity: 0,
+        elevation: 0,
+    },
+    loadingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    loginButtonText: {
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 8,
+    },
+    footerContainer: {
+        alignItems: 'center',
+    },
+    forgotPasswordButton: {
+        marginBottom: 16,
+    },
+    forgotPasswordText: {
+        color: '#2563eb',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    registerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    registerText: {
+        color: '#64748b',
+        fontSize: 14,
+    },
+    registerLink: {
+        color: '#2563eb',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+});
 
-export default connect(mapStateToProps, {
-    reportErrors,
-    getSavedData,
-    updateScene,
-    getValidations,
-    updateUserData,
-    loginApiTurnos,
-    getUserCharges,
-    sendError,
-    registerUserDevice,
-    getPrescriptions,
-    checkUpdationNedded,
-})(App);
+export default App;
