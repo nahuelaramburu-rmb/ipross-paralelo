@@ -32,7 +32,7 @@ public class MainActivity extends ReactActivity {
                 ReactRootView reactRootView = new ReactRootView(MainActivity.this);
                 // ReactRootView reactRootView = new RNGestureHandlerEnabledRootView(MainActivity.this);
                 // If you opted-in for the New Architecture, we enable the Fabric Renderer.
-                reactRootView.setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED);
+                reactRootView.setIsFabric(false);
                 return reactRootView;
             }
         };

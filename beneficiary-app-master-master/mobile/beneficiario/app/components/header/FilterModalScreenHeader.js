@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { moderateScale } from '../../lib/size-normalizer';
 import Icon from 'react-native-vector-icons/Ionicons';
 import strings from '../../constants/Strings';

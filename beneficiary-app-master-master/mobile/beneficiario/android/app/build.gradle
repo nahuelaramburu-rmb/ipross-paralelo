@@ -149,8 +149,8 @@ android {
         applicationId "com.ipross.beneficiario.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 143
-        versionName "1.4.3"
+        versionCode 148
+        versionName "1.4.8"
         multiDexEnabled = true
         
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", false.toString()

@@ -1,5 +1,5 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
-import { View, Platform } from 'react-native';
+import { View } from 'react-native';
 import TextField from './TextField';
 import * as Colors from '../constants/Colors';
 import { moderateScale } from '../lib/size-normalizer';

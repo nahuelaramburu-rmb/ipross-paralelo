@@ -7,7 +7,6 @@ import { updateAccess } from '../lib/authentication';
 import { LOGGED_IN } from '../constants/ActionTypes';
 
 import rootReducer from '../reducers';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 var tokenPromise = null;
 

@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, Dimensions, Animated } from 'react-native';
 
 import * as Colors from '../constants/Colors';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 import { font_styles } from '../lib/default-styles';
 
 import { moderateScale } from '../lib/size-normalizer';

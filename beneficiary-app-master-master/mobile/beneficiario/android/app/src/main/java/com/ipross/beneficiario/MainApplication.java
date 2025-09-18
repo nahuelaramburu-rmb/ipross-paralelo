@@ -29,7 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
       new ReactNativeHost(this) {
         @Override
         public boolean getUseDeveloperSupport() {
-          return BuildConfig.DEBUG;
+          return false;
         }
 
         @Override
@@ -61,7 +61,7 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
-    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+    if (false) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
       // We use reflection here to pick up the class that initializes the new architecture,
       // since the new architecture is not available in old version of react native
