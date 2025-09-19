@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+// apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"  // Handled by autolinking
 import com.android.build.OutputFile
 
 /**
@@ -84,7 +84,8 @@ project.ext.react = [
     devDisabledInRelease: true,
 ]
 
-apply from: "../../node_modules/react-native/react.gradle"
+// React.gradle disabled due to Gradle 9 incompatibility - using manual bundle creation
+// apply from: "../../node_modules/react-native/react.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
