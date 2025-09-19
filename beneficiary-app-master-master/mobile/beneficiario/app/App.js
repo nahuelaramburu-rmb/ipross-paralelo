@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image } from 'react-native';
 
 class App extends Component {
     constructor(props) {
@@ -24,11 +24,11 @@ class App extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.logoContainer}>
-                    <View style={styles.logoCircle}>
-                        <Text style={styles.logoText}>I</Text>
-                    </View>
-                    <Text style={styles.appTitle}>IPROSS</Text>
-                    <Text style={styles.subtitle}>Instituto Provincial de Obra Social</Text>
+                    <Image 
+                        source={require('./images/ipross_logo_green.jpg')} 
+                        style={styles.logoImage}
+                        resizeMode="contain"
+                    />
                 </View>
 
                 <View style={styles.formContainer}>
@@ -72,7 +72,7 @@ class App extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#6ac54e',
         paddingHorizontal: 24,
         paddingVertical: 32,
         justifyContent: 'center'
@@ -81,35 +81,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 48
     },
-    logoCircle: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#2563eb',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 16
-    },
-    logoText: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: '#ffffff'
-    },
-    appTitle: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#1e293b',
-        marginBottom: 4
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#64748b',
-        textAlign: 'center'
+    logoImage: {
+        width: 200,
+        height: 100
     },
     formContainer: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#e8f5e8',
         borderRadius: 16,
-        padding: 24
+        padding: 24,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5
     },
     welcomeTitle: {
         fontSize: 28,
@@ -137,11 +124,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9fafb'
     },
     loginButton: {
-        backgroundColor: '#2563eb',
+        backgroundColor: '#4a9f3a',
         borderRadius: 12,
         paddingVertical: 16,
         alignItems: 'center',
-        marginVertical: 24
+        marginVertical: 24,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3
     },
     loginButtonText: {
         color: '#ffffff',
@@ -152,8 +147,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     forgotText: {
-        color: '#2563eb',
-        fontSize: 16
+        color: '#4a9f3a',
+        fontSize: 16,
+        fontWeight: '500'
     }
 });
 
