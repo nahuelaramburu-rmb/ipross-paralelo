@@ -47,6 +47,7 @@ public class AuthenticatorImpl implements Authenticator {
         return authenticator.getTotpPassword(getBase32Key(salt), Instant.now().toEpochMilli());
     }
 
+    //
     private String getBase32Key(String salt) {
         String stringKey = StringUtils.join(applicationProperties.getOtpKey(), salt);
         return codec32.encodeAsString(stringKey.getBytes()).replace(EQUAL, "");

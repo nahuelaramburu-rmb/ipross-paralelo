@@ -3,6 +3,7 @@ package com.capacidad.identityservice.config.oauth;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -16,12 +17,12 @@ public class ClientStoreConfig {
      * Repositorio de clientes en JDBC
      */
     @Bean
-    public RegisteredClientRepository registeredClientRepository(DataSource dataSource,
+    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate,
                                                                  PasswordEncoder passwordEncoder) {
-        JdbcRegisteredClientRepository jdbcRepository = new JdbcRegisteredClientRepository((JdbcOperations) dataSource);
+        JdbcRegisteredClientRepository jdbcRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
 
-        // Nota: La codificación de passwords se aplica directamente al crear los RegisteredClients
-        // ejemplo: clientSecret("{noop}miSecreto")
+        //  La codificación de passwords se aplica directamente al crear los RegisteredClients
+        // ejemplo: clientSecret("{noop}secreto")
         return jdbcRepository;
     }
 }
