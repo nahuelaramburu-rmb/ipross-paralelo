@@ -16,8 +16,13 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@SequenceGenerator(name = "base_seq_gen", sequenceName = "application_scope_role_seq")
+@SequenceGenerator(name = "scope_role_seq_gen", sequenceName = "application_scope_role_seq", allocationSize = 1)
 public class ScopeRole extends BaseEntity<Long> implements Serializable {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "scope_role_seq_gen")
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resource_id", nullable = false)

@@ -18,8 +18,13 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@SequenceGenerator(name = "base_seq_gen", sequenceName = "application_user_context_seq")
+@SequenceGenerator(name = "usercontext_seq_gen", sequenceName = "application_user_context_seq", allocationSize = 1)
 public class ApplicationUserContext extends BaseEntity<Long> implements Serializable {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usercontext_seq_gen")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_user_id", nullable = false)

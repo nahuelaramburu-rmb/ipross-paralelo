@@ -5,18 +5,21 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Base64;
 import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-final class JWTParser {
+
+final class JwtParser {
     private static final int HEADER = 0;
     private static final int PAYLOAD = 1;
     private static final int JWT_PARTS = 3;
     private static final String INVALID_ERROR_MESSAGE = "Invalid JWT";
     private static final String PARSING_ERROR_MESSAGE = "Error parsing JWT";
 
-    private JWTParser() {
+
+    private JwtParser() {
     }
 
     static JSONObject getHeader(String jwt) {
@@ -97,5 +100,8 @@ final class JWTParser {
             throw new InvalidParameterException("Malformed JWT");
         }
     }
+
+
+
 }
 

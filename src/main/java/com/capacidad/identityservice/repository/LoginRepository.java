@@ -20,4 +20,6 @@ public interface LoginRepository extends ExtendedRepository<Login, Long> {
     List<LoginViewDTO> findAllByPrincipalOrIpAddressAndFailureEvent(@Param("username") String username,
                                                                     @Param("ipAddress") String ipAddress);
 
+
+
 }

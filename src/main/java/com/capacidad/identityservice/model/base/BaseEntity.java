@@ -33,9 +33,10 @@ public abstract class BaseEntity<I extends Serializable> {
     @JsonIgnore
     @Column(name = "deletion_token", columnDefinition = "uuid DEFAULT uuid_nil()", nullable = false)
     protected UUID deletionToken = UUID.fromString(UUID_NIL);
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "base_seq_gen")
-    @SequenceGenerator(name = "sequenceGenerator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+   // @SequenceGenerator(name = "sequenceGenerator")
     private I id;
 
     public void associateChildObjects() {

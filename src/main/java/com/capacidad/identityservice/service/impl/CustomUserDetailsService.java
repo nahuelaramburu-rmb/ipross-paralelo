@@ -7,6 +7,7 @@ import com.capacidad.identityservice.service.ApplicationUserContextService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -50,7 +51,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final ApplicationUserContextService userContextService;
 
     @Autowired
-    public CustomUserDetailsService(ApplicationUserContextService userContextService) {
+    public CustomUserDetailsService(@Lazy ApplicationUserContextService userContextService) {
         this.userContextService = userContextService;
     }
 

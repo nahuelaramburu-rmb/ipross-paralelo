@@ -1,12 +1,10 @@
 package com.capacidad.identityservice.service.impl;
 
+import com.capacidad.identityservice.config.security.JwtUtils;
 import com.capacidad.identityservice.exception.InvalidUserStateException;
 import com.capacidad.identityservice.misc.Utils;
 import com.capacidad.identityservice.model.*;
-import com.capacidad.identityservice.model.dto.NewPasswordDTO;
-import com.capacidad.identityservice.model.dto.ResetPasswordDTO;
-import com.capacidad.identityservice.model.dto.RestorePasswordDTO;
-import com.capacidad.identityservice.model.dto.UpdateApplicationUserDTO;
+import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
 import com.capacidad.identityservice.repository.ApplicationUserRepository;
 import com.capacidad.identityservice.service.ApplicationUserService;
@@ -14,9 +12,15 @@ import com.capacidad.identityservice.service.ApplicationUserSupportService;
 import com.capacidad.identityservice.service.base.BaseServiceImpl;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
+import com.nimbusds.jwt.JWTParser;
+import io.jsonwebtoken.JwtParser;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static java.util.Collections.emptyList;
+
 @Log4j2
 @Service
 public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser, Long> implements ApplicationUserService {
@@ -36,13 +42,20 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     private final ApplicationUserRepository userRepository;
     private final ApplicationUserSupportService supportService;
 
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtil;
+    private final PasswordEncoder encoder;
+
 
     @Autowired
     public ApplicationUserServiceImpl(ApplicationUserRepository repository,
-                                      ApplicationUserSupportService supportService) {
+                                      ApplicationUserSupportService supportService, AuthenticationManager authenticationManager, JwtUtils jwtUtil, PasswordEncoder encoder) {
         super(repository);
         this.userRepository = repository;
         this.supportService = supportService;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.encoder = encoder;
     }
 
     @Override
@@ -264,6 +277,61 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
         contextUser.getProfile().setIdType(dataToUpdate.getProfile().getIdType());
         ApplicationUser updated = userRepository.save(contextUser);
         userContext.setUser(updated);
+    }
+
+
+
+    // todo , llenar con mas campos al user
+    @Override
+    public AuthResponse login(LoginRequestDTO request) {
+
+
+        // se encarga de validar el user y password,
+        // lanza una excepcion en casos incorrectos.
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        // aca ya se obtuvo el user
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new InvalidUserStateException("el usuario no existe"));
+
+        CustomUserDetails userDetails = new CustomUserDetails(user.getUsername(), user.getPassword(), emptyList());
+
+        var jwtToken = jwtUtil.generateToken(userDetails);
+
+        // retorno el token de login
+        return AuthResponse.builder()
+                .token(jwtToken)
+                .build();
+
+
+    }
+
+
+    // todo , llenar con mas campos al user
+    public String register(RegisterRequestDTO request) {
+
+        // VALIDAR que no exista un user con el mismo email
+        var userDB = userRepository.findByEmail(request.getEmail());
+
+        if (userDB.isPresent()){
+
+            throw new InvalidUserStateException("usuario con el mismo email ya registrado");
+        }
+
+        ApplicationUser user = new ApplicationUser();
+        user.setUsername(request.getFirstname());
+        user.setEmail(request.getEmail());
+        user.setPassword(encoder.encode(request.getPassword()));
+//        user.setRole(request.getRole());
+
+        userRepository.save(user);
+
+        return "cliente registrado con exito";
     }
 
 }

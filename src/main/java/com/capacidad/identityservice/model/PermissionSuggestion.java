@@ -18,8 +18,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@SequenceGenerator(name = "base_seq_gen", sequenceName = "application_permission_suggestion_seq")
+@SequenceGenerator(name = "permission_seq_gen", sequenceName = "application_permission_suggestion_seq", allocationSize = 1)
 public class PermissionSuggestion extends BaseEntity<Long> implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_seq_gen")
+    private Long id;
+
 
     @Column(nullable = false, unique = true)
     private String name;

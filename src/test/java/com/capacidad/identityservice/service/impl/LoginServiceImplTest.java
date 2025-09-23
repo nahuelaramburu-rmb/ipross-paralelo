@@ -62,7 +62,7 @@ public class LoginServiceImplTest {
                 () -> loginService.registerLoginAttempt(customUserDetails, LoginEvent.FAILURE, request)
         );
 
-        // Puedes opcionalmente verificar el mensaje de la excepción
+        // opcionalmente verificar el mensaje de la excepción
         assertEquals("Expected exception message", exception.getMessage());
     }
 

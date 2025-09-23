@@ -19,8 +19,14 @@ import static com.capacidad.identityservice.misc.constant.ApplicationConstants.C
 @NoArgsConstructor
 @Getter
 @Setter
-@SequenceGenerator(name = "base_seq_gen", sequenceName = "application_permission_group_seq")
+@SequenceGenerator(name = "permission_group_seq_gen", sequenceName = "application_permission_group_seq", allocationSize = 1)
 public class PermissionGroup extends BaseEntity<Long> implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_group_seq_gen")
+   // @SequenceGenerator(name = "permission_group_seq_gen", sequenceName = "application_permission_group_seq", allocationSize = 1)
+    private Long id;
+
 
     @Column(nullable = false, unique = true, updatable = false)
     private String name;

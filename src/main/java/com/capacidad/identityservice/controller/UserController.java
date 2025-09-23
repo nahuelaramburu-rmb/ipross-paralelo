@@ -1,6 +1,7 @@
 package com.capacidad.identityservice.controller;
 
 import com.capacidad.identityservice.misc.constant.ControllerEndpoints;
+import com.capacidad.identityservice.model.RegisterRequestDTO;
 import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.hal.PageModelWrapper;
 import com.capacidad.identityservice.model.projection.ApplicationUserContextProjection;
@@ -21,6 +22,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.util.Map;
 import java.util.UUID;
 
 import static com.capacidad.identityservice.misc.constant.ControllerEndpoints.*;
@@ -141,6 +144,21 @@ public class UserController {
     public ResponseEntity<Object> deleteAllUserContextsByResourceId(@RequestParam(name = "resource_id") UUID resourceId) throws ObjectNotFoundException, ObjectNotValidException {
         userContextService.deleteAll(resourceId);
         return ResponseEntity.noContent().build();
+    }
+
+
+    //
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) throws ObjectNotFoundException {
+
+        return ResponseEntity.ok(Map.of("message", userService.register(request)));
+    }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO authRequest) throws ObjectNotFoundException {
+
+        return ResponseEntity.ok(Map.of("message", userService.login(authRequest)));
     }
 
 }

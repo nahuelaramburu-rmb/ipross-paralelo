@@ -17,7 +17,7 @@ public final class SecurityUtils {
 
     public static Optional<String> getBearerToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
-        return StringUtils.isNotBlank(authorizationHeader) && StringUtils.startsWithIgnoreCase(authorizationHeader, "Bearer") ? Optional.of(JWTParser.removeJwtPrefix(authorizationHeader)) : Optional.empty();
+        return StringUtils.isNotBlank(authorizationHeader) && StringUtils.startsWithIgnoreCase(authorizationHeader, "Bearer") ? Optional.of(JwtParser.removeJwtPrefix(authorizationHeader)) : Optional.empty();
     }
 
     public static Optional<String[]> getBasicAuthorizationCredentials(HttpServletRequest request) {

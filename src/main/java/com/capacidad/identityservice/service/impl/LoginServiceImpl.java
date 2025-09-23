@@ -6,7 +6,10 @@ import com.capacidad.identityservice.exception.InvalidUserStateException;
 import com.capacidad.identityservice.model.CustomUserDetails;
 import com.capacidad.identityservice.model.Login;
 import com.capacidad.identityservice.model.LoginEvent;
+import com.capacidad.identityservice.model.dto.AuthResponseDTO;
+import com.capacidad.identityservice.model.dto.LoginRequestDTO;
 import com.capacidad.identityservice.model.projection.LoginViewDTO;
+import com.capacidad.identityservice.repository.ApplicationUserRepository;
 import com.capacidad.identityservice.repository.LoginRepository;
 import com.capacidad.identityservice.service.LoginService;
 import  com.capacidad.identityservice.misc.securityutils.SecurityUtils;
@@ -14,7 +17,10 @@ import  com.capacidad.identityservice.misc.securityutils.SecurityUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,10 +71,46 @@ public class LoginServiceImpl implements LoginService {
 
     private final LoginRepository loginRepository;
 
+    // se agregan estos campos
+    private final PasswordEncoder encoder;
+    private final AuthenticationManager authenticationManager;
+    private final ApplicationUserRepository userRepository;
+
     @Autowired
-    public LoginServiceImpl(LoginRepository loginRepository) {
+    public LoginServiceImpl(LoginRepository loginRepository, PasswordEncoder encoder, AuthenticationManager authenticationManager, ApplicationUserRepository userRepository) {
         this.loginRepository = loginRepository;
+        this.encoder = encoder;
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
     }
+
+
+    // forma de hacer login
+//    public AuthResponseDTO login(LoginRequestDTO request) {
+//
+//        // se encarga de validar el user y password,
+//        // lanza una excepcion en casos incorrectos.
+//        authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        request.getEmail(),
+//                        request.getPassword()
+//                )
+//        );
+//
+//        // aca ya se obtuvo el user
+//        var user = userRepository.findByEmail(request.getEmail())
+//                .orElseThrow(() -> new InvalidUserStateException("usuario no existe"));
+//
+//        System.out.println("user encontrado " + user.getEmail());
+//
+//        var jwtToken = jwtUtil.generateToken(user);
+//
+//        // retorno el token de login
+//        return AuthResponseDTO.builder()
+//                .token(jwtToken)
+//                .build();
+//    }
+
 
 
     // valida los intentos de ingreso fallidos del user

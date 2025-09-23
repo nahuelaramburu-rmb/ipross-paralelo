@@ -1,14 +1,10 @@
 package com.capacidad.identityservice.model;
 
 import com.capacidad.identityservice.model.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -55,8 +51,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@SequenceGenerator(name = "base_seq_gen", sequenceName = "application_tenant_seq")
+@SequenceGenerator(name = "tenant_seq_gen", sequenceName = "application_tenant_seq", allocationSize = 1)
 public class Tenant extends BaseEntity<Long> implements Serializable {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tenant_seq_gen")
+    private Long id;
+
 
     @Column(nullable = false, unique = true)
     private String name;

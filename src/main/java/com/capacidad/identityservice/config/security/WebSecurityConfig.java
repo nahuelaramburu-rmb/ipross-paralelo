@@ -9,9 +9,12 @@ import com.capacidad.identityservice.service.impl.CustomUserDetailsService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,6 +35,7 @@ import static com.capacidad.identityservice.misc.constant.SecurityConstants.FUND
 public class WebSecurityConfig {
 
     //servicio personalizado para cargar usuarios desde BD o cualquier fuente.
+    @Lazy
     private final CustomUserDetailsService userDetailsService;
 
     //se encarga de codificar y verificar contraseñas
@@ -75,32 +79,39 @@ public class WebSecurityConfig {
 
     //el administrador que coordina la autenticación
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManager.class);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     // se define toda la configuración (endpoints protegidos, filtros, roles, etc.).
     @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint customAuthEntryPoint) throws Exception {
 
         //aplica configuración por defecto para un Authorization Server OAuth2 (endpoints de autorización, tokens, etc.).
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        //OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
         // Configuración de endpoints ignorados
         http.csrf().disable()
+
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, ENDPOINT_HEALTH).permitAll()
-                        .requestMatchers(HttpMethod.GET, StringUtils.join(ENDPOINT_USERS, ENDPOINT_VERIFICATION, "/**")).permitAll()
-                        .requestMatchers(StringUtils.join(ENDPOINT_USERS, ENDPOINT_FORGOT, "/**")).permitAll()
-                        .requestMatchers(HttpMethod.PUT, StringUtils.join(ENDPOINT_USERS, ENDPOINT_PASSWORD, ".*", "username", ".*")).permitAll()
-                        .requestMatchers(HttpMethod.GET, StringUtils.join(ENDPOINT_USERS, ENDPOINT_ME)).authenticated()
-                        .requestMatchers(StringUtils.join(ENDPOINT_ACTUATOR, "/**")).hasRole(ADMIN)
-                        .requestMatchers(HttpMethod.PUT, StringUtils.join(ENDPOINT_USERS, ENDPOINT_PASSWORD_RESET)).hasAnyRole(ADMIN, FUNDER)
-                        .requestMatchers(HttpMethod.PUT, StringUtils.join(ENDPOINT_USERS, ".*", "sub", ".*")).hasAuthority(Utils.buildScope(UPDATE, USERS))
-                        .requestMatchers(HttpMethod.POST, StringUtils.join(ENDPOINT_USERS, "/**")).hasAuthority(Utils.buildScope(CREATE, USERS))
-                        .requestMatchers(HttpMethod.GET, StringUtils.join(ENDPOINT_USERS, "/**")).hasAuthority(Utils.buildScope(READ, USERS))
-                        .requestMatchers(HttpMethod.DELETE, StringUtils.join(ENDPOINT_USERS, "/**")).hasAuthority(Utils.buildScope(DELETE, USERS))
-                        .requestMatchers(HttpMethod.GET, StringUtils.join(ENDPOINT_PERMISSION_GROUPS, "/**")).hasAuthority(Utils.buildScope(READ, PERMISSION_GROUPS))
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_VERIFICATION + "/**").permitAll()
+                        .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD + "/**/username/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_ME).authenticated()
+                        .requestMatchers(ENDPOINT_ACTUATOR + "/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
+                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(READ, USERS))
+                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
+                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_LOGIN).permitAll() // login access
+                        .requestMatchers("/identity-service/v1/api-docs/**",
+                                "/identity-service/v1/swagger-ui/**",
+                                "/swagger-ui/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

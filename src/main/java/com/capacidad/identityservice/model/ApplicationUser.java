@@ -18,12 +18,18 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@SequenceGenerator(name = "base_seq_gen", sequenceName = "application_user_seq")
+@SequenceGenerator(name = "user_seq_gen", sequenceName = "application_user_seq", allocationSize = 1)
 public class ApplicationUser extends BaseEntity<Long> implements Serializable {
 
     //versión de serialización de la clase
     //Sirve para garantizar que los objetos serializados sean compatibles entre distintas versiones de la clase
     private static final long serialVersionUID = -2156950437969065955L;
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
+    private Long id;
+
 
     @Column(nullable = false, unique = true, updatable = false)
     private String username;
@@ -53,7 +59,7 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     @Column
     private ChallengeType challengeType;
 
-    //enum que clasifica al usuario (ej: ADMIN, USER, etc.).
+    //enum que clasifica al usuario (DEV, PROD, TEST, UAT)
     @Enumerated(EnumType.STRING)
     @Column(name = "user_group", nullable = false)
     private Group group;

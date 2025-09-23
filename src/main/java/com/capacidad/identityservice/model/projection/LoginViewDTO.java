@@ -1,11 +1,15 @@
 package com.capacidad.identityservice.model.projection;
 
 import com.capacidad.identityservice.model.Login;
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Data
 @Getter
+@Setter
 public class LoginViewDTO {
 
     private final Long id;

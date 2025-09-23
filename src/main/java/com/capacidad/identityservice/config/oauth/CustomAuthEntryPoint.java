@@ -110,7 +110,7 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
         response.getWriter().write(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(body)); //Escribe el JSON en el response
 
         // serializa el objeto java a json
-        objectMapper.writeValue(response.getOutputStream(), body);
+        objectMapper.writeValue(response.getWriter(), body);
 
         // registra en logs la información del error.
         log.warn("Authentication failed: {}", body);

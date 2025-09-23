@@ -2,10 +2,8 @@ package com.capacidad.identityservice.service;
 
 import com.capacidad.identityservice.model.ApplicationUser;
 import com.capacidad.identityservice.model.ApplicationUserContext;
-import com.capacidad.identityservice.model.dto.NewPasswordDTO;
-import com.capacidad.identityservice.model.dto.ResetPasswordDTO;
-import com.capacidad.identityservice.model.dto.RestorePasswordDTO;
-import com.capacidad.identityservice.model.dto.UpdateApplicationUserDTO;
+import com.capacidad.identityservice.model.RegisterRequestDTO;
+import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
 import com.capacidad.identityservice.service.base.BaseService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
@@ -49,4 +47,6 @@ public interface ApplicationUserService extends BaseService<ApplicationUser, Lon
 
     void update(ApplicationUserContext userContext, UpdateApplicationUserDTO dataToUpdate) throws ObjectNotFoundException;
 
+    Object login(LoginRequestDTO authRequest) throws ObjectNotFoundException;
+    Object register(RegisterRequestDTO authRequest) throws ObjectNotFoundException;
 }
