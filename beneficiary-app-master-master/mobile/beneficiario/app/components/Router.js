@@ -32,7 +32,7 @@ import PrescriptionDetail from './prescription/PrescriptionDetail';
 import ProfessionalScreen from '../screens/professional/ProfessionalScreen';
 import ProfessionalListScreen from '../screens/professional/ProfessionalListScreen';
 import ProfessionalDetailScreen from '../screens/professional/ProfessionalDetailScreen';
-import ProfessionalMapsScreen from '../screens/professional/ProfessionalMapsScreen';
+import ProfessionalMapsScreen from '../screens/professional/ProfessionalMapsScreenTemp';
 import {
     ValidationScreen,
     AuthorizationRatingScreen,
