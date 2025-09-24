@@ -10,7 +10,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
-// import Router from './components/Router';
+import Router from './components/RouterSimple';
 
 class App extends Component {
     constructor(props) {
@@ -64,79 +64,12 @@ class App extends Component {
         }
     };
 
-    renderSimpleMenu = () => {
-        return (
-            <View style={styles.container}>
-                <View style={styles.logoContainer}>
-                    <Image
-                        source={require('./images/ipross_logo_green.jpg')}
-                        style={styles.logoImage}
-                        resizeMode='cover'
-                    />
-                </View>
-
-                <View style={styles.menuContainer}>
-                    <Text style={styles.menuTitle}>IPROSS Beneficiario</Text>
-                    <Text style={styles.welcomeText}>¡Bienvenido al sistema!</Text>
-
-                    <TouchableOpacity 
-                        style={styles.menuButton}
-                        onPress={() => Alert.alert('Información', 'Mi Perfil - Función en desarrollo')}
-                    >
-                        <Text style={styles.menuButtonText}>Mi Perfil</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={styles.menuButton}
-                        onPress={() => Alert.alert('Información', 'Mis Beneficios - Función en desarrollo')}
-                    >
-                        <Text style={styles.menuButtonText}>Mis Beneficios</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={styles.menuButton}
-                        onPress={() => Alert.alert('Información', 'Autorizaciones - Función en desarrollo')}
-                    >
-                        <Text style={styles.menuButtonText}>Autorizaciones</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={styles.menuButton}
-                        onPress={() => Alert.alert('Información', 'Prestadores - Función en desarrollo')}
-                    >
-                        <Text style={styles.menuButtonText}>Prestadores</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={styles.menuButton}
-                        onPress={() => Alert.alert('Información', 'Contacto - Función en desarrollo')}
-                    >
-                        <Text style={styles.menuButtonText}>Contacto</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={[styles.menuButton, styles.logoutButton]}
-                        onPress={() => this.setState({ 
-                            isLoggedIn: false, 
-                            username: '', 
-                            password: '' 
-                        })}
-                    >
-                        <Text style={[styles.menuButtonText, styles.logoutText]}>
-                            Cerrar Sesión
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        );
-    };
-
     render() {
         const { isLoggedIn, loginSuccess } = this.state;
 
         if (isLoggedIn) {
-            // Menú principal simple sin navigation compleja
-            return this.renderSimpleMenu();
+            // Menú oficial: panel principal de la app
+            return <Router />;
         }
 
         // Mostrar mensaje de éxito
