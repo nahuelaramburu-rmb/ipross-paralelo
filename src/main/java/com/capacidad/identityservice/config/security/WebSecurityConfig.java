@@ -31,7 +31,8 @@ import static com.capacidad.identityservice.misc.constant.SecurityConstants.FUND
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)  // habilita la seguridad a nivel de métodos con anotaciones como @PreAuthorize y @PostAuthorize.
+@EnableMethodSecurity(prePostEnabled = true)
+// habilita la seguridad a nivel de métodos con anotaciones como @PreAuthorize y @PostAuthorize.
 public class WebSecurityConfig {
 
     //servicio personalizado para cargar usuarios desde BD o cualquier fuente.
@@ -95,36 +96,59 @@ public class WebSecurityConfig {
         http.csrf().disable()
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, ENDPOINT_HEALTH).permitAll()
-                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_VERIFICATION + "/**").permitAll()
-                        .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD + "/**/username/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_ME).authenticated()
-                        .requestMatchers(ENDPOINT_ACTUATOR + "/**").hasRole(ADMIN)
-                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
-                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
-                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
-                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(READ, USERS))
-                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
-                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
-                        .requestMatchers(HttpMethod.POST, ENDPOINT_LOGIN).permitAll() // login access
-                        .requestMatchers("/identity-service/v1/api-docs/**",
-                                "/identity-service/v1/swagger-ui/**",
-                                "/swagger-ui/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, ENDPOINT_HEALTH).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/identity-service/v1/api-docs/**",
+                                        "/identity-service/v1/swagger-ui/**",
+                                        "/swagger-ui/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/entrar").permitAll()
+                                .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/register").permitAll()   // todo , registrar 1 user de prueba, pero oauht bloquea todas las peticiones sin tener usuario
 
-                        .anyRequest().authenticated()
+                                .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_VERIFICATION + "/**").permitAll()
+                                .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
+                                .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD + "/**/username/**").permitAll()
+                                //  .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_ME).authenticated()
+                                .requestMatchers(ENDPOINT_ACTUATOR + "/**").hasRole(ADMIN)
+//                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
+//                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
+//                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").permitAll() // acceso
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").permitAll() // acceso
+//                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
+//                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
+                                //   .requestMatchers(HttpMethod.POST, ENDPOINT_LOGIN).permitAll() // login access
+
+
+                                .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(customAuthEntryPoint) // manejar errores de autenticación personalizados.
-                )
+//                .exceptionHandling(ex -> ex
+//                        .authenticationEntryPoint(customAuthEntryPoint) // manejar errores de autenticación personalizados.
+//                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
-                )
-                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
-                .addFilterBefore(i18nFilter, JWTAuthenticationFilter.class)
-                .addFilterAfter(clientBasicAuthenticationFilter, JWTAuthenticationFilter.class);  // TODO , REVISAR clientBasicAuthenticationFilter
+                );
+        // .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
+        //   .addFilterBefore(i18nFilter, JWTAuthenticationFilter.class)
+        // .addFilterAfter(clientBasicAuthenticationFilter, JWTAuthenticationFilter.class);  // TODO , REVISAR clientBasicAuthenticationFilter
 
         return http.build();
     }
 
 }
+
+
+/*
+* <?php
+
+	$dbhost = 'localhost';
+	$dbuser = 'c2800777_ipross';
+	$dbpass = '23bazigiSU';
+	$dbname = 'c2800777_ipross';
+
+	$conn = mysqli_connect($dbhost, $dbuser, $dbpass) or die ('Ocurrio un error al conectarse al servidor mysql');
+	mysql_select_db($dbname);
+?>
+*
+*
+*
+* */

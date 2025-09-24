@@ -17,7 +17,7 @@ public class Login extends BaseEntity<Long> {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "login_seq_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "login_seq_gen")
     private Long id;
 
 

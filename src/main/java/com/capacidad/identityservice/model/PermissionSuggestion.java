@@ -22,7 +22,7 @@ import java.util.Set;
 public class PermissionSuggestion extends BaseEntity<Long> implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_seq_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "permission_seq_gen")
     private Long id;
 
 

@@ -22,7 +22,7 @@ public class Role extends BaseEntity<Long> implements Serializable {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "role_seq_gen")
     private Long id;
 
     @Column(nullable = false, unique = true)

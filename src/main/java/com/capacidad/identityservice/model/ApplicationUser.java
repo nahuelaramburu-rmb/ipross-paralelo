@@ -27,7 +27,7 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "user_seq_gen")
     private Long id;
 
 

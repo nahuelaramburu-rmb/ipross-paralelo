@@ -35,7 +35,7 @@ public abstract class BaseEntity<I extends Serializable> {
     protected UUID deletionToken = UUID.fromString(UUID_NIL);
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
    // @SequenceGenerator(name = "sequenceGenerator")
     private I id;
 

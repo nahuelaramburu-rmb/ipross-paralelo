@@ -15,5 +15,5 @@ public class LoginRequestDTO {
 
     private String email;
     private String password;
-    private List<String> roles;
+
 }

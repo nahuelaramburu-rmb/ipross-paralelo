@@ -154,11 +154,20 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", userService.register(request)));
     }
 
-
+    //
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO authRequest) throws ObjectNotFoundException {
+    public ResponseEntity<?> login(
+            @RequestBody LoginRequestDTO authRequest
+    ) throws ObjectNotFoundException {
 
         return ResponseEntity.ok(Map.of("message", userService.login(authRequest)));
+    }
+
+
+    @GetMapping("/hola")
+    public String hola() throws ObjectNotFoundException {
+
+        return "holaaa";
     }
 
 }

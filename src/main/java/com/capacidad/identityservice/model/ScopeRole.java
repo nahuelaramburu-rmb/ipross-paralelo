@@ -21,7 +21,7 @@ public class ScopeRole extends BaseEntity<Long> implements Serializable {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "scope_role_seq_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "scope_role_seq_gen")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)

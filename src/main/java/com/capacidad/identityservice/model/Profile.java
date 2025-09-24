@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class Profile extends BaseEntity<Long> implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_seq_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "profile_seq_gen")
     private Long id;
 
 

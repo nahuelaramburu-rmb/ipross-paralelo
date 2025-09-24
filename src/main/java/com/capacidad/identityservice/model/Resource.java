@@ -18,7 +18,7 @@ public class Resource extends BaseEntity<Long> implements Serializable {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "resource_seq_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "resource_seq_gen")
 //    @SequenceGenerator(name = "resource_seq_gen", sequenceName = "application_resource_seq", allocationSize = 1)
     private Long id;
 
