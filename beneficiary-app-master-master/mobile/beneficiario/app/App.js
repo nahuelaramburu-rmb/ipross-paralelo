@@ -21,6 +21,7 @@ class App extends Component {
             isLoading: false,
             isLoggedIn: false,
             loginSuccess: false,
+            loggedUser: null,
         };
     }
 
@@ -34,18 +35,20 @@ class App extends Component {
         this.setState({ isLoading: true });
 
         try {
-            // Simular petición a una API
-            await axios.post('https://jsonplaceholder.typicode.com/users', {
-                username: username,
-                password: password,
-                device: 'mobile',
+            // Llamada a la API real de IPROSS
+            const response = await axios.post('https://backend-ipross-production.up.railway.app/api/auth/login', {
+                numero_afiliado: username,
+                contraseña: password,
             });
 
-            // Simular delay adicional de red
-            setTimeout(() => {
+            const userData = response.data;
+
+            if (userData.status === 'success') {
+                // Login exitoso
                 this.setState({
                     isLoading: false,
                     loginSuccess: true,
+                    loggedUser: userData,
                 });
 
                 // Mostrar mensaje de éxito por 2 segundos
@@ -57,10 +60,20 @@ class App extends Component {
                         password: '',
                     });
                 }, 2000);
-            }, 1500);
+            } else {
+                // Credenciales incorrectas
+                this.setState({ isLoading: false });
+                Alert.alert('Error', 'Credenciales incorrectas. Verifique su usuario y contraseña.');
+            }
         } catch (error) {
             this.setState({ isLoading: false });
-            Alert.alert('Error', 'Error en la conexión. Intente nuevamente.');
+            console.error('Error de login:', error);
+            
+            if (error.response && error.response.status === 404) {
+                Alert.alert('Error', 'Usuario no encontrado. Verifique sus credenciales.');
+            } else {
+                Alert.alert('Error', 'Error en la conexión. Intente nuevamente.');
+            }
         }
     };
 
@@ -69,7 +82,7 @@ class App extends Component {
 
         if (isLoggedIn) {
             // Menú oficial: panel principal de la app
-            return <Router />;
+            return <Router loggedUser={this.state.loggedUser} />;
         }
 
         // Mostrar mensaje de éxito

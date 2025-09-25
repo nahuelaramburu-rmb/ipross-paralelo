@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
 
-const Router = () => {
+const Router = ({ loggedUser }) => {
     const [currentScreen, setCurrentScreen] = useState('BeneficiaryInformation');
+    
+    // Obtener nombre del usuario o usar valor por defecto
+    const userName = loggedUser && loggedUser.nombre ? loggedUser.nombre : 'Usuario';
 
     const renderBeneficiaryInformation = () => (
         <ScrollView style={styles.screenContainer}>
@@ -13,7 +16,7 @@ const Router = () => {
                     resizeMode='contain'
                 />
                 <Text style={styles.headerTitle}>IPROSS Beneficiario</Text>
-                <Text style={styles.headerSubtitle}>Panel Principal</Text>
+                <Text style={styles.headerSubtitle}>Bienvenido, {userName}</Text>
             </View>
 
             <View style={styles.contentContainer}>
@@ -21,7 +24,8 @@ const Router = () => {
 
                 <View style={styles.infoCard}>
                     <Text style={styles.cardTitle}>Datos del Beneficiario</Text>
-                    <Text style={styles.cardSubtext}>Consulte su información personal</Text>
+                    <Text style={styles.cardSubtext}>Nombre: {userName}</Text>
+                    <Text style={styles.cardSubtext}>N° Afiliado: {loggedUser && loggedUser.numero_afiliado ? loggedUser.numero_afiliado : 'No disponible'}</Text>
                 </View>
 
                 <View style={styles.infoCard}>
