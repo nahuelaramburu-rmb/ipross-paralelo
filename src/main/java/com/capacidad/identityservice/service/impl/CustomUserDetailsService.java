@@ -1,19 +1,22 @@
 package com.capacidad.identityservice.service.impl;
 
-import com.capacidad.identityservice.model.ApplicationUser;
-import com.capacidad.identityservice.model.ApplicationUserContext;
-import com.capacidad.identityservice.model.CustomUserDetails;
+import com.capacidad.identityservice.misc.AuthorityMapper;
+import com.capacidad.identityservice.model.*;
 import com.capacidad.identityservice.service.ApplicationUserContextService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptyList;
@@ -50,16 +53,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     // se usa para buscar usuarios y sus contextos (tenant, permisos, etc.) en la base de datos.
     private final ApplicationUserContextService userContextService;
 
+
     @Autowired
     public CustomUserDetailsService(@Lazy ApplicationUserContextService userContextService) {
         this.userContextService = userContextService;
     }
+
+
 
     @Override
     public UserDetails loadUserByUsername(String username) {
 
         // representa a los usuarios de este sistema
         ApplicationUser user;
+        Tenant userTenant;
+        Role userRole; //
+       // List<String> userAuthorities = new ArrayList<>();
 
         try {
 
@@ -72,6 +81,11 @@ public class CustomUserDetailsService implements UserDetailsService {
             //Luego obtiene el ApplicationUser relacionado.
             //si contextSet está vacío, esto puede tirar NoSuchElementException
             user = contextSet.iterator().next().getUser();
+         //   userTenant = contextSet.iterator().next().getTenant();
+
+            // obtengo el rol del user ( todo -> a cada rol se le asignara luego su authority)
+            userRole = contextSet.iterator().next().getRole();
+
 
             //Si no encuentra nada en la base de datos, lanza UsernameNotFoundException.
             //Esto es lo que espera Spring Security para saber que el login falló porque el usuario no existe.
@@ -84,11 +98,25 @@ public class CustomUserDetailsService implements UserDetailsService {
         //Envuelve un ApplicationUser para que Spring Security lo entienda como UserDetails.
         //  Ahí es donde Spring valida contraseña, cuenta expirada, authorities, etc.
 
-        //asocia el ApplicationUser completo al CustomUserDetails
-        CustomUserDetails userDetails = new CustomUserDetails(user.getUsername(), user.getPassword(), emptyList());
+        // el user contiene el tenant , roles , scope , del user,
+        //  debo obtener de user : a que tenant pertenece el user , y en base a eso , ver si es user de la app mobile, ver sus roles , permisos , etc
+        // todo , una vez obtenida esa data, me va a servir para restringir los endpoints de la app , de acuerdo al scope de cada user,
+
+
+        //solo creo un userDetails con username , password y su rol !!
+        CustomUserDetails userDetails = new CustomUserDetails(
+
+                user.getUsername(), user.getPassword(), userRole
+        );
+
+
+        System.out.println("user encontrado " + userDetails.getUsername());
+
 
         //asocia el ApplicationUser completo al CustomUserDetails
         userDetails.setApplicationUser(user);
+
+
 
         //El objeto CustomUserDetails es entregado a Spring Security
         //Spring lo usará en:

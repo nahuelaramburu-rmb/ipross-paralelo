@@ -70,7 +70,7 @@ Al final limpia el contexto para no afectar a otras requests.
 * */
 
 
-@Component
+//@Component
 public class ClientBasicAuthenticationFilter extends OncePerRequestFilter {
 
     private final GlobalExceptionHandler exceptionHandler;

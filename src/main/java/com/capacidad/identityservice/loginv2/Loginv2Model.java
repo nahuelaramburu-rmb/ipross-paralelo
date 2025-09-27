@@ -1,14 +1,16 @@
-package com.capacidad.identityservice.model;
+package com.capacidad.identityservice.loginv2;
 
 
+import com.capacidad.identityservice.model.Userv2Login;
 import jakarta.persistence.*;
-import org.springframework.data.annotation.Reference;
+import lombok.Data;
 
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "login" )
-public class LoginMockModel {
+public class Loginv2Model {
 
 
     @Id
@@ -20,8 +22,8 @@ public class LoginMockModel {
 
 
     @OneToOne
-    @JoinColumn(name = "user_id") // esta es la clave foránea
-    private User user;
+    @JoinColumn(name = "id_user") // esta es la clave foránea
+    private Userv2Login user;
 
     private Date created_at;
 

@@ -1,5 +1,6 @@
 package com.capacidad.identityservice.model;
 
+import lombok.Getter;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
@@ -14,6 +15,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 
+@Getter
 public class CustomUserDetails implements UserDetails, CredentialsContainer, Serializable {
 
     @Serial
@@ -26,9 +28,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     private final boolean credentialsNonExpired;
     private final boolean enabled;
     private ApplicationUser applicationUser;
-
+    private Role role;
     private final String tenantId;
-
 
 
     public String getTenantId() {
@@ -48,6 +49,12 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     }
 
 
+    // constructor con username, password, rol del user
+    public CustomUserDetails(String username, String password, Role role) {
+        this(username, password, true, true, true, true, Collections.emptyList(), null);
+
+        this.role = role;
+    }
 
 
     /**
@@ -56,8 +63,15 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     public CustomUserDetails(String username, String password,
                              Collection<? extends GrantedAuthority> authorities, String tenantId) {
         this(username, password, true, true, true, true, authorities, tenantId);
+
     }
 
+    // user role constructor
+    public CustomUserDetails(String username, String password,
+                             Collection<? extends GrantedAuthority> authorities, String tenantId, Role userRole) {
+        this(username, password, true, true, true, true, authorities, tenantId);
+        this.role = userRole;
+    }
 
 
     /**
@@ -88,7 +102,6 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
                     "Cannot pass null or empty values to constructor");
         }
 
-        this.tenantId = tenantId;
         this.username = username;
         this.password = password;
         this.enabled = enabled;
@@ -96,6 +109,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
         this.credentialsNonExpired = credentialsNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
+        this.tenantId = tenantId;
     }
 
 

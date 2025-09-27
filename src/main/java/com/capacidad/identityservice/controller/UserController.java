@@ -91,10 +91,12 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    // se usaria para obtener los datos del user , en la app , ejemplo : "cuenta info"
     @GetMapping(ENDPOINT_ME)
     public ResponseEntity<ApplicationUserProjection> getProfile() throws ObjectNotFoundException {
         return ResponseEntity.ok(userService.getAuthUser());
     }
+
 
     @PostMapping
     public ResponseEntity<Object> createUser(@Valid @RequestBody ApplicationUserContextDTO input) throws ObjectNotFoundException, ObjectNotValidException {
@@ -147,27 +149,20 @@ public class UserController {
     }
 
 
-    //
+
+
+    // el register no se expone en la app , quizas se crean usuarios desde un panel web ...
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) throws ObjectNotFoundException {
 
-        return ResponseEntity.ok(Map.of("message", userService.register(request)));
-    }
+     //   return ResponseEntity.ok(Map.of("message", userService.register(request)));
 
-    //
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestBody LoginRequestDTO authRequest
-    ) throws ObjectNotFoundException {
-
-        return ResponseEntity.ok(Map.of("message", userService.login(authRequest)));
+        return ResponseEntity.ok(Map.of("message", "register"));
     }
 
 
-    @GetMapping("/hola")
-    public String hola() throws ObjectNotFoundException {
 
-        return "holaaa";
-    }
+
+
 
 }

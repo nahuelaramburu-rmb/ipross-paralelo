@@ -50,7 +50,7 @@ import static com.capacidad.identityservice.misc.constant.SecurityConstants.ROLE
     Eliminar contextos o usuarios completos según corresponda.
     Gestionar flujos como recuperación de contraseña o verificación por email.
     Consultar usuarios y contextos con filtros avanzados.
-    Asegurar siempre la validación de seguridad y autoridad del rol antes de cualquier operación.
+    Asegurar siempre la validación de seguridad y autoridad del rol antes de cualquier operación.**
 *
 *
 *El ApplicationUserContext representa la relación entre un usuario (ApplicationUser), un rol (Role), y el tenant en el que está operando.

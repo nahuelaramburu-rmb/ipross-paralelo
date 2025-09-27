@@ -46,7 +46,4 @@ public interface ApplicationUserService extends BaseService<ApplicationUser, Lon
     void clearUserTokens(String username);
 
     void update(ApplicationUserContext userContext, UpdateApplicationUserDTO dataToUpdate) throws ObjectNotFoundException;
-
-    Object login(LoginRequestDTO authRequest) throws ObjectNotFoundException;
-    Object register(RegisterRequestDTO authRequest) throws ObjectNotFoundException;
 }

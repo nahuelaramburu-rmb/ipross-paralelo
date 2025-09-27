@@ -59,7 +59,6 @@ public class Tenant extends BaseEntity<Long> implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "tenant_seq_gen")
     private Long id;
 
-
     @Column(nullable = false, unique = true)
     private String name;
 

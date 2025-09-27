@@ -7,33 +7,33 @@ import com.capacidad.identityservice.model.*;
 import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
 import com.capacidad.identityservice.repository.ApplicationUserRepository;
-import com.capacidad.identityservice.repository.LoginMockRepository;
+import com.capacidad.identityservice.loginv2.Loginv2Repository;
 import com.capacidad.identityservice.service.ApplicationUserService;
 import com.capacidad.identityservice.service.ApplicationUserSupportService;
 import com.capacidad.identityservice.service.base.BaseServiceImpl;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
-import com.nimbusds.jwt.JWTParser;
-import io.jsonwebtoken.JwtParser;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import static java.util.Collections.emptyList;
+
+/*
+*
+* este service se usa en el contexto de cuando un user logeado quiere actualizar su password,resetear ,confirmar user,
+* es decir , operaciones de un user ya registrado en el sistema,
+*
+* */
+
 
 @Log4j2
 @Service
@@ -43,22 +43,14 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     private final ApplicationUserRepository userRepository;
     private final ApplicationUserSupportService supportService;
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtil;
-    private final PasswordEncoder encoder;
-
-    private final LoginMockRepository loginMockRepository;
 
     @Autowired
     public ApplicationUserServiceImpl(ApplicationUserRepository repository,
-                                      ApplicationUserSupportService supportService, AuthenticationManager authenticationManager, JwtUtils jwtUtil, PasswordEncoder encoder, LoginMockRepository loginMockRepository) {
+                                      ApplicationUserSupportService supportService) {
         super(repository);
         this.userRepository = repository;
         this.supportService = supportService;
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-        this.encoder = encoder;
-        this.loginMockRepository = loginMockRepository;
+
     }
 
     @Override
@@ -231,10 +223,12 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     private void validatePassword(String password) throws ObjectNotValidException {
         if (password.length() < 8)
             throw new ObjectNotValidException("applicationUser.invalidPasswordLength");
+
         var alphaPattern = Pattern.compile("\\p{Alpha}");
         var digitPattern = Pattern.compile("\\p{Digit}");
         var alphaMatcher = alphaPattern.matcher(password);
         var digitMatcher = digitPattern.matcher(password);
+
         if (!alphaMatcher.find() || !digitMatcher.find())
             throw new ObjectNotValidException("applicationUser.invalidPasswordChars");
     }
@@ -283,64 +277,5 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     }
 
 
-    // todo , llenar con mas campos al user
-    @Override
-    public String login(LoginRequestDTO request) {
-
-
-        // se encarga de validar el user y password,
-        // lanza una excepcion en casos incorrectos.
-//        authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        request.getEmail(),
-//                        request.getPassword()
-//                )
-//        );
-
-        // aca ya se obtuvo el user
-//        var user = userRepository.findByEmail(request.getEmail())
-//                .orElseThrow(() -> new InvalidUserStateException("el usuario no existe"));
-//
-        // mock
-        var usermock = loginMockRepository.findByUsuario(request.getEmail())
-                .orElseThrow(() -> new InvalidUserStateException("el usuario no existe"));
-
-
-        return "usuario loggeado con exito";
-
-        //  CustomUserDetails userDetails = new CustomUserDetails(user.getUsername(), user.getPassword(), emptyList());
-
-        //var jwtToken = jwtUtil.generateToken(userDetails);
-
-        // retorno el token de login
-//        return AuthResponse.builder()
-//                .token(jwtToken)
-//                .build();
-
-        //return null;
-    }
-
-
-    // todo , llenar con mas campos al user
-    public String register(RegisterRequestDTO request) {
-
-        // VALIDAR que no exista un user con el mismo email
-        var userDB = userRepository.findByEmail(request.getEmail());
-
-        if (userDB.isPresent()) {
-
-            throw new InvalidUserStateException("usuario con el mismo email ya registrado");
-        }
-
-        ApplicationUser user = new ApplicationUser();
-        user.setUsername(request.getFirstname());
-        user.setEmail(request.getEmail());
-        user.setPassword(encoder.encode(request.getPassword()));
-//        user.setRole(request.getRole());
-
-        userRepository.save(user);
-
-        return "cliente registrado con exito";
-    }
 
 }

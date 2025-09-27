@@ -63,6 +63,7 @@ public class LoginServiceImpl implements LoginService {
     private static final int AWAIT_MINUTES = 10;
 
     // cantidad de logins exitosos que se guardarán en batch en la base de datos
+    // setear a 50 , para optimizar la escritura en db
     private static final int SUCCESS_LOGIN_INSERT_BATCH_SIZE = 50;
 
     // cola concurrente para almacenar logins exitosos temporalmente antes de hacer el batch insert.
@@ -83,33 +84,6 @@ public class LoginServiceImpl implements LoginService {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
     }
-
-
-    // forma de hacer login
-//    public AuthResponseDTO login(LoginRequestDTO request) {
-//
-//        // se encarga de validar el user y password,
-//        // lanza una excepcion en casos incorrectos.
-//        authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        request.getEmail(),
-//                        request.getPassword()
-//                )
-//        );
-//
-//        // aca ya se obtuvo el user
-//        var user = userRepository.findByEmail(request.getEmail())
-//                .orElseThrow(() -> new InvalidUserStateException("usuario no existe"));
-//
-//        System.out.println("user encontrado " + user.getEmail());
-//
-//        var jwtToken = jwtUtil.generateToken(user);
-//
-//        // retorno el token de login
-//        return AuthResponseDTO.builder()
-//                .token(jwtToken)
-//                .build();
-//    }
 
 
 

@@ -55,7 +55,7 @@ Maneja errores de autenticación y asegura la limpieza del contexto al final de 
  *
  * */
 
-@Component
+//@Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     //verifica que el token sea legítimo y confiable antes de procesarlo

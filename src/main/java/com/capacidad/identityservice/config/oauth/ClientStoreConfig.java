@@ -10,19 +10,19 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 
 import javax.sql.DataSource;
 
-@Configuration
+//@Configuration
 public class ClientStoreConfig {
 
     /**
      * Repositorio de clientes en JDBC
      */
-    @Bean
-    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate,
-                                                                 PasswordEncoder passwordEncoder) {
-        JdbcRegisteredClientRepository jdbcRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
-
-        //  La codificación de passwords se aplica directamente al crear los RegisteredClients
-        // ejemplo: clientSecret("{noop}secreto")
-        return jdbcRepository;
-    }
+//    @Bean
+//    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate,
+//                                                                 PasswordEncoder passwordEncoder) {
+//        JdbcRegisteredClientRepository jdbcRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
+//
+//        //  La codificación de passwords se aplica directamente al crear los RegisteredClients
+//        // ejemplo: clientSecret("{noop}secreto")
+//        return jdbcRepository;
+//    }
 }

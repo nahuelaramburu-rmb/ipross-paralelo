@@ -15,9 +15,8 @@ import jakarta.persistence.*;
 @SequenceGenerator(name = "login_seq_gen", sequenceName = "application_login_seq" ,allocationSize = 1)
 public class Login extends BaseEntity<Long> {
 
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "login_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "login_seq_gen")
     private Long id;
 
 

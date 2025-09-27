@@ -1,0 +1,209 @@
+Explicación General del DER
+
+El modelo representa un sistema de gestión de usuarios multi-tenant (multi-empresa o multi-organización), con roles, permisos, recursos y contexto.
+
+
+La idea central es que:
+
+Existen usuarios, con su perfil personal y un estado.
+
+Los usuarios pueden estar en diferentes tenants (organizaciones) y tener roles.
+
+Los roles definen qué recursos y operaciones pueden usar, y se agrupan en grupos de permisos.
+
+Se guarda también el historial de logins.
+
+
+----------------------------------------------------------------------------------------------
+
+
+🔹 Entidades Principales
+
+**application_profile
+
+Contiene los datos personales básicos del usuario (nombre, apellido, documento, tipo de documento).
+
+Relación: un usuario siempre tiene un perfil.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_state
+
+Define el estado del usuario (ej: activo, bloqueado, pendiente, etc.).
+
+Relación: un usuario siempre está en un estado.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_user
+
+Representa al usuario de la aplicación.
+
+Atributos clave: username, email, contraseña, verificación de email, OTPs, etc.
+
+Relación:
+
+FK a application_profile (perfil personal).
+
+FK a application_state (estado del usuario).
+
+Este el núcleo del modelo, conecta a los usuarios con su información y con el sistema.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_tenant
+
+Representa una organización/empresa/cliente dentro de un sistema multi-tenant.
+
+Cada tenant tiene un UUID único para identificación global.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_resource
+
+Representa los recursos del sistema (ej: módulos, APIs, entidades del negocio).
+
+Los roles pueden usar estos recursos.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_role
+
+Define un rol con:
+
+nombre único,
+
+nivel de acceso,
+
+configuración sobre recursos reutilizables.
+
+
+Relación: un rol puede estar asociado a recursos, permisos y grupos de permisos.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_permission_group
+
+Agrupa permisos específicos en conjuntos reutilizables.
+
+Relación:
+
+Se conecta con roles (M:N).
+
+Se conecta con sugerencias de permisos (M:N).
+
+Se conecta con contextos de usuario (M:N).
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_permission_suggestion
+
+Define permisos sugeridos para un rol.
+
+Ejemplo: “Rol Administrador → Permiso: gestionar usuarios”.
+
+Relación: siempre ligado a un rol.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_user_context
+
+Define el contexto de un usuario:
+
+En qué tenant está,
+
+Qué rol tiene,
+
+Qué sugerencias de permisos aplican.
+
+Además puede vincularse a grupos de permisos.
+
+Relación clave: une usuarios ↔ tenant ↔ roles ↔ permisos.
+
+Es la tabla que permite que un mismo usuario tenga distintos roles en distintos tenants.
+
+
+----------------------------------------------------------------------------------------------
+
+**application_scope_role
+
+Relaciona un rol con recursos y tenants, indicando qué operaciones puede realizar.
+
+Ejemplo: “Rol Gestor puede hacer [crear, leer, actualizar] en Recurso Inventario del Tenant X”.
+
+
+----------------------------------------------------------------------------------------------
+
+
+**application_login
+
+Guarda un historial de inicios de sesión:
+
+Usuario (principal),
+
+Tenant,
+
+Evento de login,
+
+Agente y dirección IP.
+
+esta tabla sirve para auditoría y seguridad.
+
+
+----------------------------------------------------------------------------------------------
+
+
+🔹 Tablas Intermedias (Many-to-Many)
+
+application_role_permission_group
+Relaciona roles ↔ grupos de permisos.
+→ Un rol puede tener varios grupos de permisos, y un grupo puede pertenecer a varios roles.
+
+
+application_permission_suggestion_group
+Relaciona sugerencias de permisos ↔ grupos de permisos.
+→ Una sugerencia puede aplicarse en varios grupos.
+
+
+application_context_permission_group
+Relaciona contextos de usuario ↔ grupos de permisos.
+→ Un usuario en cierto tenant con un rol específico puede heredar grupos de permisos.
+
+
+----------------------------------------------------------------------------------------------
+
+
+Resumen Conceptual
+
+Usuario: Tiene perfil y estado.
+
+Tenant: Organizaciones donde un usuario puede estar.
+
+Rol: Define el nivel de acceso.
+
+Permisos y grupos: Determinan qué puede hacer cada rol o usuario.
+
+Contexto de usuario: Conecta usuario + tenant + rol + permisos.
+
+Scope de rol: Define operaciones permitidas sobre recursos.
+
+Login: Guarda auditoría de accesos.
+
+resumén:
+modelo gestiona usuarios multi-tenant, sus roles, permisos, y recursos, con capacidad de auditar accesos.

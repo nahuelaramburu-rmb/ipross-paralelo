@@ -5,6 +5,7 @@ public final class ControllerEndpoints {
     public static final String ENDPOINT_USERS = "/users";
     public static final String ENDPOINT_PERMISSION_GROUPS = "/permission-groups";
     public static final String ENDPOINT_ME = "/me";
+    public static final String ENDPOINT_AUTH = "/auth";
     public static final String ENDPOINT_OAUTH = "/oauth";
     public static final String ENDPOINT_PASSWORD = "/password";
     public static final String ENDPOINT_PASSWORD_RESET = "/password/reset";

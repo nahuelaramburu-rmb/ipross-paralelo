@@ -1,0 +1,118 @@
++-----------------------------+          +--------------------------+
+|  application_profile        |          |  application_state       |
+|-----------------------------|          |--------------------------|
+| PK id                       |          | PK id                    |
+| name, last_name             |          | name (UNIQUE)            |
+| id_number, id_type          |          +--------------------------+
++-----------------------------+
+           |
+           | FK profile_id
+           v
++-----------------------------------------------------------+
+|  application_user                                         |
+|-----------------------------------------------------------|
+| PK id                                                     |
+| username (UNIQUE), email (UNIQUE)                         |
+| resource_id (UUID), sub (UUID UNIQUE)                     |
+| password, email_verified, challenge_type, user_group      |
+| FK profile_id → application_profile.id                    |
+| FK state_id → application_state.id                        |
++-----------------------------------------------------------+
+           |
+           | 1:N
+           v
++-----------------------------------------------------------+
+|  application_user_context                                 |
+|-----------------------------------------------------------|
+| PK id                                                     |
+| FK application_user_id → application_user.id              |
+| FK application_tenant_id → application_tenant.id          |
+| FK application_role_id → application_role.id              |
+| FK permission_suggestion_id → application_permission_sugg |
+| permission_strategy                                       |
+| UNIQUE(user_id, tenant_id, role_id)                       |
++-----------------------------------------------------------+
+           |
+           | M:N
+           v
++-----------------------------------------------------------+
+| application_context_permission_group                      |
+|-----------------------------------------------------------|
+| FK application_context_id → application_user_context.id   |
+| FK application_permission_group_id → perm_group.id        |
+| UNIQUE(context_id, group_id)                              |
++-----------------------------------------------------------+
+
++--------------------------+          +--------------------------+
+|  application_tenant      |          |  application_resource    |
+|--------------------------|          |--------------------------|
+| PK id                    |          | PK id                    |
+| name (UNIQUE)            |          | name (UNIQUE)            |
+| tenant_id (UUID UNIQUE)  |          +--------------------------+
++--------------------------+                     |
+           ^                                     | 1:N
+           | FK tenant_id                        v
+           |                           +--------------------------+
+           |                           |  application_scope_role  |
+           |                           |--------------------------|
+           |                           | PK id                    |
+           |                           | operations (TEXT[])      |
+           |                           | FK resource_id           |
+           |                           | FK tenant_id             |
+           |                           | FK role_id               |
+           |                           +--------------------------+
+           |
++-----------------------------------------------------------+
+|  application_role                                         |
+|-----------------------------------------------------------|
+| PK id                                                     |
+| name (UNIQUE)                                             |
+| access_level, resource_id_required, reusable_resource_id  |
++-----------------------------------------------------------+
+           |
+           | 1:N
+           v
++-----------------------------------------------------------+
+|  application_permission_suggestion                        |
+|-----------------------------------------------------------|
+| PK id                                                     |
+| name (UNIQUE), description                                |
+| FK application_role_id → application_role.id              |
++-----------------------------------------------------------+
+           |
+           | M:N
+           v
++-----------------------------------------------------------+
+|  application_permission_suggestion_group                  |
+|-----------------------------------------------------------|
+| FK suggestion_id → application_permission_suggestion.id   |
+| FK permission_group_id → application_permission_group.id  |
+| UNIQUE(suggestion_id, group_id)                           |
++-----------------------------------------------------------+
+
++-----------------------------+
+| application_permission_group|
+|-----------------------------|
+| PK id                       |
+| name (UNIQUE)               |
++-----------------------------+
+           ^
+           | M:N
+           |
++-----------------------------------------------------------+
+| application_role_permission_group                         |
+|-----------------------------------------------------------|
+| FK role_id → application_role.id                          |
+| FK permission_group_id → application_permission_group.id  |
+| UNIQUE(role_id, group_id)                                 |
++-----------------------------------------------------------+
+
++--------------------------+
+| application_login        |
+|--------------------------|
+| PK id                    |
+| principal, principal_cls |
+| tenant_context           |
+| login_event, agent       |
+| ip_address               |
++--------------------------+

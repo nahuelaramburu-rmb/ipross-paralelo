@@ -27,7 +27,7 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "user_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
     private Long id;
 
 
@@ -38,7 +38,7 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     private String email;
 
     //identificadores en formato UUID (probablemente para trazabilidad y compatibilidad con OAuth2 / OpenID Connect)
-    @Column(columnDefinition = "uuid", name = "resource_id", updatable = false)
+    @Column(columnDefinition = "uuid", name = "resource_id", updatable = true)
     private UUID resourceId;
 
     @Column(columnDefinition = "uuid", unique = true, updatable = false)
@@ -65,8 +65,8 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     private Group group;
 
     //datos personales del usuario (nombre, apellido, etc.).
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id", nullable = false)
+    //@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //@JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
     // referencia a la entidad State (estado funcional del usuario)

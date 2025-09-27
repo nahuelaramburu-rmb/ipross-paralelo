@@ -64,7 +64,7 @@ public class ApplicationUserSupportServiceImpl implements ApplicationUserSupport
     private final Authenticator authenticator;
     private final ApplicationProperties applicationProperties;
     private final TemplateService templateService;
-    private final RegisteredClientRepository registeredClientRepository;
+   // private final RegisteredClientRepository registeredClientRepository;
     private final OAuth2AuthorizationService authorizationService;
     private final JdbcTemplate jdbcTemplate;
 
@@ -73,7 +73,7 @@ public class ApplicationUserSupportServiceImpl implements ApplicationUserSupport
                                              Authenticator authenticator,
                                              ApplicationProperties applicationProperties,
                                              TemplateService templateService,
-                                             RegisteredClientRepository registeredClientRepository,
+                                      //       RegisteredClientRepository registeredClientRepository,
                                              OAuth2AuthorizationService authorizationService,
                                              JdbcTemplate jdbcTemplate) {
         this.passwordEncoder = passwordEncoder;
@@ -81,7 +81,7 @@ public class ApplicationUserSupportServiceImpl implements ApplicationUserSupport
         this.authenticator = authenticator;
         this.applicationProperties = applicationProperties;
         this.templateService = templateService;
-        this.registeredClientRepository = registeredClientRepository;
+     //   this.registeredClientRepository = registeredClientRepository;
         this.authorizationService = authorizationService;
         this.jdbcTemplate = jdbcTemplate;
     }

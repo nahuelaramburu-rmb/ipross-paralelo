@@ -30,12 +30,14 @@ public abstract class BaseEntity<I extends Serializable> {
     @JsonIgnore
     @Column(columnDefinition = "boolean DEFAULT false", nullable = false)
     protected Boolean deleted = false;
-    @JsonIgnore
-    @Column(name = "deletion_token", columnDefinition = "uuid DEFAULT uuid_nil()", nullable = false)
+
+   // @JsonIgnore
+  //  @Column(name = "deletion_token", columnDefinition = "uuid DEFAULT '00000000-0000-0000-0000-000000000000'", nullable = false)
     protected UUID deletionToken = UUID.fromString(UUID_NIL);
 
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
    // @SequenceGenerator(name = "sequenceGenerator")
     private I id;
 

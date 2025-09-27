@@ -1,7 +1,6 @@
 package com.capacidad.identityservice.repository;
 
 import com.capacidad.identityservice.model.ApplicationUser;
-import com.capacidad.identityservice.model.LoginMockModel;
 import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
 import com.capacidad.identityservice.repository.base.ExtendedRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,11 +26,7 @@ public interface ApplicationUserRepository extends ExtendedRepository<Applicatio
             "where u.email = ?1")
     Optional<ApplicationUser> findByEmail(String email);
 
-
-
 //
-
-
 
     Optional<ApplicationUser> findByUsernameOrEmail(String username, String email);
 

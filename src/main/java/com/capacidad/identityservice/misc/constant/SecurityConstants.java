@@ -17,6 +17,7 @@ public final class SecurityConstants {
     public static final String JWT_CLAIM_EMAIL_VERIFIED = "email_verified";
     public static final String JWT_CLAIM_SUBROLE = "subrole";
 
+    // roles
     public static final String BENEFICIARY = "BENEFICIARY";
     public static final String PRACTITIONER = "PRACTITIONER";
     public static final String ADMIN = "ADMIN";
@@ -26,18 +27,25 @@ public final class SecurityConstants {
     public static final String AUDITOR = "AUDITOR";
     public static final String FUNDER = "FUNDER";
 
+    // le asigna authorities a cada rol
     private static final String ROLE_BENEFICIARY = StringUtils.join(ROLE_PREFIX, BENEFICIARY);
     public static final SimpleGrantedAuthority ROLE_BENEFICIARY_AUTHORITY = new SimpleGrantedAuthority(ROLE_BENEFICIARY);
+
     private static final String ROLE_PRACTITIONER = StringUtils.join(ROLE_PREFIX, PRACTITIONER);
     public static final SimpleGrantedAuthority ROLE_PRACTITIONER_AUTHORITY = new SimpleGrantedAuthority(ROLE_PRACTITIONER);
+
     private static final String ROLE_ADMIN = StringUtils.join(ROLE_PREFIX, ADMIN);
     public static final SimpleGrantedAuthority ROLE_ADMIN_AUTHORITY = new SimpleGrantedAuthority(ROLE_ADMIN);
+
     private static final String ROLE_CLIENT = StringUtils.join(ROLE_PREFIX, CLIENT);
     public static final SimpleGrantedAuthority ROLE_CLIENT_AUTHORITY = new SimpleGrantedAuthority(ROLE_CLIENT);
+
     private static final String ROLE_MEDICAL_CENTER = StringUtils.join(ROLE_PREFIX, MEDICAL_CENTER);
     public static final SimpleGrantedAuthority ROLE_MEDICAL_CENTER_AUTHORITY = new SimpleGrantedAuthority(ROLE_MEDICAL_CENTER);
+
     private static final String ROLE_ORGANIZATION = StringUtils.join(ROLE_PREFIX, ORGANIZATION);
     public static final SimpleGrantedAuthority ROLE_ORGANIZATION_AUTHORITY = new SimpleGrantedAuthority(ROLE_ORGANIZATION);
+
     private static final String ROLE_FUNDER = StringUtils.join(ROLE_PREFIX, FUNDER);
     public static final SimpleGrantedAuthority ROLE_FUNDER_AUTHORITY = new SimpleGrantedAuthority(ROLE_FUNDER);
 

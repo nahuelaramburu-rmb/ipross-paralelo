@@ -29,6 +29,9 @@ import static com.capacidad.identityservice.misc.constant.ScopeConstants.*;
 import static com.capacidad.identityservice.misc.constant.SecurityConstants.ADMIN;
 import static com.capacidad.identityservice.misc.constant.SecurityConstants.FUNDER;
 
+
+// por ahora se implementa un login sin JWTAuthenticationFilter y ClientBasicAuthenticationFilter
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -43,23 +46,23 @@ public class WebSecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     //filtro que valida tokens JWT en cada request
-    private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    // private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
     // filtro extra para autenticar clientes vía Basic Auth
-    private final ClientBasicAuthenticationFilter clientBasicAuthenticationFilter;
+//    private final ClientBasicAuthenticationFilter clientBasicAuthenticationFilter;
 
     //filtro que gestiona la internacionalización (idiomas) en las peticiones
     private final I18nFilter i18nFilter;
 
-    public WebSecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter,
+    public WebSecurityConfig(//JWTAuthenticationFilter jwtAuthenticationFilter,
                              CustomUserDetailsService userDetailsService,
                              PasswordEncoder passwordEncoder,
-                             ClientBasicAuthenticationFilter clientBasicAuthenticationFilter,
+                             //       ClientBasicAuthenticationFilter clientBasicAuthenticationFilter,
                              I18nFilter i18nFilter) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.clientBasicAuthenticationFilter = clientBasicAuthenticationFilter;
+        //   this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        //   this.clientBasicAuthenticationFilter = clientBasicAuthenticationFilter;
         this.i18nFilter = i18nFilter;
     }
 
@@ -100,10 +103,8 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/identity-service/v1/api-docs/**",
                                         "/identity-service/v1/swagger-ui/**",
                                         "/swagger-ui/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/entrar").permitAll()
-                                .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/register").permitAll()   // todo , registrar 1 user de prueba, pero oauht bloquea todas las peticiones sin tener usuario
-
+                                // .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/login").permitAll()
+                                //           .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/register").permitAll()
                                 .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_VERIFICATION + "/**").permitAll()
                                 .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
                                 .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD + "/**/username/**").permitAll()
@@ -111,9 +112,12 @@ public class WebSecurityConfig {
                                 .requestMatchers(ENDPOINT_ACTUATOR + "/**").hasRole(ADMIN)
 //                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
 //                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
-//                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
-                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").permitAll() // acceso
-                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").permitAll() // acceso
+                                //  .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
+                                .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").permitAll() // acceso
+                                .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").permitAll() // acceso
+                                .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_LOGIN).permitAll() // acceso
+
+
 //                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
 //                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
                                 //   .requestMatchers(HttpMethod.POST, ENDPOINT_LOGIN).permitAll() // login access
@@ -135,20 +139,3 @@ public class WebSecurityConfig {
     }
 
 }
-
-
-/*
-* <?php
-
-	$dbhost = 'localhost';
-	$dbuser = 'c2800777_ipross';
-	$dbpass = '23bazigiSU';
-	$dbname = 'c2800777_ipross';
-
-	$conn = mysqli_connect($dbhost, $dbuser, $dbpass) or die ('Ocurrio un error al conectarse al servidor mysql');
-	mysql_select_db($dbname);
-?>
-*
-*
-*
-* */
