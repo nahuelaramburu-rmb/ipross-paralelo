@@ -1,4 +1,4 @@
-package com.ipross.beneficiario;
+package com.ipross.beneficiario.mobile;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -16,7 +16,7 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-        return "iprossvem";
+        return "IprossVEM";
     }
 
     /**

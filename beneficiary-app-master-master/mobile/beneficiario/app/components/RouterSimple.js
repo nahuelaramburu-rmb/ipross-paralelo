@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ScrollView } fr
 
 const Router = ({ loggedUser }) => {
     const [currentScreen, setCurrentScreen] = useState('BeneficiaryInformation');
-    
+
     // Obtener nombre del usuario o usar valor por defecto
     const userName = loggedUser && loggedUser.nombre ? loggedUser.nombre : 'Usuario';
 
@@ -25,7 +25,12 @@ const Router = ({ loggedUser }) => {
                 <View style={styles.infoCard}>
                     <Text style={styles.cardTitle}>Datos del Beneficiario</Text>
                     <Text style={styles.cardSubtext}>Nombre: {userName}</Text>
-                    <Text style={styles.cardSubtext}>N° Afiliado: {loggedUser && loggedUser.numero_afiliado ? loggedUser.numero_afiliado : 'No disponible'}</Text>
+                    <Text style={styles.cardSubtext}>
+                        N° Afiliado:{' '}
+                        {loggedUser && loggedUser.numero_afiliado
+                            ? loggedUser.numero_afiliado
+                            : 'No disponible'}
+                    </Text>
                 </View>
 
                 <View style={styles.infoCard}>

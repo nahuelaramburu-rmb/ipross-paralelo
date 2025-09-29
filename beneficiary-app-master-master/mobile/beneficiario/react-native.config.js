@@ -2,7 +2,7 @@ module.exports = {
     project: {
         ios: {},
         android: {
-            packageName: 'com.ipross.beneficiario',
+            packageName: 'com.ipross.beneficiario.mobile',
         },
     },
     assets: ['./app/fonts'],

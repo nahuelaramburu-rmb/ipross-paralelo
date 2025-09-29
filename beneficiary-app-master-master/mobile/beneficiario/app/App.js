@@ -36,10 +36,13 @@ class App extends Component {
 
         try {
             // Llamada a la API real de IPROSS
-            const response = await axios.post('https://backend-ipross-production.up.railway.app/api/auth/login', {
-                numero_afiliado: username,
-                contraseña: password,
-            });
+            const response = await axios.post(
+                'https://backend-ipross-production.up.railway.app/api/auth/login',
+                {
+                    numero_afiliado: username,
+                    contraseña: password,
+                }
+            );
 
             const userData = response.data;
 
@@ -68,7 +71,7 @@ class App extends Component {
         } catch (error) {
             this.setState({ isLoading: false });
             console.error('Error de login:', error);
-            
+
             if (error.response && error.response.status === 404) {
                 Alert.alert('Error', 'Usuario no encontrado. Verifique sus credenciales.');
             } else {
@@ -104,6 +107,19 @@ class App extends Component {
                         style={styles.logoImage}
                         resizeMode='cover'
                     />
+                    
+                    {/* Banner de Construcción - Debajo del logo */}
+                    <View style={styles.constructionBanner}>
+                        <Text style={styles.constructionIcon}>🚧</Text>
+                        <View style={styles.constructionTextContainer}>
+                            <Text style={styles.constructionTitle}>App en Construcción</Text>
+                            <Text style={styles.constructionText}>
+                                La app no está operativa. Estamos trabajando para mejorar tu atención
+                            </Text>
+                            <Text style={styles.constructionSubtext}>Estate atento a las novedades</Text>
+                        </View>
+                        <Text style={styles.constructionIcon}>🚧</Text>
+                    </View>
                 </View>
 
                 <View style={styles.formContainer}>
@@ -164,12 +180,13 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
         alignItems: 'center',
-        marginBottom: 48,
+        marginBottom: 24,
     },
     logoImage: {
         width: 400,
         height: 200,
         marginHorizontal: -40,
+        marginBottom: 16,
     },
     formContainer: {
         backgroundColor: '#e8f5e8',
@@ -324,6 +341,57 @@ const styles = StyleSheet.create({
     },
     logoutText: {
         color: '#dc2626',
+    },
+    // Estilos para el banner de construcción
+    constructionBanner: {
+        backgroundColor: '#ff6b35',
+        borderWidth: 3,
+        borderColor: '#ff4500',
+        borderRadius: 12,
+        marginHorizontal: 0,
+        marginVertical: 20,
+        paddingVertical: 20,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        shadowColor: '#ff4500',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+        elevation: 10,
+        width: '100%',
+    },
+    constructionTextContainer: {
+        flex: 1,
+        alignItems: 'center',
+        marginHorizontal: 10,
+    },
+    constructionIcon: {
+        fontSize: 24,
+    },
+    constructionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#ffffff',
+        textAlign: 'center',
+        marginBottom: 4,
+    },
+    constructionText: {
+        fontSize: 14,
+        color: '#ffffff',
+        textAlign: 'center',
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    constructionSubtext: {
+        fontSize: 12,
+        color: '#ffe4e1',
+        textAlign: 'center',
+        fontStyle: 'italic',
     },
 });
 
