@@ -20,11 +20,12 @@ public interface ApplicationUserRepository extends ExtendedRepository<Applicatio
 
     Optional<ApplicationUser> findBySub(UUID sub);
 
-    @Query(value = "select u from ApplicationUser u " +
-            "join fetch u.profile " +
-            "join fetch u.state " +
-            "where u.email = ?1")
-    Optional<ApplicationUser> findByEmail(String email);
+//    @Query(value = "select u from ApplicationUser u " +
+//            "join fetch u.profile " +
+//            "join fetch u.state " +
+//            "where u.email = ?1")
+@Query("SELECT u FROM ApplicationUser u WHERE u.email = :email")
+Optional<ApplicationUser> findByEmail(String email);
 
 //
 

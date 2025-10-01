@@ -1,13 +1,11 @@
 package com.capacidad.identityservice.service.impl;
 
-import com.capacidad.identityservice.config.security.JwtUtils;
 import com.capacidad.identityservice.exception.InvalidUserStateException;
 import com.capacidad.identityservice.misc.Utils;
 import com.capacidad.identityservice.model.*;
 import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
 import com.capacidad.identityservice.repository.ApplicationUserRepository;
-import com.capacidad.identityservice.loginv2.Loginv2Repository;
 import com.capacidad.identityservice.service.ApplicationUserService;
 import com.capacidad.identityservice.service.ApplicationUserSupportService;
 import com.capacidad.identityservice.service.base.BaseServiceImpl;
@@ -15,9 +13,7 @@ import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -181,6 +177,7 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
         return supportService.prepareTemplate(Collections.emptyMap(), templateName);
     }
 
+
     @Override
     public ApplicationUser create(ApplicationUser user) throws ObjectNotValidException {
         log.info("create - args: {}({})", user.getClass(), user);
@@ -188,6 +185,7 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
         user.setChallengeType(ChallengeType.FORCE_CHANGE_PASSWORD);
         return userRepository.save(user);
     }
+
 
     @Override
     public ApplicationUserProjection getAuthUser() throws ObjectNotFoundException {

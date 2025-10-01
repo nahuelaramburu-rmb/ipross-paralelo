@@ -2,7 +2,6 @@ package com.capacidad.identityservice.service;
 
 import com.capacidad.identityservice.model.ApplicationUser;
 import com.capacidad.identityservice.model.ApplicationUserContext;
-import com.capacidad.identityservice.model.RegisterRequestDTO;
 import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
 import com.capacidad.identityservice.service.base.BaseService;

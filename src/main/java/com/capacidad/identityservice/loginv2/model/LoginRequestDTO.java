@@ -1,11 +1,9 @@
-package com.capacidad.identityservice.model.dto;
+package com.capacidad.identityservice.loginv2.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Builder

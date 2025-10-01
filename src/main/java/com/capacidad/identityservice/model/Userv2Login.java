@@ -1,6 +1,6 @@
 package com.capacidad.identityservice.model;
 
-import com.capacidad.identityservice.loginv2.Loginv2Model;
+import com.capacidad.identityservice.loginv2.model.Loginv2Model;
 import jakarta.persistence.*;
 
 @Entity

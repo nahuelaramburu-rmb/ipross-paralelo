@@ -18,6 +18,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,7 +32,7 @@ import static com.capacidad.identityservice.misc.constant.SecurityConstants.ADMI
 import static com.capacidad.identityservice.misc.constant.SecurityConstants.FUNDER;
 
 
-// por ahora se implementa un login sin JWTAuthenticationFilter y ClientBasicAuthenticationFilter
+// por ahora se implementa login sin JWTAuthenticationFilter y ClientBasicAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
@@ -87,23 +89,39 @@ public class WebSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
+
     // se define toda la configuración (endpoints protegidos, filtros, roles, etc.).
     @Bean
-    @Order(2)
+    //  @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint customAuthEntryPoint) throws Exception {
 
         //aplica configuración por defecto para un Authorization Server OAuth2 (endpoints de autorización, tokens, etc.).
         //OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
         // Configuración de endpoints ignorados
-        http.csrf().disable()
+        http
+                .cors()
+                .and()
+                .csrf().disable()
 
                 .authorizeHttpRequests(authorize -> authorize
+
                                 .requestMatchers(HttpMethod.GET, ENDPOINT_HEALTH).permitAll()
-                                .requestMatchers(HttpMethod.GET, "/identity-service/v1/api-docs/**",
-                                        "/identity-service/v1/swagger-ui/**",
-                                        "/swagger-ui/**").permitAll()
-                                // .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/login").permitAll()
+
+                                .requestMatchers(HttpMethod.GET,
+                                        "/v2/api-docs",
+                                        "/v3/api-docs",
+                                        "/v3/api-docs/**",
+                                        "/swagger-resources",
+                                        "/swagger-resources/**",
+                                        "/configuration/ui",
+                                        "/configuration/security",
+                                        "/swagger-ui/**",
+                                        "/webjars/**",
+                                        "/swagger-ui.html"
+                                ).permitAll()
+
                                 //           .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/register").permitAll()
                                 .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_VERIFICATION + "/**").permitAll()
                                 .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
@@ -113,14 +131,16 @@ public class WebSecurityConfig {
 //                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
 //                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
                                 //  .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
+
                                 .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").permitAll() // acceso
                                 .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").permitAll() // acceso
-                                .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_LOGIN).permitAll() // acceso
+                                .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_LOGIN).permitAll() // acceso a login
+                                .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_REGISTER).permitAll() // acceso a register
+                                .requestMatchers(HttpMethod.GET, ENDPOINT_AUTH + "/getuserinfo/*").permitAll() // acceso
 
 
 //                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
 //                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
-                                //   .requestMatchers(HttpMethod.POST, ENDPOINT_LOGIN).permitAll() // login access
 
 
                                 .anyRequest().authenticated()

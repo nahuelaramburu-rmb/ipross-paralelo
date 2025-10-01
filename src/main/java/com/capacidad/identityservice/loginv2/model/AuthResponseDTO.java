@@ -1,4 +1,4 @@
-package com.capacidad.identityservice.model.dto;
+package com.capacidad.identityservice.loginv2.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

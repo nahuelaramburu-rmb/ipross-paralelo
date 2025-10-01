@@ -1,4 +1,4 @@
-package com.capacidad.identityservice.loginv2;
+package com.capacidad.identityservice.loginv2.model;
 
 
 import com.capacidad.identityservice.model.Userv2Login;

@@ -1,7 +1,6 @@
 package com.capacidad.identityservice.controller;
 
 import com.capacidad.identityservice.misc.constant.ControllerEndpoints;
-import com.capacidad.identityservice.model.RegisterRequestDTO;
 import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.hal.PageModelWrapper;
 import com.capacidad.identityservice.model.projection.ApplicationUserContextProjection;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static com.capacidad.identityservice.misc.constant.ControllerEndpoints.*;
@@ -91,6 +89,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+
     // se usaria para obtener los datos del user , en la app , ejemplo : "cuenta info"
     @GetMapping(ENDPOINT_ME)
     public ResponseEntity<ApplicationUserProjection> getProfile() throws ObjectNotFoundException {
@@ -147,22 +146,5 @@ public class UserController {
         userContextService.deleteAll(resourceId);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
-    // el register no se expone en la app , quizas se crean usuarios desde un panel web ...
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) throws ObjectNotFoundException {
-
-     //   return ResponseEntity.ok(Map.of("message", userService.register(request)));
-
-        return ResponseEntity.ok(Map.of("message", "register"));
-    }
-
-
-
-
-
 
 }

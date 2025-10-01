@@ -1,9 +1,7 @@
 package com.capacidad.identityservice.model;
 
 import com.capacidad.identityservice.model.base.BaseEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -25,6 +23,14 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     //Sirve para garantizar que los objetos serializados sean compatibles entre distintas versiones de la clase
     private static final long serialVersionUID = -2156950437969065955L;
 
+
+    public ApplicationUser(String username, String email, String password , Group group ) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.group = group;
+
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
@@ -65,8 +71,8 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     private Group group;
 
     //datos personales del usuario (nombre, apellido, etc.).
-    //@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    //@JoinColumn(name = "profile_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
     // referencia a la entidad State (estado funcional del usuario)
