@@ -145,13 +145,20 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+    packagingOptions {
+        jniLibs {
+            pickFirsts += ['**/libc++_shared.so', '**/libfbjni.so', '**/libhermes.so']
+        }
+    }
+
+    // Support for 16K page alignment
 
     defaultConfig {
         applicationId "com.ipross.beneficiario.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 156
-        versionName "1.5.6"
+        versionCode 157
+        versionName "1.5.7"
         multiDexEnabled = true
         
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", false.toString()
@@ -254,8 +261,8 @@ dependencies {
     // }
 
     if (enableHermes) {
-        //noinspection GradleDynamicVersion
-        implementation("com.facebook.react:hermes-engine:+") { // From node_modules
+        // Hermes version compatible with 16k page alignment
+        implementation("com.facebook.react:hermes-engine:0.70.15") { // From node_modules
             exclude group:'com.facebook.fbjni'
         }
     } else {
