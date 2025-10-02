@@ -77,15 +77,12 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     entryFile: "index.js",
-    enableHermes: true,  // Enable Hermes for better performance with RN 0.70
-    bundleInDebug: false,  // Allow dev server in debug mode
-    bundleInRelease: true,
-    devDisabledInDebug: false,  // Enable dev mode in debug builds
-    devDisabledInRelease: true,
+    enableHermes: false,  // Temporarily disable Hermes for RN 0.73 compatibility
 ]
 
-// React.gradle disabled due to Gradle 9 incompatibility - using manual bundle creation
-// apply from: "../../node_modules/react-native/react.gradle"
+// Apply autolinking for native modules (React Native 0.73)
+apply from: new File(rootProject.projectDir.parent, "node_modules/react-native/node_modules/@react-native-community/cli-platform-android/native_modules.gradle");
+applyNativeModulesAppBuildGradle(project)
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -145,6 +142,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+    
+    buildFeatures {
+        buildConfig true  // Required for Android Gradle Plugin 8.x
+    }
+    
     packagingOptions {
         jniLibs {
             pickFirsts += ['**/libc++_shared.so', '**/libfbjni.so', '**/libhermes.so']
@@ -160,6 +162,7 @@ android {
         versionCode 157
         versionName "1.5.7"
         multiDexEnabled = true
+        // buildToolsVersion removed - AGP 8.7.3 uses 34.0.0+ by default
         
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", false.toString()
         buildConfigField "boolean", "IS_HERMES_ENABLED", enableHermes.toString()
@@ -230,9 +233,16 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     
-    // React Native Dependencies - using autolinking
-    implementation "com.facebook.react:react-native:+"  // From node_modules
-    implementation "com.facebook.soloader:soloader:0.10.5"
+    // AndroidX libraries
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    implementation "com.facebook.soloader:soloader:0.12.1+"
+    
+    // React Native and Hermes will be added by autolinking
+    
+    // Flipper dependencies commented out for React Native 0.73 compatibility
+    // debugImplementation("com.facebook.flipper:flipper-integration:+")
+    // debugImplementation("com.facebook.react:flipper-integration")
 
    // COMMENTED OUT: react-native-maps removed from dependencies
    // implementation(project(':react-native-maps')){
@@ -244,7 +254,7 @@ dependencies {
    // implementation 'com.google.android.gms:play-services-base:17.2.1'
    // implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     // Flipper dependencies commented out due to fresco dependency conflicts
     // debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
@@ -260,14 +270,8 @@ dependencies {
     //     exclude group:'com.facebook.flipper'
     // }
 
-    if (enableHermes) {
-        // Hermes version compatible with 16k page alignment
-        implementation("com.facebook.react:hermes-engine:0.70.15") { // From node_modules
-            exclude group:'com.facebook.fbjni'
-        }
-    } else {
-        implementation jscFlavor
-    }
+    // Hermes is automatically managed by React Native 0.73+ autolinking
+    // No manual hermes-android dependency needed
 }
 
 // Run this once to be able to run the application with BUCK
@@ -281,6 +285,4 @@ apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 // COMMENTED OUT: Google Services temporarily until google-services.json is updated with new package name
 // apply plugin: 'com.google.gms.google-services'
 
-// Apply React Native autolinking - DISABLED for manual configuration
-// apply from: file("../../native_modules.gradle")
-apply from: file("../../native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+// React Native autolinking applied at the top of the file

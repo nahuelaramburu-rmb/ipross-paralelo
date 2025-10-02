@@ -27,5 +27,10 @@ module.exports = {
                 android: null,
             },
         },
+        'react-native-reanimated': {
+            platforms: {
+                android: null,
+            },
+        },
     },
 };
