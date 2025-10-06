@@ -18,4 +18,7 @@ public interface ApplicationUserContextRepository extends ExtendedRepository<App
 
     Set<ApplicationUserContextView> findAllByUserUsernameOrUserEmail(String username, String email);
 
+
+
+
 }

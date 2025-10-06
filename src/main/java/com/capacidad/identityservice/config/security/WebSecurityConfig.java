@@ -40,60 +40,28 @@ import static com.capacidad.identityservice.misc.constant.SecurityConstants.FUND
 // habilita la seguridad a nivel de métodos con anotaciones como @PreAuthorize y @PostAuthorize.
 public class WebSecurityConfig {
 
-    //servicio personalizado para cargar usuarios desde BD o cualquier fuente.
-    @Lazy
-    private final CustomUserDetailsService userDetailsService;
-
-    //se encarga de codificar y verificar contraseñas
-    private final PasswordEncoder passwordEncoder;
 
     //filtro que valida tokens JWT en cada request
-    // private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
-    // filtro extra para autenticar clientes vía Basic Auth
-//    private final ClientBasicAuthenticationFilter clientBasicAuthenticationFilter;
+    // filtro extra para autenticar clientes vía Basic Auth , oauth2
+    // private final ClientBasicAuthenticationFilter clientBasicAuthenticationFilter;
 
     //filtro que gestiona la internacionalización (idiomas) en las peticiones
     private final I18nFilter i18nFilter;
 
-    public WebSecurityConfig(//JWTAuthenticationFilter jwtAuthenticationFilter,
-                             CustomUserDetailsService userDetailsService,
-                             PasswordEncoder passwordEncoder,
-                             //       ClientBasicAuthenticationFilter clientBasicAuthenticationFilter,
+    public WebSecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter,
+                             //   ClientBasicAuthenticationFilter clientBasicAuthenticationFilter,
                              I18nFilter i18nFilter) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
-        //   this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        //   this.clientBasicAuthenticationFilter = clientBasicAuthenticationFilter;
+
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        //  this.clientBasicAuthenticationFilter = clientBasicAuthenticationFilter;
         this.i18nFilter = i18nFilter;
     }
-
-    //maneja cabeceras de proxies/reverse proxies (ej. X-Forwarded-For
-    @Bean
-    public ForwardedHeaderFilter forwardedHeaderFilter() {
-        return new ForwardedHeaderFilter();
-    }
-
-    // proveedor de autenticación basado en usuarios de BD, usando CustomUserDetailsService + PasswordEncoder
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
-
-    //el administrador que coordina la autenticación
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
 
 
     // se define toda la configuración (endpoints protegidos, filtros, roles, etc.).
     @Bean
-    //  @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint customAuthEntryPoint) throws Exception {
 
         //aplica configuración por defecto para un Authorization Server OAuth2 (endpoints de autorización, tokens, etc.).
@@ -107,53 +75,58 @@ public class WebSecurityConfig {
 
                 .authorizeHttpRequests(authorize -> authorize
 
-                                .requestMatchers(HttpMethod.GET, ENDPOINT_HEALTH).permitAll()
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_HEALTH).permitAll()
 
-                                .requestMatchers(HttpMethod.GET,
-                                        "/v2/api-docs",
-                                        "/v3/api-docs",
-                                        "/v3/api-docs/**",
-                                        "/swagger-resources",
-                                        "/swagger-resources/**",
-                                        "/configuration/ui",
-                                        "/configuration/security",
-                                        "/swagger-ui/**",
-                                        "/webjars/**",
-                                        "/swagger-ui.html"
-                                ).permitAll()
-
-                                //           .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/register").permitAll()
-                                .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_VERIFICATION + "/**").permitAll()
-                                .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
-                                .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD + "/**/username/**").permitAll()
-                                //  .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_ME).authenticated()
-                                .requestMatchers(ENDPOINT_ACTUATOR + "/**").hasRole(ADMIN)
-//                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
-//                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
-                                //  .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
-
-                                .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").permitAll() // acceso
-                                .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").permitAll() // acceso
-                                .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_LOGIN).permitAll() // acceso a login
-                                .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_REGISTER).permitAll() // acceso a register
-                                .requestMatchers(HttpMethod.GET, ENDPOINT_AUTH + "/getuserinfo/*").permitAll() // acceso
+                        // swagger
+                        .requestMatchers(HttpMethod.GET,
+                                "/v2/api-docs",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-resources",
+                                "/swagger-resources/**",
+                                "/configuration/ui",
+                                "/configuration/security",
+                                "/swagger-ui/**",
+                                "/webjars/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
 
 
-//                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
-//                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_VERIFICATION + "/**").permitAll()
+
+                        .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
+
+                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD + "/**/username/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_ME).authenticated()
+                        .requestMatchers(ENDPOINT_ACTUATOR + "/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
+                        .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
+
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").permitAll() // acceso
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").permitAll() // acceso
+
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_LOGIN).permitAll() // acceso a login
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_REGISTER_BENEFICIARY).permitAll() // acceso a register
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_REGISTER_PRACTITIONER).permitAll() // acceso a register
 
 
-                                .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
+                        .requestMatchers(HttpMethod.DELETE, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(DELETE, USERS))
+
+
+                        .anyRequest().authenticated()
                 )
-//                .exceptionHandling(ex -> ex
-//                        .authenticationEntryPoint(customAuthEntryPoint) // manejar errores de autenticación personalizados.
-//                )
+                //.authenticationProvider(authenticationProvider)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthEntryPoint) // manejar errores de autenticación personalizados.
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
-                );
-        // .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
-        //   .addFilterBefore(i18nFilter, JWTAuthenticationFilter.class)
-        // .addFilterAfter(clientBasicAuthenticationFilter, JWTAuthenticationFilter.class);  // TODO , REVISAR clientBasicAuthenticationFilter
+                )
+                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class);
+        // .addFilterBefore(i18nFilter, JWTAuthenticationFilter.class);
+        //  .addFilterAfter(clientBasicAuthenticationFilter, JWTAuthenticationFilter.class);  // TODO , REVISAR clientBasicAuthenticationFilter
 
         return http.build();
     }

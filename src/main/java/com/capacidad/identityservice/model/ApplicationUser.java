@@ -4,10 +4,11 @@ import com.capacidad.identityservice.model.base.BaseEntity;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 // Usuario base de la aplicación.
 
@@ -24,12 +25,11 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     private static final long serialVersionUID = -2156950437969065955L;
 
 
-    public ApplicationUser(String username, String email, String password , Group group ) {
+    public ApplicationUser(String username, String email, String password, Profile profile) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.group = group;
-
+        this.profile = profile;
     }
 
     @Id
@@ -92,6 +92,10 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     private Set<ApplicationUserContext> contextSet = new HashSet<>();
 
 
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
+
     //Garantiza la consistencia en la relación bidireccional User ↔ Context
     //Cuando se agregan contextos, este metodo se asegura de setear el user en cada ApplicationUserContext
     @Override
@@ -99,4 +103,51 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
         this.contextSet.forEach(context -> context.setUser(this));
     }
 
+
+
 }
+
+
+
+/*
+*
+* {
+  "username": "jdoe",
+  "email": "jdoe@example.com",
+  "password": "MySecurePass123",
+  "emailVerified": false,
+  "challengeType": "OTP",
+  "group": "DEV",
+  "profile": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "phoneNumber": "+123456789",
+    "address": "123 Main St"
+  },
+  "state": {
+    "id": 1
+  },
+  "contextSet": [
+    {
+      "tenant": {
+        "id": 10
+      },
+      "role": {
+        "id": 5
+      },
+      "permissionSuggestion": {
+        "id": 2
+      },
+      "permissionStrategy": "ALLOW",
+      "permissionGroups": [
+        { "id": 100 },
+        { "id": 101 }
+      ]
+    }
+  ]
+}
+
+*
+*
+*
+* */

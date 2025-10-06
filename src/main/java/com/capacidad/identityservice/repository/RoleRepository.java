@@ -14,4 +14,5 @@ public interface RoleRepository extends ExtendedRepository<Role, Long> {
 
     List<Role> findAllByNameIn(List<String> names);
 
+    Optional<Role> findByName(String name);
 }

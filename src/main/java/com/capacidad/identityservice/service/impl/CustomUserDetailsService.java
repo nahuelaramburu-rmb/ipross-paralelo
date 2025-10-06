@@ -2,22 +2,23 @@ package com.capacidad.identityservice.service.impl;
 
 import com.capacidad.identityservice.misc.AuthorityMapper;
 import com.capacidad.identityservice.model.*;
+import com.capacidad.identityservice.model.projection.ScopeRoleViewDTO;
+import com.capacidad.identityservice.repository.ScopeRoleRepository;
 import com.capacidad.identityservice.service.ApplicationUserContextService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
@@ -36,7 +37,7 @@ El metodo clave es loadUserByUsername(String username) → tiene que devolver un
     Si no lo encuentra → lanza UsernameNotFoundException.
     Devuelve el UserDetails para que Spring Security termine la autenticación.
 *
-*   todo , Ahora mismo esta implementación devuelve un usuario sin authorities (roles vacíos)
+*
 *
 *
 *   ApplicationUser = el modelo de usuario real en la aplicación (con username, password, email, etc.).
@@ -52,23 +53,24 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // se usa para buscar usuarios y sus contextos (tenant, permisos, etc.) en la base de datos.
     private final ApplicationUserContextService userContextService;
-
+    private final ScopeRoleRepository scopeRoleRepository;
 
     @Autowired
-    public CustomUserDetailsService(@Lazy ApplicationUserContextService userContextService) {
+    public CustomUserDetailsService(@Lazy ApplicationUserContextService userContextService, ScopeRoleRepository scopeRoleRepository) {
         this.userContextService = userContextService;
+        this.scopeRoleRepository = scopeRoleRepository;
     }
 
 
-
+    // todo , validar que obtenga la data necesaria para setear en claims del jwt !!! 2/10/25
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public CustomUserDetails loadUserByUsername(String username) {
 
         // representa a los usuarios de este sistema
         ApplicationUser user;
         Tenant userTenant;
         Role userRole; //
-       // List<String> userAuthorities = new ArrayList<>();
+        Set<GrantedAuthority> authorities = new HashSet<>();
 
         try {
 
@@ -77,14 +79,45 @@ public class CustomUserDetailsService implements UserDetailsService {
             // Esto devuelve un conjunto de contextos asociados al usuario
             Set<ApplicationUserContext> contextSet = userContextService.findAllContextsByUsernameOrEmail(username);
 
+            if (contextSet == null || contextSet.isEmpty()) {
+                log.error("No se encontró ApplicationUserContext para el usuario: {}", username);
+                throw new UsernameNotFoundException("Usuario no tiene contextos válidos: " + username);
+            }
+
+
             // De todos los contextos (contextSet) agarra el primero (iterator().next()).
             //Luego obtiene el ApplicationUser relacionado.
             //si contextSet está vacío, esto puede tirar NoSuchElementException
             user = contextSet.iterator().next().getUser();
-         //   userTenant = contextSet.iterator().next().getTenant();
+
+            System.out.println("userr ; " + user.getUsername());
+
+            //   userTenant = contextSet.iterator().next().getTenant();
 
             // obtengo el rol del user ( todo -> a cada rol se le asignara luego su authority)
             userRole = contextSet.iterator().next().getRole();
+
+
+            // obtengo las operaciones permitidas a el rol del user
+            //   List<Operation> roleOperations = scopeRoleRepository.findAllOperationsByRoleName(userRole.getName());
+
+//            authorities = roleOperations.stream()
+//                    .map(op -> new SimpleGrantedAuthority(op.name())) // si Operation es enum
+//                    .collect(Collectors.toSet());
+
+
+            Set<ScopeRoleViewDTO> scopeRoleViewDTOS = scopeRoleRepository.findAllByRoleNameAndTenantIsNull(userRole.getName());
+
+            // es necesario agregarle el prefijo ??
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userRole.getName().toUpperCase()));
+
+            authorities = scopeRoleViewDTOS.stream()
+                    .flatMap(dto -> dto.getOperations().stream()
+                            .map(op -> new SimpleGrantedAuthority(
+                                    dto.getResourceName().toLowerCase() + ":" + op.name().toLowerCase()
+                            ))
+                    )
+                    .collect(Collectors.toSet());
 
 
             //Si no encuentra nada en la base de datos, lanza UsernameNotFoundException.
@@ -94,19 +127,15 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
 
-        //CustomUserDetails:
-        //Envuelve un ApplicationUser para que Spring Security lo entienda como UserDetails.
-        //  Ahí es donde Spring valida contraseña, cuenta expirada, authorities, etc.
-
         // el user contiene el tenant , roles , scope , del user,
         //  debo obtener de user : a que tenant pertenece el user , y en base a eso , ver si es user de la app mobile, ver sus roles , permisos , etc
-        // todo , una vez obtenida esa data, me va a servir para restringir los endpoints de la app , de acuerdo al scope de cada user,
 
 
-        //solo creo un userDetails con username , password y su rol !!
+        System.out.println("user email :" + user.getEmail());
+
+        //solo creo un userDetails con username , password y su rol , authorities
         CustomUserDetails userDetails = new CustomUserDetails(
-
-                user.getUsername(), user.getPassword(), userRole
+                user.getEmail(), user.getPassword(), userRole, authorities
         );
 
 
@@ -117,7 +146,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         userDetails.setApplicationUser(user);
 
 
-
         //El objeto CustomUserDetails es entregado a Spring Security
         //Spring lo usará en:
         //Validación de la contraseña
@@ -125,5 +153,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         //Obtener authorities/roles del usuario autenticado
         return userDetails;
     }
+
+
 
 }

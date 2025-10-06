@@ -10,9 +10,13 @@ public interface ApplicationUserContextView {
 
     Long getId();
 
+    Long getUserId();
+
     String getUserUsername();
 
     String getUserPassword();
+
+    String getUserEmail();
 
     Long getRoleId();
 
@@ -41,10 +45,13 @@ public interface ApplicationUserContextView {
         role.setId(getRoleId());
         var state = new State();
         state.setId(getUserStateId());
+
         var applicationUser = new ApplicationUser();
+        applicationUser.setId(getUserId());
         applicationUser.setState(state);
         applicationUser.setUsername(getUserUsername());
         applicationUser.setPassword(getUserPassword());
+        applicationUser.setEmail(getUserEmail());
         applicationUser.setResourceId(getUserResourceId());
         applicationUser.setSub(getUserSub());
         applicationUser.setChallengeType(getUserChallengeType());
@@ -59,7 +66,9 @@ public interface ApplicationUserContextView {
         context.setRole(role);
         context.setUser(applicationUser);
         context.setId(getId());
-        applicationUser.getContextSet().add(context);
+
+       // applicationUser.getContextSet().add(context);
+
         return context;
     }
 

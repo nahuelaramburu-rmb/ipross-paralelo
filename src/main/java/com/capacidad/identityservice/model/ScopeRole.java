@@ -11,8 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-// clase fuera de uso ??
-// no tiene data en la db
+
 
 @Entity
 @Table(name = "application_scope_role")

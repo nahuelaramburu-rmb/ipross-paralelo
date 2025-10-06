@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+// obtiene los alcances de operaciones sobre la data de cada user , de acuerdo a su rol ,
+
 @Service
 @Slf4j
 public class ScopeRoleServiceImpl extends BaseServiceImpl<ScopeRole, Long> implements ScopeRoleService {

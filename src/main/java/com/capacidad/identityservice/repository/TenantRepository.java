@@ -12,4 +12,6 @@ public interface TenantRepository extends ExtendedRepository<Tenant, Long> {
 
     Optional<Tenant> findByTenantIdAndDeletedIsFalse(UUID tenantId);
 
+    Optional<Tenant> findByName(String name);
+
 }

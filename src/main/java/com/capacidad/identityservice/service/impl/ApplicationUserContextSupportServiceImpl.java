@@ -205,8 +205,12 @@ public class ApplicationUserContextSupportServiceImpl implements ApplicationUser
 
     @Override
     public void sendRestoreEmail(ApplicationUser user) {
+
+
         String templateMimeText = templateService.prepareRestorePasswordEmail(user);
+
         String title = templateService.getLocaleTitle("title.restorePasswordTitle");
+
         emailService.sendMimeEmail(user.getEmail(), title, templateMimeText, true);
     }
 

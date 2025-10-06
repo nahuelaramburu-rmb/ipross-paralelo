@@ -26,7 +26,7 @@ public class ApplicationUserContext extends BaseEntity<Long> implements Serializ
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usercontext_seq_gen")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "application_user_id", nullable = false)
     private ApplicationUser user;
 

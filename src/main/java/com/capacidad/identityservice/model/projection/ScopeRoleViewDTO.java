@@ -6,6 +6,10 @@ import com.capacidad.identityservice.model.ScopeRole;
 
 import java.util.List;
 
+
+// define las operaciones sobre los recursos del sistema ,
+// de acuerdo al rol del user,
+
 public class ScopeRoleViewDTO {
 
     private final ScopeRole scopeRole;
@@ -20,6 +24,14 @@ public class ScopeRoleViewDTO {
 
     public ScopeRole getScopeRole() {
         return this.scopeRole;
+    }
+
+    public String getResourceName() {
+        return scopeRole.getResource().getName();
+    }
+
+    public List<Operation> getOperations() {
+        return scopeRole.getOperations();
     }
 
 }

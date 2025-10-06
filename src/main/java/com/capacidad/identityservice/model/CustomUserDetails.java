@@ -44,14 +44,38 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     // ===================================================================================================
 
     // Constructor principal que acepta authorities
-    public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        this(username, password, true, true, true, true, authorities, null);
+    public CustomUserDetails(String username,
+                             String password,
+                             Collection<? extends GrantedAuthority> authorities
+    ) {
+
+        this(
+                username,
+                password,
+                true,
+                true,
+                true,
+                true,
+                authorities,
+                null);
     }
 
 
     // constructor con username, password, rol del user
-    public CustomUserDetails(String username, String password, Role role) {
-        this(username, password, true, true, true, true, Collections.emptyList(), null);
+    public CustomUserDetails(String username,
+                             String password,
+                             Role role,
+                             Collection<? extends GrantedAuthority> authorities
+    ) {
+        this(
+                username,
+                password,
+                true,
+                true,
+                true,
+                true,
+                authorities,
+                null);
 
         this.role = role;
     }
@@ -60,15 +84,22 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     /**
      * Calls the more complex constructor with all boolean arguments set to {@code true}.
      */
-    public CustomUserDetails(String username, String password,
-                             Collection<? extends GrantedAuthority> authorities, String tenantId) {
+    public CustomUserDetails(String username,
+                             String password,
+                             Collection<? extends GrantedAuthority> authorities,
+                             String tenantId
+    ) {
         this(username, password, true, true, true, true, authorities, tenantId);
 
     }
 
     // user role constructor
-    public CustomUserDetails(String username, String password,
-                             Collection<? extends GrantedAuthority> authorities, String tenantId, Role userRole) {
+    public CustomUserDetails(String username,
+                             String password,
+                             Collection<? extends GrantedAuthority> authorities,
+                             String tenantId,
+                             Role userRole
+    ) {
         this(username, password, true, true, true, true, authorities, tenantId);
         this.role = userRole;
     }

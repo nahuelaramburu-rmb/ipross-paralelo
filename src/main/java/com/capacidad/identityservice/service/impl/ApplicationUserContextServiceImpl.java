@@ -275,7 +275,6 @@ public class ApplicationUserContextServiceImpl extends BaseServiceImpl<Applicati
     }
 
 
-
     @Override
     public void forgotPassword(String email) throws ObjectNotFoundException, ObjectNotValidException {
 
@@ -289,7 +288,6 @@ public class ApplicationUserContextServiceImpl extends BaseServiceImpl<Applicati
         //Envía correo de recuperación
         supportService.sendRestoreEmail(user);
     }
-
 
 
     @Override
@@ -336,7 +334,6 @@ public class ApplicationUserContextServiceImpl extends BaseServiceImpl<Applicati
     }
 
 
-
     @Override
     public ApplicationUserContextProjection.WithPermissionGroups findUser(UUID sub) throws ObjectNotFoundException {
 
@@ -350,7 +347,6 @@ public class ApplicationUserContextServiceImpl extends BaseServiceImpl<Applicati
         //Convierte el resultado en proyección WithPermissionGroups.
         return supportService.buildProjection(ApplicationUserContextProjection.WithPermissionGroups.class, res);
     }
-
 
 
     @Transactional

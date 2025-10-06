@@ -1,18 +1,21 @@
 package com.capacidad.identityservice.service.impl;
 
+import com.capacidad.identityservice.config.security.JwtService;
 import com.capacidad.identityservice.exception.InvalidUserStateException;
 import com.capacidad.identityservice.misc.Utils;
 import com.capacidad.identityservice.model.*;
 import com.capacidad.identityservice.model.dto.*;
 import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
-import com.capacidad.identityservice.repository.ApplicationUserRepository;
+import com.capacidad.identityservice.repository.*;
 import com.capacidad.identityservice.service.ApplicationUserService;
 import com.capacidad.identityservice.service.ApplicationUserSupportService;
 import com.capacidad.identityservice.service.base.BaseServiceImpl;
+import com.capacidad.identityservice.service.service.utils.ApplicationUserServiceUtils;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +27,11 @@ import java.util.regex.Pattern;
 
 
 /*
-*
-* este service se usa en el contexto de cuando un user logeado quiere actualizar su password,resetear ,confirmar user,
-* es decir , operaciones de un user ya registrado en el sistema,
-*
-* */
+ *
+ * este service se usa en el contexto de cuando un user logeado quiere actualizar su password,resetear ,confirmar user,
+ * es decir , operaciones de un user ya registrado en el sistema,
+ *
+ * */
 
 
 @Log4j2
@@ -40,14 +43,16 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     private final ApplicationUserSupportService supportService;
 
 
+
     @Autowired
     public ApplicationUserServiceImpl(ApplicationUserRepository repository,
-                                      ApplicationUserSupportService supportService) {
+                                      ApplicationUserSupportService supportService
+                                      ) {
         super(repository);
         this.userRepository = repository;
         this.supportService = supportService;
-
     }
+
 
     @Override
     public void checkUserState(ApplicationUser user) {
@@ -120,35 +125,53 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
 
     @Override
     public void confirmForgotPassword(RestorePasswordDTO input) throws ObjectNotFoundException, ObjectNotValidException {
+
         ApplicationUser user = userRepository.findByEmail(input.getEmail())
                 .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundEmail", input.getEmail()));
+
         if (!user.getState().getId().equals(StateReference.CONFIRMED.getId()))
             throw new ObjectNotValidException("applicationUser.notConfirmed");
+
         if (user.getRestoreOtp() == null || !user.getRestoreOtp().equals(input.getRestoreOtp()))
             throw new ObjectNotValidException("applicationUser.invalidRestoreOTP");
+
         boolean isNotExpiredAndValid = supportService.isOtpValid(input.getRestoreOtp(), user.getEmail());
+
         user.setRestoreOtp(null);
+
         if (!isNotExpiredAndValid) {
             userRepository.save(user);
             userRepository.flush();
             throw new ObjectNotValidException("applicationUser.invalidRestoreOTP");
         }
+
         user.setPassword(input.getNewPassword());
         validate(user);
         encodePassword(user);
         userRepository.save(user);
     }
 
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ApplicationUser restorePassword(String email) throws ObjectNotFoundException {
+
         ApplicationUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundEmail", email));
+
+        // fuerza a hibernate a cargar el profile,para cuando hace un save del user, no haya errores
+        Profile profile = user.getProfile();
+        profile.getName();
+
         int restoreOtp = supportService.generateOtpCode(user.getEmail());
+
         user.setRestoreOtp(restoreOtp);
+
         userRepository.save(user);
+
         return user;
     }
+
 
     @Override
     public String verifyAccount(int otpCode, UUID sub) {
@@ -194,6 +217,8 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
                 .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundUsername", principal));
     }
 
+
+    // registra un cliente
     @Override
     public ApplicationUser signUp(ApplicationUser user) throws ObjectNotValidException {
         log.info("signUp - args: {}({})", user.getClass(), user);
@@ -213,11 +238,26 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
         user.associateChildObjects();
     }
 
+
     @Override
     public void validate(ApplicationUser user) throws ObjectNotValidException {
+        validateEmail(user.getEmail());
         validatePassword(user.getPassword());
     }
 
+
+    private void validateEmail(String email) throws ObjectNotValidException {
+
+        Optional<ApplicationUser> user = userRepository.findByEmail(email);
+
+        if (user.isPresent()) {
+
+            throw new ObjectNotValidException("applicationUser.emailAlreadyExist");
+        }
+    }
+
+
+    // el largo de password debe ser mayor a 8 , debe contener al menos 1 numero y una letra
     private void validatePassword(String password) throws ObjectNotValidException {
         if (password.length() < 8)
             throw new ObjectNotValidException("applicationUser.invalidPasswordLength");
@@ -231,17 +271,21 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
             throw new ObjectNotValidException("applicationUser.invalidPasswordChars");
     }
 
-    private void encodePassword(ApplicationUser user) {
+
+    @Override
+    public void encodePassword(ApplicationUser user) {
         String unencodedPassword = user.getPassword();
         user.setPassword(supportService.encodePassword(unencodedPassword));
         user.setTemporaryPassword(unencodedPassword);
     }
+
 
     @Override
     public ApplicationUser findByUsernameOrEmail(String username) throws ObjectNotFoundException {
         return userRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundUsernameOrEmail", username));
     }
+
 
     @Override
     public boolean existsByResourceId(UUID resourceId) {
@@ -273,7 +317,6 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
         ApplicationUser updated = userRepository.save(contextUser);
         userContext.setUser(updated);
     }
-
 
 
 }

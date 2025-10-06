@@ -1,4 +1,4 @@
-package com.capacidad.identityservice.loginv2.model;
+package com.capacidad.identityservice.model.dto.authdto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequestDTO {
+public class LoginResponseDTO {
 
     private String username;
-    private String password;
-
+    private String email;
 }
