@@ -1,4 +1,20 @@
-module.exports = {
-    presets: ['module:metro-react-native-babel-preset'],
-    // plugins: ['react-native-reanimated/plugin'], // Disabled for build stability
+module.exports = function(api) {
+  api.cache(true);
+  return {
+    presets: [
+      [
+        'babel-preset-expo',
+        {
+          web: {
+            disableImportExportTransform: true
+          }
+        }
+      ]
+    ],
+    env: {
+      production: {
+        plugins: ['react-native-paper/babel']
+      }
+    }
+  };
 };

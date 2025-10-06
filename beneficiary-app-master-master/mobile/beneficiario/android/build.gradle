@@ -1,138 +1,21 @@
-// Top-level build        classpath("com.android.tools.build:gradle:8.7.3")file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     ext {
+        buildToolsVersion = "33.0.1"
         minSdkVersion = 21
-        compileSdkVersion = 35
-        targetSdkVersion = 35
-        supportLibVersion = "28.0.0"
-        layServicesVersion = "17.0.0" // or find latest version
-        kotlinVersion = "1.9.22"
-        ndkVersion = "27.1.12297006"
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+        ndkVersion = "25.1.8937393"
+        kotlinVersion = "1.8.0"
     }
     repositories {
         google()
         mavenCentral()
-        gradlePluginPortal()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:8.7.3')
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath 'com.google.gms:google-services:4.4.0'
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath("com.android.tools.build:gradle:8.1.1")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0")
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { 
-            url = 'https://www.jitpack.io' 
-        }
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url = "$rootDir/../node_modules/react-native/android"
-            name = "React Native"
-        }
-        maven {
-            // Android JSC is installed from npm
-            url = "$rootDir/../node_modules/jsc-android/dist"
-            name = "JSC"
-        }
-        mavenLocal()
-    }
-    
-    // Add React Native dependencies globally for all subprojects
-    configurations.configureEach {
-        resolutionStrategy {
-            dependencySubstitution {
-                // Redirect React Native lookups to the node_modules version
-                substitute(module("com.facebook.react:react-native"))
-                    .using(module("com.facebook.react:react-android:0.73.9"))
-                    .because("React Native 0.73+ uses react-android instead of react-native")
-                substitute(module("com.facebook.react:react-native:+"))
-                    .using(module("com.facebook.react:react-android:0.73.9"))
-                    .because("React Native 0.73+ uses react-android instead of react-native")
-                // Also handle direct react-android lookups without version
-                substitute(module("com.facebook.react:react-android"))
-                    .using(module("com.facebook.react:react-android:0.73.9"))
-                    .because("Ensure react-android has proper version")
-            }
-        }
-    }
-}
-
-subprojects {
-    afterEvaluate {project ->
-        if (project.hasProperty("android")) {
-            android {
-                compileSdkVersion = 35
-                
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_17
-                    targetCompatibility JavaVersion.VERSION_17
-                }
-            }
-        }
-    }
-}
-
-// Modern Gradle 9.0 configuration
-gradle.projectsEvaluated {
-    tasks.withType(JavaCompile).configureEach {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-    }
-}
-
-// Enable buildConfig and namespace for all Android projects (required for AGP 8.x)
-subprojects { subproject ->
-    afterEvaluate {
-        if (subproject.hasProperty("android")) {
-            subproject.android {
-                buildFeatures {
-                    buildConfig = true
-                }
-            }
-            
-            // Set namespace for known React Native packages that don't have it
-            if (!subproject.android.hasProperty("namespace") || subproject.android.namespace == null) {
-                def packageMap = [
-                    'react-android': 'com.facebook.react',
-                    'react-native': 'com.facebook.react',
-                    'react-native-community_datetimepicker': 'com.reactcommunity.rndatetimepicker',
-                    'react-native-community_netinfo': 'com.reactnativecommunity.netinfo',
-                    'react-native-date-picker': 'com.henninghall.date_picker',
-                    'react-native-extra-dimensions-android': 'ca.jaysoo.extradimensions',
-                    'react-native-push-notification': 'com.dieam.reactnativepushnotification',
-                    'react-native-image-picker': 'com.imagepicker',
-                    'react-native-sensitive-info': 'br.com.classapp.RNSensitiveInfo',
-                    'lottie-react-native': 'com.airbnb.android.react.lottie',
-                    'react-native-camera': 'com.lwansbrough.RCTCamera',
-                    'react-native-vector-icons': 'com.oblador.vectoricons',
-                    'react-native-gesture-handler': 'com.swmansion.gesturehandler.react',
-                    'react-native-config': 'com.lugg.ReactNativeConfig',
-                    'react-native-fs': 'com.rnfs',
-                    'react-native-paper': 'com.reactnativepaper',
-                    'react-native-webview': 'com.reactnativecommunity.webview',
-                    'react-native-screens': 'com.swmansion.rnscreens',
-                    'react-native-safe-area-context': 'com.th3rdwave.safeareacontext',
-                    'react-native-svg': 'com.horcrux.svg',
-                    'react-native-device-info': 'com.learnium.RNDeviceInfo',
-                    'react-native-permissions': 'com.zoontek.rnpermissions',
-                    'react-native-blob-util': 'com.ReactNativeBlobUtil',
-                    'react-native-reanimated': 'com.swmansion.reanimated',
-                    'rn-fetch-blob': 'com.RNFetchBlob',
-                    'react-native-share': 'cl.json.social',
-                    'react-native-linear-gradient': 'com.BV.LinearGradient'
-                ]
-                def packageName = packageMap[subproject.name]
-                if (packageName) {
-                    subproject.android.namespace = packageName
-                    logger.info("Set namespace for ${subproject.name} to ${packageName}")
-                }
-            }
-        }
-    }
-}
+apply plugin: "com.facebook.react.rootproject"

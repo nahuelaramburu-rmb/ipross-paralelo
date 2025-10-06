@@ -64,3 +64,14 @@ google-services.json
 ios/tmp.xcconfig
 
 .env
+# Expo
+.expo
+dist/
+web-build/
+
+# Android gradle caches
+android/.gradle
+
+# Expo Prebuild
+/android
+/ios

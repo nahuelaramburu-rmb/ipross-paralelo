@@ -1,3 +1,0 @@
-C:/Users/Lucas/Desktop/Proyects/ipross-paralelo/beneficiary-app-master-master/mobile/beneficiario/android/app/.cxx/Debug/4h1l4z1c/x86/CMakeFiles/appmodules.dir
-C:/Users/Lucas/Desktop/Proyects/ipross-paralelo/beneficiary-app-master-master/mobile/beneficiario/android/app/.cxx/Debug/4h1l4z1c/x86/CMakeFiles/edit_cache.dir
-C:/Users/Lucas/Desktop/Proyects/ipross-paralelo/beneficiary-app-master-master/mobile/beneficiario/android/app/.cxx/Debug/4h1l4z1c/x86/CMakeFiles/rebuild_cache.dir
