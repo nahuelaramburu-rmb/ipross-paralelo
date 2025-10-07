@@ -6,9 +6,10 @@
     "orientation": "portrait",
     "scheme": "iprossbeneficiarios",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#6ac64f",
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#6ac64f"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -22,6 +23,10 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.beneficiario",
+      "navigationBar": {
+        "backgroundColor": "#6ac64f",
+        "barStyle": "light-content"
+      },
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.WRITE_EXTERNAL_STORAGE",

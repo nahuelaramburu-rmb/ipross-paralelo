@@ -8,6 +8,7 @@ import {
     StyleSheet,
     Image,
     ActivityIndicator,
+    StatusBar,
 } from 'react-native';
 import axios from 'axios';
 import Router from './components/RouterSimple';
@@ -22,8 +23,13 @@ class App extends Component {
             isLoggedIn: false,
             loginSuccess: false,
             loggedUser: null,
+            showConstructionBanner: true,
         };
     }
+
+    handleCloseConstructionBanner = () => {
+        this.setState({ showConstructionBanner: false });
+    };
 
     handleLogin = async () => {
         const { username, password } = this.state;
@@ -101,6 +107,11 @@ class App extends Component {
         }
         return (
             <View style={styles.container}>
+                <StatusBar 
+                    backgroundColor="#6ac64f" 
+                    barStyle="light-content" 
+                    translucent={false}
+                />
                 <View style={styles.logoContainer}>
                     <Image
                         source={require('./images/ipross_logo_green.jpg')}
@@ -109,17 +120,25 @@ class App extends Component {
                     />
                     
                     {/* Banner de Construcción - Debajo del logo */}
-                    <View style={styles.constructionBanner}>
-                        <Text style={styles.constructionIcon}>🚧</Text>
-                        <View style={styles.constructionTextContainer}>
-                            <Text style={styles.constructionTitle}>App en Construcción</Text>
-                            <Text style={styles.constructionText}>
-                                La app no está operativa. Estamos trabajando para mejorar tu atención
-                            </Text>
-                            <Text style={styles.constructionSubtext}>Estate atento a las novedades</Text>
+                    {this.state.showConstructionBanner && (
+                        <View style={styles.constructionBanner}>
+                            <Text style={styles.constructionIcon}>🚧</Text>
+                            <View style={styles.constructionTextContainer}>
+                                <Text style={styles.constructionTitle}>App en Construcción</Text>
+                                <Text style={styles.constructionText}>
+                                    La app no está operativa. Estamos trabajando para mejorar tu atención
+                                </Text>
+                                <Text style={styles.constructionSubtext}>Estate atento a las novedades</Text>
+                                <TouchableOpacity 
+                                    style={styles.acceptButton}
+                                    onPress={this.handleCloseConstructionBanner}
+                                >
+                                    <Text style={styles.acceptButtonText}>Aceptar</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={styles.constructionIcon}>🚧</Text>
                         </View>
-                        <Text style={styles.constructionIcon}>🚧</Text>
-                    </View>
+                    )}
                 </View>
 
                 <View style={styles.formContainer}>
@@ -171,78 +190,88 @@ class App extends Component {
 }
 
 const styles = StyleSheet.create({
+    // Container principal con fondo verde IPROSS
     container: {
         flex: 1,
-        backgroundColor: '#6ac54e',
+        backgroundColor: '#6ac64f',
         paddingHorizontal: 24,
-        paddingVertical: 32,
-        justifyContent: 'center',
+        paddingVertical: 40,
+        justifyContent: 'space-between',
     },
     logoContainer: {
         alignItems: 'center',
         marginBottom: 24,
+        marginTop: 24,
     },
     logoImage: {
-        width: 400,
-        height: 200,
-        marginHorizontal: -40,
+        width: 280,
+        height: 140,
         marginBottom: 16,
     },
+    
+    // Formulario con diseño IPROSS
     formContainer: {
-        backgroundColor: '#e8f5e8',
-        borderRadius: 16,
-        padding: 24,
-        shadowColor: '#000',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 28,
+        shadowColor: '#000000',
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 4,
         },
         shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
+        shadowRadius: 12,
+        elevation: 8,
+        borderWidth: 1,
+        borderColor: '#e8e8e8',
     },
     welcomeTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#1e293b',
+        fontSize: 32,
+        fontWeight: '900',
+        color: '#000000',
         textAlign: 'center',
-        marginBottom: 32,
+        marginBottom: 8,
     },
+    
+    // Inputs con diseño IPROSS
     inputWrapper: {
         marginBottom: 20,
     },
     inputLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#374151',
+        color: '#000000',
         marginBottom: 8,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#d1d5db',
+        borderWidth: 2,
+        borderColor: '#e8e8e8',
         borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 14,
         fontSize: 16,
-        backgroundColor: '#f9fafb',
+        backgroundColor: '#FFFFFF',
+        color: '#000000',
     },
+    
+    // Botón principal verde IPROSS
     loginButton: {
-        backgroundColor: '#4a9f3a',
+        backgroundColor: '#6ac64f',
         borderRadius: 12,
         paddingVertical: 16,
         alignItems: 'center',
         marginVertical: 24,
-        shadowColor: '#000',
+        shadowColor: '#6ac64f',
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 4,
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 3,
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 6,
     },
     loginButtonText: {
-        color: '#ffffff',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: 'bold',
     },
@@ -250,148 +279,126 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     forgotText: {
-        color: '#4a9f3a',
+        color: '#007be0',
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: '600',
     },
-    // Estilos para loading
+    
+    // Estados del botón
     loginButtonDisabled: {
-        backgroundColor: '#9ca3af',
+        backgroundColor: '#999999',
+        shadowOpacity: 0.1,
     },
     loadingContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 12,
     },
-    // Estilos para mensaje de éxito
+    
+    // Mensaje de éxito con colores IPROSS
     successContainer: {
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#6ac64f',
     },
     successMessage: {
-        backgroundColor: '#ffffff',
-        borderRadius: 16,
-        padding: 32,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 40,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: '#000000',
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+        elevation: 10,
+        borderWidth: 3,
+        borderColor: '#6ac64f',
+    },
+    successText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#6ac64f',
+        marginBottom: 12,
+    },
+    successSubText: {
+        fontSize: 16,
+        color: '#666666',
+    },
+    
+    // Banner de construcción rediseñado con identidad IPROSS
+    constructionBanner: {
+        backgroundColor: '#f39c12',
+        borderWidth: 3,
+        borderColor: '#e67e22',
+        borderRadius: 16,
+        marginHorizontal: 0,
+        marginVertical: 20,
+        paddingVertical: 24,
+        paddingHorizontal: 20,
+        shadowColor: '#000000',
         shadowOffset: {
             width: 0,
             height: 4,
         },
         shadowOpacity: 0.2,
         shadowRadius: 8,
-        elevation: 6,
-    },
-    successText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#4a9f3a',
-        marginBottom: 8,
-    },
-    successSubText: {
-        fontSize: 16,
-        color: '#6b7280',
-    },
-    // Estilos para menú simple
-    menuContainer: {
-        backgroundColor: '#ffffff',
-        borderRadius: 16,
-        padding: 24,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    menuTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#1e293b',
-        textAlign: 'center',
-        marginBottom: 8,
-    },
-    welcomeText: {
-        fontSize: 16,
-        color: '#6b7280',
-        textAlign: 'center',
-        marginBottom: 24,
-    },
-    menuButton: {
-        backgroundColor: '#f3f4f6',
-        borderRadius: 12,
-        paddingVertical: 16,
-        paddingHorizontal: 20,
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-    },
-    menuButtonText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#374151',
-        textAlign: 'center',
-    },
-    logoutButton: {
-        backgroundColor: '#fee2e2',
-        borderColor: '#fca5a5',
-        marginTop: 16,
-    },
-    logoutText: {
-        color: '#dc2626',
-    },
-    // Estilos para el banner de construcción
-    constructionBanner: {
-        backgroundColor: '#ff6b35',
-        borderWidth: 3,
-        borderColor: '#ff4500',
-        borderRadius: 12,
-        marginHorizontal: 0,
-        marginVertical: 20,
-        paddingVertical: 20,
-        paddingHorizontal: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        shadowColor: '#ff4500',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 8,
-        elevation: 10,
+        elevation: 8,
         width: '100%',
     },
     constructionTextContainer: {
-        flex: 1,
         alignItems: 'center',
-        marginHorizontal: 10,
+        marginVertical: 8,
     },
     constructionIcon: {
-        fontSize: 24,
+        fontSize: 32,
+        textAlign: 'center',
+        marginBottom: 8,
     },
     constructionTitle: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
-        color: '#ffffff',
+        color: '#000000',
         textAlign: 'center',
-        marginBottom: 4,
+        marginBottom: 8,
     },
     constructionText: {
-        fontSize: 14,
-        color: '#ffffff',
+        fontSize: 15,
+        color: '#000000',
         textAlign: 'center',
-        fontWeight: '600',
-        marginBottom: 2,
+        fontWeight: '500',
+        marginBottom: 6,
+        lineHeight: 22,
     },
     constructionSubtext: {
-        fontSize: 12,
-        color: '#ffe4e1',
+        fontSize: 13,
+        color: '#666666',
         textAlign: 'center',
         fontStyle: 'italic',
+        marginBottom: 16,
+    },
+    acceptButton: {
+        backgroundColor: '#6ac64f',
+        borderRadius: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        alignSelf: 'center',
+        shadowColor: '#6ac64f',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+    acceptButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

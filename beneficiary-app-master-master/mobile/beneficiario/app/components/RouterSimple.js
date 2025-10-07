@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, StatusBar } from 'react-native';
 
 const Router = ({ loggedUser }) => {
     const [currentScreen, setCurrentScreen] = useState('BeneficiaryInformation');
@@ -132,6 +132,11 @@ const Router = ({ loggedUser }) => {
 
     return (
         <View style={styles.container}>
+            <StatusBar 
+                backgroundColor="#6ac64f" 
+                barStyle="light-content" 
+                translucent={false}
+            />
             {renderCurrentScreen()}
 
             {/* Bottom Tab Bar Simple */}
@@ -191,83 +196,110 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
     },
     header: {
-        backgroundColor: '#6ac54e',
+        backgroundColor: '#6ac64f',
         paddingTop: 50,
-        paddingBottom: 20,
-        paddingHorizontal: 20,
+        paddingBottom: 24,
+        paddingHorizontal: 24,
         alignItems: 'center',
+        shadowColor: '#000000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 4,
     },
     headerLogo: {
         width: 120,
         height: 60,
-        marginBottom: 10,
+        marginBottom: 8,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#ffffff',
-        marginBottom: 5,
+        color: '#FFFFFF',
+        marginBottom: 4,
     },
     headerSubtitle: {
         fontSize: 16,
-        color: '#ffffff',
-        opacity: 0.8,
+        fontWeight: '400',
+        color: '#FFFFFF',
+        opacity: 0.9,
     },
     contentContainer: {
         flex: 1,
-        padding: 20,
+        padding: 24,
     },
     sectionTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1e293b',
-        marginBottom: 15,
-        marginTop: 10,
+        fontWeight: '600',
+        color: '#000000',
+        marginBottom: 16,
+        marginTop: 8,
     },
     infoCard: {
-        backgroundColor: '#ffffff',
-        borderRadius: 12,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
         padding: 20,
-        marginBottom: 15,
-        shadowColor: '#000',
+        marginVertical: 8,
+        shadowColor: '#000000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    cardTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#000000',
+        marginBottom: 8,
+    },
+    cardSubtext: {
+        fontSize: 14,
+        fontWeight: '400',
+        color: '#666666',
+        marginTop: 4,
+    },
+    actionButton: {
+        backgroundColor: '#6ac64f',
+        borderRadius: 12,
+        paddingVertical: 15,
+        paddingHorizontal: 24,
+        marginBottom: 16,
+        alignItems: 'center',
+        shadowColor: '#000000',
         shadowOffset: {
             width: 0,
             height: 2,
         },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 3,
-    },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#1e293b',
-        marginBottom: 8,
-    },
-    cardSubtext: {
-        fontSize: 14,
-        color: '#6b7280',
-    },
-    actionButton: {
-        backgroundColor: '#4a9f3a',
-        borderRadius: 12,
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        marginBottom: 12,
-        alignItems: 'center',
+        elevation: 2,
     },
     actionButtonText: {
-        color: '#ffffff',
         fontSize: 16,
         fontWeight: '600',
+        color: '#FFFFFF',
     },
     bottomTabBar: {
         flexDirection: 'row',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderTopWidth: 1,
-        borderTopColor: '#e5e7eb',
+        borderTopColor: '#e8e8e8',
         paddingVertical: 8,
         paddingHorizontal: 5,
+        shadowColor: '#000000',
+        shadowOffset: {
+            width: 0,
+            height: -2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 8,
     },
     tabButton: {
         flex: 1,
@@ -282,12 +314,12 @@ const styles = StyleSheet.create({
     tabText: {
         fontSize: 12,
         fontWeight: '500',
-        color: '#6b7280',
+        color: '#666666',
         textAlign: 'center',
     },
     activeTabText: {
+        fontWeight: '700',
         color: '#4a9f3a',
-        fontWeight: '600',
     },
 });
 
