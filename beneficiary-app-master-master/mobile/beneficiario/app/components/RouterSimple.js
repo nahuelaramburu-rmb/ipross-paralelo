@@ -11,12 +11,10 @@ const Router = ({ loggedUser }) => {
         <ScrollView style={styles.screenContainer}>
             <View style={styles.header}>
                 <Image
-                    source={require('../images/ipross_logo_green.jpg')}
+                    source={require('../images/ipross_logo_white.png')}
                     style={styles.headerLogo}
                     resizeMode='contain'
                 />
-                <Text style={styles.headerTitle}>IPROSS Beneficiario</Text>
-                <Text style={styles.headerSubtitle}>Bienvenido, {userName}</Text>
             </View>
 
             <View style={styles.contentContainer}>
@@ -201,6 +199,7 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         paddingHorizontal: 24,
         alignItems: 'center',
+        justifyContent: 'center',
         shadowColor: '#000000',
         shadowOffset: {
             width: 0,
@@ -211,9 +210,8 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     headerLogo: {
-        width: 120,
-        height: 60,
-        marginBottom: 8,
+        width: 180,
+        height: 80,
     },
     headerTitle: {
         fontSize: 24,

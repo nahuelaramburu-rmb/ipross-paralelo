@@ -112,36 +112,38 @@ class App extends Component {
                     barStyle="light-content" 
                     translucent={false}
                 />
-                <View style={styles.logoContainer}>
-                    <Image
-                        source={require('./images/ipross_logo_green.jpg')}
-                        style={styles.logoImage}
-                        resizeMode='cover'
-                    />
-                    
-                    {/* Banner de Construcción - Debajo del logo */}
-                    {this.state.showConstructionBanner && (
-                        <View style={styles.constructionBanner}>
-                            <Text style={styles.constructionIcon}>🚧</Text>
-                            <View style={styles.constructionTextContainer}>
-                                <Text style={styles.constructionTitle}>App en Construcción</Text>
-                                <Text style={styles.constructionText}>
-                                    La app no está operativa. Estamos trabajando para mejorar tu atención
-                                </Text>
-                                <Text style={styles.constructionSubtext}>Estate atento a las novedades</Text>
-                                <TouchableOpacity 
-                                    style={styles.acceptButton}
-                                    onPress={this.handleCloseConstructionBanner}
-                                >
-                                    <Text style={styles.acceptButtonText}>Aceptar</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <Text style={styles.constructionIcon}>🚧</Text>
+                
+                {/* Banner de Construcción - Arriba de todo */}
+                {this.state.showConstructionBanner && (
+                    <View style={styles.constructionBanner}>
+                        <Text style={styles.constructionIcon}>🚧</Text>
+                        <View style={styles.constructionTextContainer}>
+                            <Text style={styles.constructionTitle}>App en Construcción</Text>
+                            <Text style={styles.constructionText}>
+                                La app no está operativa. Estamos trabajando para mejorar tu atención
+                            </Text>
+                            <Text style={styles.constructionSubtext}>Estate atento a las novedades</Text>
+                            <TouchableOpacity 
+                                style={styles.acceptButton}
+                                onPress={this.handleCloseConstructionBanner}
+                            >
+                                <Text style={styles.acceptButtonText}>Aceptar</Text>
+                            </TouchableOpacity>
                         </View>
-                    )}
-                </View>
+                        <Text style={styles.constructionIcon}>🚧</Text>
+                    </View>
+                )}
 
-                <View style={styles.formContainer}>
+                <View style={styles.contentContainer}>
+                    <View style={styles.logoContainer}>
+                        <Image
+                            source={require('./images/ipross_logo_white.png')}
+                            style={styles.logoImage}
+                            resizeMode='contain'
+                        />
+                    </View>
+
+                    <View style={styles.formContainer}>
                     <Text style={styles.welcomeTitle}>Bienvenido</Text>
 
                     <View style={styles.inputWrapper}>
@@ -184,6 +186,7 @@ class App extends Component {
                         <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
                     </TouchableOpacity>
                 </View>
+                </View>
             </View>
         );
     }
@@ -194,19 +197,23 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#6ac64f',
-        paddingHorizontal: 24,
-        paddingVertical: 40,
-        justifyContent: 'space-between',
     },
+    
+    // Contenedor que centra verticalmente
+    contentContainer: {
+        flex: 1,
+        paddingHorizontal: 24,
+        paddingVertical: 20,
+        justifyContent: 'center',
+    },
+    
     logoContainer: {
         alignItems: 'center',
-        marginBottom: 24,
-        marginTop: 24,
+        marginBottom: 32,
     },
     logoImage: {
         width: 280,
-        height: 140,
-        marginBottom: 16,
+        height: 100,
     },
     
     // Formulario con diseño IPROSS
@@ -334,10 +341,11 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: '#e67e22',
         borderRadius: 16,
-        marginHorizontal: 0,
-        marginVertical: 20,
-        paddingVertical: 24,
-        paddingHorizontal: 20,
+        marginHorizontal: 20,
+        marginTop: 20,
+        marginBottom: 12,
+        paddingVertical: 20,
+        paddingHorizontal: 16,
         shadowColor: '#000000',
         shadowOffset: {
             width: 0,
@@ -346,7 +354,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 8,
-        width: '100%',
     },
     constructionTextContainer: {
         alignItems: 'center',
