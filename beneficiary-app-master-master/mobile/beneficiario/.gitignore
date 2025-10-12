@@ -28,6 +28,7 @@ Pods
 build/
 .idea
 .gradle
+android/.gradle
 local.properties
 *.iml
 .env.*
