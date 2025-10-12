@@ -13,6 +13,8 @@ import {
 import axios from 'axios';
 import Router from './components/RouterSimple';
 
+const API_BASE_URL = 'http://168.181.187.5:81';
+
 class App extends Component {
     constructor(props) {
         super(props);
@@ -34,30 +36,35 @@ class App extends Component {
     handleLogin = async () => {
         const { username, password } = this.state;
         if (!username.trim() || !password.trim()) {
-            Alert.alert('Error', 'Por favor ingrese usuario y contraseña');
+            Alert.alert('Error', 'Por favor ingrese email y contraseña');
             return;
         }
 
         this.setState({ isLoading: true });
 
         try {
-            // Llamada a la API real de IPROSS
+            // Llamada al nuevo endpoint de login con email
             const response = await axios.post(
-                'https://backend-ipross-production.up.railway.app/api/auth/login',
+                `${API_BASE_URL}/identity-service/v1/auth/login`,
                 {
-                    numero_afiliado: username,
-                    contraseña: password,
+                    email: username,
+                    password: password,
                 }
             );
 
             const userData = response.data;
 
-            if (userData.status === 'success') {
+            // El backend retorna { message: { access_token, refresh_token } }
+            if (userData.message && userData.message.access_token) {
                 // Login exitoso
                 this.setState({
                     isLoading: false,
                     loginSuccess: true,
-                    loggedUser: userData,
+                    loggedUser: {
+                        email: username,
+                        access_token: userData.message.access_token,
+                        refresh_token: userData.message.refresh_token,
+                    },
                 });
 
                 // Mostrar mensaje de éxito por 2 segundos
@@ -72,7 +79,7 @@ class App extends Component {
             } else {
                 // Credenciales incorrectas
                 this.setState({ isLoading: false });
-                Alert.alert('Error', 'Credenciales incorrectas. Verifique su usuario y contraseña.');
+                Alert.alert('Error', 'Credenciales incorrectas. Verifique su email y contraseña.');
             }
         } catch (error) {
             this.setState({ isLoading: false });
@@ -80,6 +87,8 @@ class App extends Component {
 
             if (error.response && error.response.status === 404) {
                 Alert.alert('Error', 'Usuario no encontrado. Verifique sus credenciales.');
+            } else if (error.response && error.response.status === 401) {
+                Alert.alert('Error', 'Email o contraseña incorrectos.');
             } else {
                 Alert.alert('Error', 'Error en la conexión. Intente nuevamente.');
             }
@@ -147,13 +156,14 @@ class App extends Component {
                     <Text style={styles.welcomeTitle}>Bienvenido</Text>
 
                     <View style={styles.inputWrapper}>
-                        <Text style={styles.inputLabel}>Número de Beneficiario</Text>
+                        <Text style={styles.inputLabel}>Email</Text>
                         <TextInput
                             style={styles.input}
                             value={this.state.username}
                             onChangeText={(text) => this.setState({ username: text })}
-                            placeholder='Ingrese su número de beneficiario'
-                            keyboardType='numeric'
+                            placeholder='Ingrese su email'
+                            keyboardType='email-address'
+                            autoCapitalize='none'
                         />
                     </View>
 
@@ -353,7 +363,9 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.2,
         shadowRadius: 8,
-        elevation: 8,
+        elevation: 999,
+        zIndex: 999,
+        position: 'relative',
     },
     constructionTextContainer: {
         alignItems: 'center',
