@@ -11,7 +11,7 @@ import {
     StatusBar,
 } from 'react-native';
 import axios from 'axios';
-import Router from './components/RouterSimple';
+import HomeScreen from './screens/HomeScreen';
 
 const API_BASE_URL = 'http://168.181.187.5:81';
 
@@ -99,8 +99,8 @@ class App extends Component {
         const { isLoggedIn, loginSuccess } = this.state;
 
         if (isLoggedIn) {
-            // Menú oficial: panel principal de la app
-            return <Router loggedUser={this.state.loggedUser} />;
+            // Pantalla principal con credencial virtual y sidebar
+            return <HomeScreen loggedUser={this.state.loggedUser} onLogout={() => this.setState({ isLoggedIn: false })} />;
         }
 
         // Mostrar mensaje de éxito
@@ -117,8 +117,8 @@ class App extends Component {
         return (
             <View style={styles.container}>
                 <StatusBar 
-                    backgroundColor="#6ac64f" 
-                    barStyle="light-content" 
+                    backgroundColor="#a6ce39" 
+                    barStyle="dark-content" 
                     translucent={false}
                 />
                 
@@ -203,10 +203,10 @@ class App extends Component {
 }
 
 const styles = StyleSheet.create({
-    // Container principal con fondo verde IPROSS
+    // Container principal con fondo verde IPROSS (nuevo diseño)
     container: {
         flex: 1,
-        backgroundColor: '#6ac64f',
+        backgroundColor: '#a6ce39',
     },
     
     // Contenedor que centra verticalmente
@@ -271,14 +271,14 @@ const styles = StyleSheet.create({
         color: '#000000',
     },
     
-    // Botón principal verde IPROSS
+    // Botón principal verde IPROSS (nuevo diseño)
     loginButton: {
-        backgroundColor: '#6ac64f',
+        backgroundColor: '#a6ce39',
         borderRadius: 12,
         paddingVertical: 16,
         alignItems: 'center',
         marginVertical: 24,
-        shadowColor: '#6ac64f',
+        shadowColor: '#a6ce39',
         shadowOffset: {
             width: 0,
             height: 4,
@@ -312,11 +312,11 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     
-    // Mensaje de éxito con colores IPROSS
+    // Mensaje de éxito con colores IPROSS (nuevo diseño)
     successContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#6ac64f',
+        backgroundColor: '#a6ce39',
     },
     successMessage: {
         backgroundColor: '#FFFFFF',
@@ -332,12 +332,12 @@ const styles = StyleSheet.create({
         shadowRadius: 12,
         elevation: 10,
         borderWidth: 3,
-        borderColor: '#6ac64f',
+        borderColor: '#a6ce39',
     },
     successText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#6ac64f',
+        color: '#a6ce39',
         marginBottom: 12,
     },
     successSubText: {
@@ -399,12 +399,12 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     acceptButton: {
-        backgroundColor: '#6ac64f',
+        backgroundColor: '#a6ce39',
         borderRadius: 10,
         paddingVertical: 12,
         paddingHorizontal: 32,
         alignSelf: 'center',
-        shadowColor: '#6ac64f',
+        shadowColor: '#a6ce39',
         shadowOffset: {
             width: 0,
             height: 3,

@@ -3,10 +3,10 @@
  * Colores oficiales de la identidad visual
  */
 
-// Colores Principales - Verde IPROSS
-export const primary = '#6ac64f';
-export const accent = '#6ac64f';
-export const accentSecondary = '#5ab03f';
+// Colores Principales - Verde IPROSS (Nuevo diseño)
+export const primary = '#a6ce39';
+export const accent = '#a6ce39';
+export const accentSecondary = '#6ac64f';
 export const accentTertiary = '#7ed461';
 
 // Colores Secundarios - Azul IPROSS
@@ -16,8 +16,8 @@ export const secondaryBlueLight = '#1a8ef0';
 
 // Light Colors
 export const white = '#FFFFFF';
-export const light1 = '#e8e8e8';
-export const light2 = '#f5f5f5';
+export const light1 = '#f5f5f5';
+export const light2 = '#e0e0e0';
 export const light3 = '#fafafa';
 export const appBackground = '#FFFFFF';
 export const tabBarBackground = '#6ac64f';
