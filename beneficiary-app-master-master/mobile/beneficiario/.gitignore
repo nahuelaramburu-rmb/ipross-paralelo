@@ -73,6 +73,6 @@ web-build/
 # Android gradle caches
 android/.gradle
 
-# Expo Prebuild
+# Expo Prebuild - Las carpetas se regeneran automáticamente
 /android
 /ios
