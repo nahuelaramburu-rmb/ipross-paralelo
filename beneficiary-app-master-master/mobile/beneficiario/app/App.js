@@ -34,21 +34,43 @@ class App extends Component {
     handleLogin = async () => {
         const { username, password } = this.state;
         if (!username.trim() || !password.trim()) {
-            Alert.alert('Error', 'Por favor ingrese email y contraseña');
+            Alert.alert('Campos vacíos', 'Por favor ingrese email y contraseña');
+            return;
+        }
+
+        // Validar formato de email básico
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(username)) {
+            Alert.alert(
+                'Email inválido',
+                'Por favor ingrese un email válido (ejemplo: usuario@dominio.com)'
+            );
             return;
         }
 
         this.setState({ isLoading: true });
 
+        console.log('=== INICIO LOGIN ===');
+        console.log('API_BASE_URL:', API_BASE_URL);
+        console.log('Email:', username);
+        console.log('URL completa:', `${API_BASE_URL}/identity-service/v1/auth/login`);
+
         try {
             // Llamada al nuevo endpoint de login con email
+            console.log('Enviando petición al servidor...');
             const response = await axios.post(
                 `${API_BASE_URL}/identity-service/v1/auth/login`,
                 {
                     email: username,
                     password: password,
+                },
+                {
+                    timeout: 10000, // 10 segundos de timeout
                 }
             );
+
+            console.log('Respuesta recibida:', response.status);
+            console.log('Datos de respuesta:', JSON.stringify(response.data, null, 2));
 
             const userData = response.data;
 
@@ -81,14 +103,58 @@ class App extends Component {
             }
         } catch (error) {
             this.setState({ isLoading: false });
-            console.error('Error de login:', error);
+            console.log('=== ERROR DE LOGIN ===');
+            console.error('Error completo:', error);
+            console.log('Error.message:', error.message);
+            console.log('Error.code:', error.code);
+            console.log('Error.response:', error.response ? 'SÍ' : 'NO');
+            console.log('Error.request:', error.request ? 'SÍ' : 'NO');
+            
+            if (error.response) {
+                console.log('Response status:', error.response.status);
+                console.log('Response data:', JSON.stringify(error.response.data, null, 2));
+            }
 
-            if (error.response && error.response.status === 404) {
-                Alert.alert('Error', 'Usuario no encontrado. Verifique sus credenciales.');
-            } else if (error.response && error.response.status === 401) {
-                Alert.alert('Error', 'Email o contraseña incorrectos.');
+            // Manejar diferentes tipos de errores
+            if (error.response) {
+                // El servidor respondió con un código de error
+                const { status, data } = error.response;
+                
+                if (status === 404) {
+                    // Usuario no encontrado
+                    const errorMsg = data?.message || data?.code || 'Usuario no encontrado';
+                    Alert.alert(
+                        'Usuario no encontrado',
+                        `${errorMsg}\n\nVerifique que el email esté registrado en el sistema.`
+                    );
+                } else if (status === 401) {
+                    Alert.alert(
+                        'Credenciales incorrectas',
+                        'El email o contraseña son incorrectos. Por favor, verifique sus datos.'
+                    );
+                } else if (status === 400) {
+                    Alert.alert(
+                        'Error en la solicitud',
+                        'Los datos ingresados no son válidos. Verifique el formato del email.'
+                    );
+                } else {
+                    Alert.alert(
+                        'Error del servidor',
+                        `El servidor respondió con error ${status}. Intente nuevamente más tarde.`
+                    );
+                }
+            } else if (error.request) {
+                // La petición se hizo pero no hubo respuesta (Network Error)
+                Alert.alert(
+                    'Error de conexión',
+                    `No se pudo conectar al servidor.\n\nVerifique:\n• Su conexión a internet\n• Que esté en la misma red que el servidor\n• Que el servidor esté disponible en ${API_BASE_URL}`
+                );
             } else {
-                Alert.alert('Error', 'Error en la conexión. Intente nuevamente.');
+                // Error al configurar la petición
+                Alert.alert(
+                    'Error inesperado',
+                    `Ocurrió un error: ${error.message}`
+                );
             }
         }
     };
