@@ -13,10 +13,16 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as Colors from '../constants/Colors';
+import TurnosScreen from './TurnosScreen';
+import PrestadoresScreen from './PrestadoresScreen';
+import AtencionesScreen from './AtencionesScreen';
+import CosegurosScreen from './CosegurosScreen';
 
 const HomeScreen = ({ loggedUser, onLogout }) => {
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [slideAnim] = useState(new Animated.Value(-300));
+    const [menuExpanded, setMenuExpanded] = useState(false);
+    const [currentScreen, setCurrentScreen] = useState('home');
 
     const userName = loggedUser?.nombre || 'Usuario';
     const userNumber = loggedUser?.numero_afiliado || '03-13642194/00';
@@ -49,11 +55,47 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
 
     const handleMenuOption = (option) => {
         toggleSidebar();
-        // Por ahora todas las opciones muestran "En construcción"
-        setTimeout(() => {
-            alert(`${option} - En construcción`);
-        }, 300);
+        
+        if (option === 'Turnos') {
+            setTimeout(() => {
+                setCurrentScreen('turnos');
+            }, 300);
+        } else if (option === 'Prestadores') {
+            setTimeout(() => {
+                setCurrentScreen('prestadores');
+            }, 300);
+        } else {
+            // Por ahora otras opciones muestran "En construcción"
+            setTimeout(() => {
+                alert(`${option} - En construcción`);
+            }, 300);
+        }
     };
+
+    const handleBackToHome = () => {
+        setCurrentScreen('home');
+    };
+
+    const handleTabChange = (screen) => {
+        setCurrentScreen(screen);
+    };
+
+    // Si estamos en otra pantalla, mostrar esa pantalla
+    if (currentScreen === 'turnos') {
+        return <TurnosScreen onBack={handleBackToHome} />;
+    }
+
+    if (currentScreen === 'prestadores') {
+        return <PrestadoresScreen onBack={handleBackToHome} />;
+    }
+
+    if (currentScreen === 'atenciones') {
+        return <AtencionesScreen onBack={handleBackToHome} />;
+    }
+
+    if (currentScreen === 'coseguros') {
+        return <CosegurosScreen onBack={handleBackToHome} />;
+    }
 
     return (
         <View style={styles.container}>
@@ -76,27 +118,95 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
             <ScrollView style={styles.content}>
                 {/* Credencial Card */}
                 <View style={styles.credentialCard}>
+                    {/* Header con logos */}
                     <View style={styles.cardHeader}>
                         <Image
                             source={require('../images/ipross_logo_green.jpg')}
                             style={styles.logoIpross}
                             resizeMode="contain"
                         />
-                        <View style={styles.rioNegroPlaceholder}>
-                            <Text style={styles.rioNegroText}>RIO NEGRO</Text>
+                        <View style={styles.rioNegroLogo}>
+                            <Text style={styles.rioNegroText}>RN</Text>
+                            <Text style={styles.rioNegroSubtext}>RIO NEGRO</Text>
                         </View>
                     </View>
 
+                    {/* Foto y datos del afiliado */}
                     <View style={styles.userSection}>
-                        <View style={styles.avatar}>
-                            <Icon name="person" size={40} color={Colors.primary} />
+                        <View style={styles.avatarContainer}>
+                            <View style={styles.avatar}>
+                                <Icon name="person" size={50} color={Colors.primary} />
+                            </View>
                         </View>
+                        
                         <View style={styles.userInfo}>
                             <Text style={styles.userName}>{userName}</Text>
-                            <Text style={styles.userNumber}>{userNumber}</Text>
-                            <Text style={styles.userDni}>DNI {dni}</Text>
+                            <View style={styles.userDataRow}>
+                                <Text style={styles.userLabel}>Afiliado: </Text>
+                                <Text style={styles.userNumber}>{userNumber}</Text>
+                            </View>
+                            <View style={styles.userDataRow}>
+                                <Text style={styles.userLabel}>DNI: </Text>
+                                <Text style={styles.userDni}>{dni}</Text>
+                            </View>
                         </View>
                     </View>
+
+                    {/* Botón para expandir opciones */}
+                    <TouchableOpacity 
+                        style={styles.expandButton}
+                        onPress={() => setMenuExpanded(!menuExpanded)}
+                    >
+                        <Text style={styles.expandButtonText}>
+                            {menuExpanded ? 'Ver menos' : 'Ver más opciones'}
+                        </Text>
+                        <Icon 
+                            name={menuExpanded ? 'chevron-up' : 'chevron-down'} 
+                            size={20} 
+                            color={Colors.primary} 
+                        />
+                    </TouchableOpacity>
+
+                    {/* Menú expandible */}
+                    {menuExpanded && (
+                        <View style={styles.expandedMenu}>
+                            <TouchableOpacity 
+                                style={styles.menuOption}
+                                onPress={() => {
+                                    setMenuExpanded(false);
+                                    alert('Ver código QR - En construcción');
+                                }}
+                            >
+                                <Icon name="qr-code" size={24} color={Colors.primary} />
+                                <Text style={styles.menuOptionText}>Código QR</Text>
+                                <Icon name="chevron-forward" size={20} color={Colors.grisOscuro} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                style={styles.menuOption}
+                                onPress={() => {
+                                    setMenuExpanded(false);
+                                    alert('Ver código Token - En construcción');
+                                }}
+                            >
+                                <Icon name="key" size={24} color={Colors.primary} />
+                                <Text style={styles.menuOptionText}>Código Token</Text>
+                                <Icon name="chevron-forward" size={20} color={Colors.grisOscuro} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                style={styles.menuOption}
+                                onPress={() => {
+                                    setMenuExpanded(false);
+                                    alert('Categoría: Obligatorio - En construcción');
+                                }}
+                            >
+                                <Icon name="pricetag" size={24} color={Colors.primary} />
+                                <Text style={styles.menuOptionText}>Categoría: Obligatorio</Text>
+                                <Icon name="chevron-forward" size={20} color={Colors.grisOscuro} />
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
 
                 {/* Información General */}
@@ -148,19 +258,31 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
 
             {/* Bottom Tab Bar */}
             <View style={styles.tabBar}>
-                <TouchableOpacity style={styles.tabActive}>
-                    <Icon name="card" size={24} color={Colors.primary} />
-                    <Text style={styles.tabTextActive}>Credencial</Text>
+                <TouchableOpacity 
+                    style={currentScreen === 'home' ? styles.tabActive : styles.tab}
+                    onPress={() => handleTabChange('home')}
+                >
+                    <Icon name="card" size={24} color={currentScreen === 'home' ? Colors.primary : Colors.grisOscuro} />
+                    <Text style={currentScreen === 'home' ? styles.tabTextActive : styles.tabText}>Credencial</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.tab} onPress={() => alert('Mis Atenciones - En construcción')}>
-                    <Icon name="heart-outline" size={24} color={Colors.grisOscuro} />
-                    <Text style={styles.tabText}>Mis Atenciones</Text>
+                <TouchableOpacity 
+                    style={currentScreen === 'atenciones' ? styles.tabActive : styles.tab}
+                    onPress={() => handleTabChange('atenciones')}
+                >
+                    <Icon name="heart-outline" size={24} color={currentScreen === 'atenciones' ? Colors.primary : Colors.grisOscuro} />
+                    <Text style={currentScreen === 'atenciones' ? styles.tabTextActive : styles.tabText}>Mis Atenciones</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.tab} onPress={() => alert('Coseguros - En construcción')}>
-                    <Icon name="cash-outline" size={24} color={Colors.grisOscuro} />
-                    <Text style={styles.tabText}>Coseguros</Text>
+                <TouchableOpacity 
+                    style={currentScreen === 'coseguros' ? styles.tabActive : styles.tab}
+                    onPress={() => handleTabChange('coseguros')}
+                >
+                    <Icon name="cash-outline" size={24} color={currentScreen === 'coseguros' ? Colors.primary : Colors.grisOscuro} />
+                    <Text style={currentScreen === 'coseguros' ? styles.tabTextActive : styles.tabText}>Coseguros</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.tab} onPress={() => alert('Trámites - En construcción')}>
+                <TouchableOpacity 
+                    style={styles.tab} 
+                    onPress={() => alert('Trámites - En construcción')}
+                >
                     <Icon name="document-outline" size={24} color={Colors.grisOscuro} />
                     <Text style={styles.tabText}>Trámites</Text>
                 </TouchableOpacity>
@@ -293,69 +415,135 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         marginHorizontal: 16,
         marginTop: 16,
-        borderRadius: 12,
+        borderRadius: 16,
         padding: 20,
-        elevation: 3,
+        elevation: 6,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        borderWidth: 1,
+        borderColor: Colors.light1,
     },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 24,
+        paddingBottom: 16,
+        borderBottomWidth: 2,
+        borderBottomColor: Colors.primary,
     },
     logoIpross: {
-        width: 100,
-        height: 40,
+        width: 120,
+        height: 45,
     },
-    rioNegroPlaceholder: {
-        width: 80,
-        height: 40,
-        backgroundColor: Colors.primary,
-        justifyContent: 'center',
+    rioNegroLogo: {
         alignItems: 'center',
-        borderRadius: 4,
+        justifyContent: 'center',
+        backgroundColor: Colors.primary,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
     },
     rioNegroText: {
-        fontSize: 12,
+        fontSize: 16,
         fontWeight: 'bold',
-        color: Colors.textDark,
+        color: Colors.white,
+        letterSpacing: 1,
+    },
+    rioNegroSubtext: {
+        fontSize: 8,
+        fontWeight: '600',
+        color: Colors.white,
+        letterSpacing: 0.5,
     },
     userSection: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        marginBottom: 20,
+    },
+    avatarContainer: {
+        marginRight: 16,
     },
     avatar: {
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: Colors.light1,
+        width: 90,
+        height: 90,
+        borderRadius: 45,
+        backgroundColor: '#f5f5f5',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: Colors.primary,
+        elevation: 3,
     },
     userInfo: {
-        marginLeft: 16,
         flex: 1,
+        justifyContent: 'center',
+        paddingTop: 8,
     },
     userName: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
         color: Colors.textDark,
-        marginBottom: 4,
+        marginBottom: 12,
+        textTransform: 'uppercase',
+    },
+    userDataRow: {
+        flexDirection: 'row',
+        marginBottom: 6,
+    },
+    userLabel: {
+        fontSize: 13,
+        color: Colors.grisOscuro,
+        fontWeight: '500',
     },
     userNumber: {
-        fontSize: 14,
-        color: Colors.grisOscuro,
-        marginBottom: 2,
+        fontSize: 13,
+        color: Colors.textDark,
+        fontWeight: '600',
     },
     userDni: {
+        fontSize: 13,
+        color: Colors.textDark,
+        fontWeight: '600',
+    },
+    expandButton: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderTopWidth: 1,
+        borderTopColor: Colors.light1,
+        marginTop: 4,
+    },
+    expandButtonText: {
         fontSize: 14,
-        color: Colors.grisOscuro,
+        fontWeight: '600',
+        color: Colors.primary,
+        marginRight: 8,
+    },
+    expandedMenu: {
+        marginTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: Colors.light1,
+        paddingTop: 12,
+    },
+    menuOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 14,
+        paddingHorizontal: 8,
+        borderRadius: 8,
+        marginBottom: 8,
+        backgroundColor: Colors.light1,
+    },
+    menuOptionText: {
+        flex: 1,
+        fontSize: 14,
+        color: Colors.textDark,
+        marginLeft: 12,
+        fontWeight: '500',
     },
     section: {
         marginTop: 16,

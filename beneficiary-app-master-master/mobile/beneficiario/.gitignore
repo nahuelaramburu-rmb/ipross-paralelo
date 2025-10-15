@@ -66,6 +66,7 @@ ios/tmp.xcconfig
 
 .env
 # Expo
+.expo/
 .expo
 dist/
 web-build/
