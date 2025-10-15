@@ -4,7 +4,6 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    Alert,
     StyleSheet,
     Image,
     ActivityIndicator,
@@ -13,9 +12,10 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
+import Toast from 'react-native-toast-message';
 import HomeScreen from './screens/HomeScreen';
 
-const API_BASE_URL = 'http://168.181.187.5:81';
+const API_BASE_URL = 'https://168.181.187.5:882';
 
 class App extends Component {
     constructor(props) {
@@ -34,22 +34,74 @@ class App extends Component {
     handleLogin = async () => {
         const { username, password } = this.state;
         if (!username.trim() || !password.trim()) {
-            Alert.alert('Campos vacíos', 'Por favor ingrese email y contraseña');
+            Toast.show({
+                type: 'error',
+                text1: 'Campos vacíos',
+                text2: 'Por favor ingrese email y contraseña',
+                position: 'top',
+                visibilityTime: 3000,
+            });
             return;
         }
 
         // Validar formato de email básico
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(username)) {
-            Alert.alert(
-                'Email inválido',
-                'Por favor ingrese un email válido (ejemplo: usuario@dominio.com)'
-            );
+            Toast.show({
+                type: 'error',
+                text1: 'Email inválido',
+                text2: 'Por favor ingrese un email válido (ejemplo: usuario@dominio.com)',
+                position: 'top',
+                visibilityTime: 3000,
+            });
             return;
         }
 
         this.setState({ isLoading: true });
 
+        // LOGIN OFFLINE - Verificar credenciales hardcodeadas
+        if (username === 'miguel@gmail.com' && password === 'Password123') {
+            console.log('=== LOGIN OFFLINE EXITOSO ===');
+            console.log('Email:', username);
+            
+            // Simular token JWT
+            const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtaWd1ZWxAZ21haWwuY29tIiwibmFtZSI6Ik1pZ3VlbCIsInJvbGUiOiJCRU5FRklDSUFSWSJ9.mocktoken';
+            
+            this.setState({
+                isLoading: false,
+                loginSuccess: true,
+                loggedUser: {
+                    email: username,
+                    nombre: 'Aramburu, Nahuel',
+                    numero_afiliado: '03-13642194/00',
+                    access_token: mockToken,
+                    refresh_token: mockToken,
+                },
+            });
+
+            // Mostrar mensaje de éxito por 2 segundos
+            setTimeout(() => {
+                this.setState({
+                    isLoggedIn: true,
+                    loginSuccess: false,
+                    username: '',
+                    password: '',
+                });
+            }, 2000);
+            return;
+        }
+
+        // Si las credenciales no coinciden, mostrar error
+        this.setState({ isLoading: false });
+        Toast.show({
+            type: 'error',
+            text1: 'Credenciales incorrectas',
+            text2: 'El email o contraseña son incorrectos.',
+            position: 'top',
+            visibilityTime: 4000,
+        });
+
+        /* CÓDIGO ONLINE COMENTADO TEMPORALMENTE
         console.log('=== INICIO LOGIN ===');
         console.log('API_BASE_URL:', API_BASE_URL);
         console.log('Email:', username);
@@ -99,7 +151,13 @@ class App extends Component {
             } else {
                 // Credenciales incorrectas
                 this.setState({ isLoading: false });
-                Alert.alert('Error', 'Credenciales incorrectas. Verifique su email y contraseña.');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Credenciales incorrectas. Verifique su email y contraseña.',
+                    position: 'top',
+                    visibilityTime: 4000,
+                });
             }
         } catch (error) {
             this.setState({ isLoading: false });
@@ -123,40 +181,59 @@ class App extends Component {
                 if (status === 404) {
                     // Usuario no encontrado
                     const errorMsg = data?.message || data?.code || 'Usuario no encontrado';
-                    Alert.alert(
-                        'Usuario no encontrado',
-                        `${errorMsg}\n\nVerifique que el email esté registrado en el sistema.`
-                    );
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Usuario no encontrado',
+                        text2: `${errorMsg}\n\nVerifique que el email esté registrado en el sistema.`,
+                        position: 'top',
+                        visibilityTime: 4000,
+                    });
                 } else if (status === 401) {
-                    Alert.alert(
-                        'Credenciales incorrectas',
-                        'El email o contraseña son incorrectos. Por favor, verifique sus datos.'
-                    );
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Credenciales incorrectas',
+                        text2: 'El email o contraseña son incorrectos. Por favor, verifique sus datos.',
+                        position: 'top',
+                        visibilityTime: 4000,
+                    });
                 } else if (status === 400) {
-                    Alert.alert(
-                        'Error en la solicitud',
-                        'Los datos ingresados no son válidos. Verifique el formato del email.'
-                    );
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error en la solicitud',
+                        text2: 'Los datos ingresados no son válidos. Verifique el formato del email.',
+                        position: 'top',
+                        visibilityTime: 4000,
+                    });
                 } else {
-                    Alert.alert(
-                        'Error del servidor',
-                        `El servidor respondió con error ${status}. Intente nuevamente más tarde.`
-                    );
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error del servidor',
+                        text2: `El servidor respondió con error ${status}. Intente nuevamente más tarde.`,
+                        position: 'top',
+                        visibilityTime: 4000,
+                    });
                 }
             } else if (error.request) {
                 // La petición se hizo pero no hubo respuesta (Network Error)
-                Alert.alert(
-                    'Error de conexión',
-                    `No se pudo conectar al servidor.\n\nVerifique:\n• Su conexión a internet\n• Que esté en la misma red que el servidor\n• Que el servidor esté disponible en ${API_BASE_URL}`
-                );
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error de conexión',
+                    text2: `No se pudo conectar al servidor.\n\nVerifique:\n• Su conexión a internet\n• Que esté en la misma red que el servidor\n• Que el servidor esté disponible en ${API_BASE_URL}`,
+                    position: 'top',
+                    visibilityTime: 5000,
+                });
             } else {
                 // Error al configurar la petición
-                Alert.alert(
-                    'Error inesperado',
-                    `Ocurrió un error: ${error.message}`
-                );
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error inesperado',
+                    text2: `Ocurrió un error: ${error.message}`,
+                    position: 'top',
+                    visibilityTime: 4000,
+                });
             }
         }
+        */
     };
 
     render() {
@@ -258,11 +335,20 @@ class App extends Component {
                         {/* Botón Registrarse */}
                         <TouchableOpacity
                             style={styles.registerButton}
-                            onPress={() => Alert.alert('Registro', 'Funcionalidad en desarrollo')}>
+                            onPress={() => Toast.show({
+                                type: 'info',
+                                text1: 'Registro',
+                                text2: 'Funcionalidad en desarrollo',
+                                position: 'top',
+                                visibilityTime: 3000,
+                            })}>
                             <Text style={styles.registerButtonText}>Registrarse</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+                
+                {/* Toast Component */}
+                <Toast />
             </View>
         );
     }

@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://168.181.187.5:81/identity-service/v1
+https://168.181.187.5:882/identity-service/v1
 ```
 
 ---
@@ -13,7 +13,7 @@ Autentica a un usuario con email y contraseña.
 
 ### Endpoint
 ```
-POST http://168.181.187.5:81/identity-service/v1/auth/login
+POST https://168.181.187.5:882/identity-service/v1/auth/login
 ```
 
 ### Headers
@@ -32,27 +32,19 @@ Content-Type: application/json
 ### Response Success (200 OK)
 ```json
 {
-    "status": "success",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-        "id": "12345",
-        "email": "miguel@gmail.com",
-        "nombre": "Miguel García",
-        "numero_afiliado": "02-12345/01",
-        "_links": {
-            "self": {
-                "href": "/api/beneficiaries/12345"
-            },
-            "plans": {
-                "href": "/api/beneficiaries/12345/plans"
-            },
-            "charges": {
-                "href": "/api/beneficiaries/12345/charges"
-            }
-        }
-    }
+  "message": {
+    "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQkVORUZJQ0lBUlkiLCJvcGVyYXRpb25zIjpbImJhdGNoZXM6cmVhZCIsImJlbmVmaWNpYXJpZXM6cmVhZCIsImJlbmVmaWNpYXJ5X2J1ZGdldHM6cmVhZCIsImRldmljZXM6Y3JlYXRlIiwiZGV2aWNlczp1cGRhdGUiLCJmaWxlczpyZWFkIiwibWVkaWNhbF9hdXRob3JpemF0aW9uczpyZWFkIiwibm90aWZpY2F0aW9uczpyZWFkIiwibm90aWZpY2F0aW9uczp1cGRhdGUiLCJwcmVfYXV0aG9yaXphdGlvbnM6cmVhZCIsInByZXNjcmlwdGlvbnM6cmVhZCIsInByb2NlZHVyZXM6Y3JlYXRlIiwicHJvY2VkdXJlczpyZWFkIiwicmVwb3J0czpyZWFkIl0sInRva2VuIHR5cGUiOiIiLCJzdWIiOiJtaWd1ZWxAZ21haWwuY29tIiwiaWF0IjoxNzYwNDY3MDE5LCJleHAiOjE3NjA0NzA2MTl9.1QQmuNcAAn2nev2HWYOtwe0i1Xjkedmx8tMfiiVWhAc",
+    "refresh_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaWd1ZWxAZ21haWwuY29tIiwiaWF0IjoxNzYwNDY3MDE5LCJleHAiOjE3NjA0ODg2MTl9.BJhnddR4_TZdh6lsn8muUu9m7wktopuOIZS9a31WgpU"
+  }
 }
 ```
+
+**Nota:** El token JWT incluye información sobre:
+- `role`: "BENEFICIARY"
+- `operations`: Permisos del usuario (lectura de beneficiarios, notificaciones, etc.)
+- `sub`: Email del usuario (miguel@gmail.com)
+- `iat`: Timestamp de emisión
+- `exp`: Timestamp de expiración (1 hora para access_token, 6 horas para refresh_token)
 
 ### Response Error (401 Unauthorized)
 ```json
@@ -90,14 +82,20 @@ import { API_BASE_URL } from '@env';
 const login = async (email, password) => {
     try {
         const response = await axios.post(
-            `${API_BASE_URL}/auth/login`,
+            `${API_BASE_URL}/identity-service/v1/auth/login`,
             {
                 email: email,
                 password: password,
             }
         );
         
-        return response.data;
+        // El backend retorna { message: { access_token, refresh_token } }
+        const { access_token, refresh_token } = response.data.message;
+        
+        return {
+            access_token,
+            refresh_token
+        };
     } catch (error) {
         console.error('Error de login:', error);
         throw error;
