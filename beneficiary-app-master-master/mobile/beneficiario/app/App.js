@@ -15,13 +15,13 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import HomeScreen from './screens/HomeScreen';
 
-const API_BASE_URL = 'https://168.181.187.5:882';
+const API_BASE_URL = 'http://168.181.187.5:81';
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: '',
+            idNumber: '',
             password: '',
             isLoading: false,
             isLoggedIn: false,
@@ -32,25 +32,24 @@ class App extends Component {
     }
 
     handleLogin = async () => {
-        const { username, password } = this.state;
-        if (!username.trim() || !password.trim()) {
+        const { idNumber, password } = this.state;
+        if (!idNumber.trim() || !password.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Campos vacíos',
-                text2: 'Por favor ingrese email y contraseña',
+                text2: 'Por favor ingrese DNI y contraseña',
                 position: 'top',
                 visibilityTime: 3000,
             });
             return;
         }
 
-        // Validar formato de email básico
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(username)) {
+        // Validar que el DNI sea numérico
+        if (!/^\d+$/.test(idNumber)) {
             Toast.show({
                 type: 'error',
-                text1: 'Email inválido',
-                text2: 'Por favor ingrese un email válido (ejemplo: usuario@dominio.com)',
+                text1: 'DNI inválido',
+                text2: 'Por favor ingrese solo números en el DNI',
                 position: 'top',
                 visibilityTime: 3000,
             });
@@ -59,61 +58,18 @@ class App extends Component {
 
         this.setState({ isLoading: true });
 
-        // LOGIN OFFLINE - Verificar credenciales hardcodeadas
-        if (username === 'miguel@gmail.com' && password === 'Password123') {
-            console.log('=== LOGIN OFFLINE EXITOSO ===');
-            console.log('Email:', username);
-            
-            // Simular token JWT
-            const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtaWd1ZWxAZ21haWwuY29tIiwibmFtZSI6Ik1pZ3VlbCIsInJvbGUiOiJCRU5FRklDSUFSWSJ9.mocktoken';
-            
-            this.setState({
-                isLoading: false,
-                loginSuccess: true,
-                loggedUser: {
-                    email: username,
-                    nombre: 'Aramburu, Nahuel',
-                    numero_afiliado: '03-13642194/00',
-                    access_token: mockToken,
-                    refresh_token: mockToken,
-                },
-            });
-
-            // Mostrar mensaje de éxito por 2 segundos
-            setTimeout(() => {
-                this.setState({
-                    isLoggedIn: true,
-                    loginSuccess: false,
-                    username: '',
-                    password: '',
-                });
-            }, 2000);
-            return;
-        }
-
-        // Si las credenciales no coinciden, mostrar error
-        this.setState({ isLoading: false });
-        Toast.show({
-            type: 'error',
-            text1: 'Credenciales incorrectas',
-            text2: 'El email o contraseña son incorrectos.',
-            position: 'top',
-            visibilityTime: 4000,
-        });
-
-        /* CÓDIGO ONLINE COMENTADO TEMPORALMENTE
         console.log('=== INICIO LOGIN ===');
         console.log('API_BASE_URL:', API_BASE_URL);
-        console.log('Email:', username);
+        console.log('DNI:', idNumber);
         console.log('URL completa:', `${API_BASE_URL}/identity-service/v1/auth/login`);
 
         try {
-            // Llamada al nuevo endpoint de login con email
+            // Intentar login con la API real
             console.log('Enviando petición al servidor...');
             const response = await axios.post(
                 `${API_BASE_URL}/identity-service/v1/auth/login`,
                 {
-                    email: username,
+                    idNumber: idNumber,
                     password: password,
                 },
                 {
@@ -126,16 +82,21 @@ class App extends Component {
 
             const userData = response.data;
 
-            // El backend retorna { message: { access_token, refresh_token } }
-            if (userData.message && userData.message.access_token) {
+            // El backend retorna el token y datos del usuario
+            if (userData.access_token || userData.message?.access_token) {
+                const accessToken = userData.access_token || userData.message.access_token;
+                const refreshToken = userData.refresh_token || userData.message.refresh_token;
+                
                 // Login exitoso
                 this.setState({
                     isLoading: false,
                     loginSuccess: true,
                     loggedUser: {
-                        email: username,
-                        access_token: userData.message.access_token,
-                        refresh_token: userData.message.refresh_token,
+                        idNumber: idNumber,
+                        nombre: userData.nombre || userData.fullName || 'Usuario IPROSS',
+                        numero_afiliado: userData.affiliateNumber || idNumber,
+                        access_token: accessToken,
+                        refresh_token: refreshToken,
                     },
                 });
 
@@ -144,47 +105,68 @@ class App extends Component {
                     this.setState({
                         isLoggedIn: true,
                         loginSuccess: false,
-                        username: '',
+                        idNumber: '',
                         password: '',
                     });
                 }, 2000);
             } else {
-                // Credenciales incorrectas
+                // Respuesta inesperada
                 this.setState({ isLoading: false });
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
-                    text2: 'Credenciales incorrectas. Verifique su email y contraseña.',
+                    text2: 'Respuesta inesperada del servidor.',
                     position: 'top',
                     visibilityTime: 4000,
                 });
             }
         } catch (error) {
-            this.setState({ isLoading: false });
-            console.log('=== ERROR DE LOGIN ===');
-            console.error('Error completo:', error);
-            console.log('Error.message:', error.message);
-            console.log('Error.code:', error.code);
-            console.log('Error.response:', error.response ? 'SÍ' : 'NO');
-            console.log('Error.request:', error.request ? 'SÍ' : 'NO');
+            console.log('=== ERROR DE LOGIN - Intentando modo offline ===');
+            console.error('Error:', error.message);
             
-            if (error.response) {
-                console.log('Response status:', error.response.status);
-                console.log('Response data:', JSON.stringify(error.response.data, null, 2));
+            // LOGIN OFFLINE - Verificar credenciales hardcodeadas
+            if (idNumber === '36447582' && password === 'Password123') {
+                console.log('=== LOGIN OFFLINE EXITOSO ===');
+                console.log('DNI:', idNumber);
+                
+                // Simular token JWT
+                const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNjQ0NzU4MiIsIm5hbWUiOiJBcmFtYnVydSwgTmFodWVsIiwicm9sZSI6IkJFTkVGSUNJQVJZIn0.mocktoken';
+                
+                this.setState({
+                    isLoading: false,
+                    loginSuccess: true,
+                    loggedUser: {
+                        idNumber: idNumber,
+                        nombre: 'Aramburu, Nahuel',
+                        numero_afiliado: '03-36447582/00',
+                        access_token: mockToken,
+                        refresh_token: mockToken,
+                    },
+                });
+
+                // Mostrar mensaje de éxito por 2 segundos
+                setTimeout(() => {
+                    this.setState({
+                        isLoggedIn: true,
+                        loginSuccess: false,
+                        idNumber: '',
+                        password: '',
+                    });
+                }, 2000);
+                return;
             }
 
-            // Manejar diferentes tipos de errores
+            // Si no es el usuario offline, mostrar el error apropiado
+            this.setState({ isLoading: false });
+            
             if (error.response) {
-                // El servidor respondió con un código de error
                 const { status, data } = error.response;
                 
                 if (status === 404) {
-                    // Usuario no encontrado
-                    const errorMsg = data?.message || data?.code || 'Usuario no encontrado';
                     Toast.show({
                         type: 'error',
                         text1: 'Usuario no encontrado',
-                        text2: `${errorMsg}\n\nVerifique que el email esté registrado en el sistema.`,
+                        text2: 'El DNI ingresado no está registrado en el sistema.',
                         position: 'top',
                         visibilityTime: 4000,
                     });
@@ -192,15 +174,7 @@ class App extends Component {
                     Toast.show({
                         type: 'error',
                         text1: 'Credenciales incorrectas',
-                        text2: 'El email o contraseña son incorrectos. Por favor, verifique sus datos.',
-                        position: 'top',
-                        visibilityTime: 4000,
-                    });
-                } else if (status === 400) {
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Error en la solicitud',
-                        text2: 'Los datos ingresados no son válidos. Verifique el formato del email.',
+                        text2: 'El DNI o contraseña son incorrectos.',
                         position: 'top',
                         visibilityTime: 4000,
                     });
@@ -208,32 +182,29 @@ class App extends Component {
                     Toast.show({
                         type: 'error',
                         text1: 'Error del servidor',
-                        text2: `El servidor respondió con error ${status}. Intente nuevamente más tarde.`,
+                        text2: `El servidor respondió con error ${status}.`,
                         position: 'top',
                         visibilityTime: 4000,
                     });
                 }
             } else if (error.request) {
-                // La petición se hizo pero no hubo respuesta (Network Error)
                 Toast.show({
                     type: 'error',
                     text1: 'Error de conexión',
-                    text2: `No se pudo conectar al servidor.\n\nVerifique:\n• Su conexión a internet\n• Que esté en la misma red que el servidor\n• Que el servidor esté disponible en ${API_BASE_URL}`,
+                    text2: 'No se pudo conectar al servidor. Trabajando en modo offline.',
                     position: 'top',
-                    visibilityTime: 5000,
+                    visibilityTime: 3000,
                 });
             } else {
-                // Error al configurar la petición
                 Toast.show({
                     type: 'error',
-                    text1: 'Error inesperado',
-                    text2: `Ocurrió un error: ${error.message}`,
+                    text1: 'Credenciales incorrectas',
+                    text2: 'DNI o contraseña incorrectos.',
                     position: 'top',
                     visibilityTime: 4000,
                 });
             }
         }
-        */
     };
 
     render() {
@@ -278,16 +249,16 @@ class App extends Component {
 
                     {/* Formulario */}
                     <View style={styles.formContainer}>
-                        {/* Input Usuario */}
+                        {/* Input DNI */}
                         <View style={styles.inputContainer}>
-                            <Icon name="person-outline" size={20} color="#999" style={styles.inputIcon} />
+                            <Icon name="card-outline" size={20} color="#999" style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
-                                value={this.state.username}
-                                onChangeText={(text) => this.setState({ username: text })}
-                                placeholder='Usuario'
+                                value={this.state.idNumber}
+                                onChangeText={(text) => this.setState({ idNumber: text })}
+                                placeholder='DNI (solo números)'
                                 placeholderTextColor="#999"
-                                keyboardType='email-address'
+                                keyboardType='numeric'
                                 autoCapitalize='none'
                             />
                         </View>

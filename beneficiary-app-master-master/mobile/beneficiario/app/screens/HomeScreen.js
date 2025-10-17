@@ -17,11 +17,16 @@ import TurnosScreen from './TurnosScreen';
 import PrestadoresScreen from './PrestadoresScreen';
 import AtencionesScreen from './AtencionesScreen';
 import CosegurosScreen from './CosegurosScreen';
+import QRScreen from './QRScreen';
+import TokenScreen from './TokenScreen';
+import FamiliaresScreen from './FamiliaresScreen';
+import TramitesScreen from './TramitesScreen';
 
 const HomeScreen = ({ loggedUser, onLogout }) => {
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [slideAnim] = useState(new Animated.Value(-300));
     const [menuExpanded, setMenuExpanded] = useState(false);
+    const [fabMenuVisible, setFabMenuVisible] = useState(false);
     const [currentScreen, setCurrentScreen] = useState('home');
 
     const userName = loggedUser?.nombre || 'Usuario';
@@ -64,6 +69,14 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
             setTimeout(() => {
                 setCurrentScreen('prestadores');
             }, 300);
+        } else if (option === 'Familiares') {
+            setTimeout(() => {
+                setCurrentScreen('familiares');
+            }, 300);
+        } else if (option === 'Trámites') {
+            setTimeout(() => {
+                setCurrentScreen('tramites');
+            }, 300);
         } else {
             // Por ahora otras opciones muestran "En construcción"
             setTimeout(() => {
@@ -95,6 +108,22 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
 
     if (currentScreen === 'coseguros') {
         return <CosegurosScreen onBack={handleBackToHome} />;
+    }
+
+    if (currentScreen === 'qr') {
+        return <QRScreen onBack={handleBackToHome} loggedUser={loggedUser} />;
+    }
+
+    if (currentScreen === 'token') {
+        return <TokenScreen onBack={handleBackToHome} loggedUser={loggedUser} />;
+    }
+
+    if (currentScreen === 'familiares') {
+        return <FamiliaresScreen onBack={handleBackToHome} loggedUser={loggedUser} />;
+    }
+
+    if (currentScreen === 'tramites') {
+        return <TramitesScreen onBack={handleBackToHome} />;
     }
 
     return (
@@ -151,62 +180,6 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                             </View>
                         </View>
                     </View>
-
-                    {/* Botón para expandir opciones */}
-                    <TouchableOpacity 
-                        style={styles.expandButton}
-                        onPress={() => setMenuExpanded(!menuExpanded)}
-                    >
-                        <Text style={styles.expandButtonText}>
-                            {menuExpanded ? 'Ver menos' : 'Ver más opciones'}
-                        </Text>
-                        <Icon 
-                            name={menuExpanded ? 'chevron-up' : 'chevron-down'} 
-                            size={20} 
-                            color={Colors.primary} 
-                        />
-                    </TouchableOpacity>
-
-                    {/* Menú expandible */}
-                    {menuExpanded && (
-                        <View style={styles.expandedMenu}>
-                            <TouchableOpacity 
-                                style={styles.menuOption}
-                                onPress={() => {
-                                    setMenuExpanded(false);
-                                    alert('Ver código QR - En construcción');
-                                }}
-                            >
-                                <Icon name="qr-code" size={24} color={Colors.primary} />
-                                <Text style={styles.menuOptionText}>Código QR</Text>
-                                <Icon name="chevron-forward" size={20} color={Colors.grisOscuro} />
-                            </TouchableOpacity>
-
-                            <TouchableOpacity 
-                                style={styles.menuOption}
-                                onPress={() => {
-                                    setMenuExpanded(false);
-                                    alert('Ver código Token - En construcción');
-                                }}
-                            >
-                                <Icon name="key" size={24} color={Colors.primary} />
-                                <Text style={styles.menuOptionText}>Código Token</Text>
-                                <Icon name="chevron-forward" size={20} color={Colors.grisOscuro} />
-                            </TouchableOpacity>
-
-                            <TouchableOpacity 
-                                style={styles.menuOption}
-                                onPress={() => {
-                                    setMenuExpanded(false);
-                                    alert('Categoría: Obligatorio - En construcción');
-                                }}
-                            >
-                                <Icon name="pricetag" size={24} color={Colors.primary} />
-                                <Text style={styles.menuOptionText}>Categoría: Obligatorio</Text>
-                                <Icon name="chevron-forward" size={20} color={Colors.grisOscuro} />
-                            </TouchableOpacity>
-                        </View>
-                    )}
                 </View>
 
                 {/* Información General */}
@@ -280,11 +253,11 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                     <Text style={currentScreen === 'coseguros' ? styles.tabTextActive : styles.tabText}>Coseguros</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                    style={styles.tab} 
-                    onPress={() => alert('Trámites - En construcción')}
+                    style={currentScreen === 'tramites' ? styles.tabActive : styles.tab}
+                    onPress={() => handleTabChange('tramites')}
                 >
-                    <Icon name="document-outline" size={24} color={Colors.grisOscuro} />
-                    <Text style={styles.tabText}>Trámites</Text>
+                    <Icon name="document-outline" size={24} color={currentScreen === 'tramites' ? Colors.primary : Colors.grisOscuro} />
+                    <Text style={currentScreen === 'tramites' ? styles.tabTextActive : styles.tabText}>Trámites</Text>
                 </TouchableOpacity>
             </View>
 
@@ -374,6 +347,67 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                         </ScrollView>
                     </Animated.View>
                 </View>
+            </Modal>
+
+            {/* Botón flotante (FAB) para QR/Token */}
+            <TouchableOpacity 
+                style={styles.fab}
+                onPress={() => setFabMenuVisible(true)}
+            >
+                <Icon name="qr-code" size={28} color="#fff" />
+            </TouchableOpacity>
+
+            {/* Modal del menú FAB */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={fabMenuVisible}
+                onRequestClose={() => setFabMenuVisible(false)}
+            >
+                <TouchableOpacity 
+                    style={styles.fabModalOverlay}
+                    activeOpacity={1}
+                    onPress={() => setFabMenuVisible(false)}
+                >
+                    <View style={styles.fabMenu}>
+                        <TouchableOpacity 
+                            style={styles.fabMenuItem}
+                            onPress={() => {
+                                setFabMenuVisible(false);
+                                setTimeout(() => setCurrentScreen('qr'), 300);
+                            }}
+                        >
+                            <Icon name="qr-code" size={24} color={Colors.primary} />
+                            <Text style={styles.fabMenuItemText}>Código QR</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.fabMenuDivider} />
+
+                        <TouchableOpacity 
+                            style={styles.fabMenuItem}
+                            onPress={() => {
+                                setFabMenuVisible(false);
+                                setTimeout(() => setCurrentScreen('token'), 300);
+                            }}
+                        >
+                            <Icon name="key" size={24} color={Colors.primary} />
+                            <Text style={styles.fabMenuItemText}>Código Token</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.fabMenuDivider} />
+
+                        <TouchableOpacity 
+                            style={styles.fabMenuItem}
+                            onPress={() => {
+                                setFabMenuVisible(false);
+                                alert('Categoría: Obligatorio');
+                            }}
+                        >
+                            <Icon name="pricetag" size={24} color={Colors.primary} />
+                            <Text style={styles.fabMenuItemText}>Categoría: Obligatorio</Text>
+                        </TouchableOpacity>
+                    </View>
+                </TouchableOpacity>
             </Modal>
         </View>
     );
@@ -741,6 +775,57 @@ const styles = StyleSheet.create({
         color: Colors.grisOscuro,
         textAlign: 'center',
         paddingVertical: 20,
+    },
+    // Botón flotante (FAB)
+    fab: {
+        position: 'absolute',
+        bottom: 80,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: Colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    fabModalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+        paddingBottom: 150,
+        paddingRight: 20,
+    },
+    fabMenu: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 8,
+        minWidth: 220,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    fabMenuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+    },
+    fabMenuItemText: {
+        fontSize: 16,
+        color: Colors.grisOscuro,
+        marginLeft: 16,
+        fontWeight: '500',
+    },
+    fabMenuDivider: {
+        height: 1,
+        backgroundColor: Colors.light2,
     },
 });
 

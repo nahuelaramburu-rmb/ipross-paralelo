@@ -1,32 +1,64 @@
-import React from 'react';
-import { StyleSheet, View, Dimensions, Image } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, View, Dimensions, Image, Animated } from 'react-native';
 import images from '../configs/images';
-import BackgroundSvg, { originalWidth, originalHeight } from '../components/BackgroundSvg';
-import RnLogo from '../images/rn-logo.svg';
 
 const { width } = Dimensions.get('window');
 
-const backgroundAspectRatio = originalWidth / originalHeight;
 const iprossLogoAspectRatio = 3126 / 1426;
-const rnLogoAspectRatio = 346.5 / 274.9;
 
 const Splash = () => {
+    const scaleAnim = useRef(new Animated.Value(0.8)).current;
+    const opacityAnim = useRef(new Animated.Value(0)).current;
+    const rotateAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        // Animación de entrada del logo
+        Animated.parallel([
+            Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 1000,
+                useNativeDriver: true,
+            }),
+            Animated.timing(opacityAnim, {
+                toValue: 1,
+                duration: 800,
+                useNativeDriver: true,
+            }),
+        ]).start();
+
+        // Animación de pulso continua
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(scaleAnim, {
+                    toValue: 1.05,
+                    duration: 1500,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(scaleAnim, {
+                    toValue: 1,
+                    duration: 1500,
+                    useNativeDriver: true,
+                }),
+            ])
+        ).start();
+    }, []);
+
     return (
         <View style={styles.container}>
-            <View style={styles.backgroundContainer}>
-                <BackgroundSvg
-                    width={width}
-                    height={'100%'}
-                    style={{ aspectRatio: backgroundAspectRatio, transform: [{ rotate: '-180deg' }] }}
+            <Animated.View 
+                style={{
+                    aspectRatio: iprossLogoAspectRatio,
+                    width: width * 0.7,
+                    transform: [{ scale: scaleAnim }],
+                    opacity: opacityAnim,
+                }}
+            >
+                <Image 
+                    source={images.iprossLogo} 
+                    style={styles.image}
+                    resizeMode="contain"
                 />
-            </View>
-
-            <View style={{ aspectRatio: iprossLogoAspectRatio, width: width * 0.7 }}>
-                <Image source={images.iprossLogo} style={[styles.image]} />
-            </View>
-            <View style={{ aspectRatio: rnLogoAspectRatio, width: width * 0.3 }}>
-                <RnLogo style={styles.image} />
-            </View>
+            </Animated.View>
         </View>
     );
 };
@@ -36,17 +68,12 @@ export default Splash;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-evenly',
+        justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#f5f5f5', // Fondo gris en lugar de verde
     },
     image: {
-        ...StyleSheet.absoluteFillObject,
-        height: undefined,
-        width: undefined,
-    },
-    backgroundContainer: {
-        ...StyleSheet.absoluteFillObject,
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
     },
 });
