@@ -21,6 +21,9 @@ import QRScreen from './QRScreen';
 import TokenScreen from './TokenScreen';
 import FamiliaresScreen from './FamiliaresScreen';
 import TramitesScreen from './TramitesScreen';
+import PrivacyPolicyScreen from './PrivacyPolicyScreen';
+import PreAutorizacionesScreen from './PreAutorizacionesScreen';
+import ModulosScreen from './ModulosScreen';
 
 const HomeScreen = ({ loggedUser, onLogout }) => {
     const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -77,6 +80,18 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
             setTimeout(() => {
                 setCurrentScreen('tramites');
             }, 300);
+        } else if (option === 'Pre-Autorizaciones') {
+            setTimeout(() => {
+                setCurrentScreen('preautorizaciones');
+            }, 300);
+        } else if (option === 'Módulos') {
+            setTimeout(() => {
+                setCurrentScreen('modulos');
+            }, 300);
+        } else if (option === 'Política de Privacidad') {
+            setTimeout(() => {
+                setCurrentScreen('privacy');
+            }, 300);
         } else {
             // Por ahora otras opciones muestran "En construcción"
             setTimeout(() => {
@@ -124,6 +139,18 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
 
     if (currentScreen === 'tramites') {
         return <TramitesScreen onBack={handleBackToHome} />;
+    }
+
+    if (currentScreen === 'privacy') {
+        return <PrivacyPolicyScreen onBack={handleBackToHome} />;
+    }
+
+    if (currentScreen === 'preautorizaciones') {
+        return <PreAutorizacionesScreen onBack={handleBackToHome} loggedUser={loggedUser} />;
+    }
+
+    if (currentScreen === 'modulos') {
+        return <ModulosScreen onBack={handleBackToHome} loggedUser={loggedUser} />;
     }
 
     return (
@@ -333,6 +360,14 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                             <View style={styles.divider} />
 
                             <TouchableOpacity 
+                                style={styles.menuItem} 
+                                onPress={() => handleMenuOption('Política de Privacidad')}
+                            >
+                                <Icon name="shield-checkmark" size={24} color="#333" />
+                                <Text style={styles.menuItemText}>Política de Privacidad</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
                                 style={styles.menuItemLogout} 
                                 onPress={() => {
                                     toggleSidebar();
@@ -343,7 +378,7 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                                 <Text style={styles.menuItemLogoutText}>Cerrar Sesión</Text>
                             </TouchableOpacity>
 
-                            <Text style={styles.version}>v1.4.1</Text>
+                            <Text style={styles.version}>v1.4.0</Text>
                         </ScrollView>
                     </Animated.View>
                 </View>

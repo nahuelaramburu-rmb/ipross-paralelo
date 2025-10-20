@@ -59,10 +59,10 @@ const QRScreen = ({ onBack, loggedUser }) => {
                     <View style={styles.qrContainer}>
                         <QRCode
                             value={qrData}
-                            size={220}
+                            size={250}
                             color="#000"
                             backgroundColor="#fff"
-                            logo={require('../images/ipross_icon.png')}
+                            logo={require('../images/ipross_logo.png')}
                             logoSize={40}
                             logoBackgroundColor='#fff'
                         />
