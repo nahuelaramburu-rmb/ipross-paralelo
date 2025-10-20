@@ -1,0 +1,14 @@
+{
+  "name": "Beneficiary Children",
+  "lastName": " Test",
+  "idNumber": 11001100,
+  "idType": {
+    "id": 1
+  },
+  "gender": "MASCULINO",
+  "beneficiaryCode": "4525000122245455",
+  "relationshipType": {
+    "id": 4
+  },
+  "birthDate": "1993-01-01"
+}

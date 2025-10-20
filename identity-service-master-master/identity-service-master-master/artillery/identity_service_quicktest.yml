@@ -1,0 +1,19 @@
+config:
+  target: "https://dev.vemsalud.com"
+  http:
+    timeout: 120
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: Warm up
+scenarios: 
+  - flow:
+    - post:
+        url: "/identity-service/v1/oauth/token"
+        form:
+          grant_type: "password"
+          client_id: "Qqa8fnc3Ri"
+          client_secret: "WjPhXg62Wc"
+          username: "30222123"
+          password: "prueba123"
+    name: "Token"  

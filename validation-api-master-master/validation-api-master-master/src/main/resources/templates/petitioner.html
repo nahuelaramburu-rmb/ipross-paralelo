@@ -1,0 +1,8 @@
+<div style="margin-top: 10px;" th:fragment="petitioner">
+    <span style="font-size: 16px;">Prestador Solicitante</span><br/>
+    <strong>[[${data.getPetitioner().getLastName()}]], [[${data.getPetitioner().getName()}]]</strong>
+    [[${data.getPetitioner().getIdType().getAlias()}]] [[${data.getPetitioner().getIdNumber()}]]<br/>
+    <div th:each="medSpec :${data.getPetitioner().getMedicalSpecialties()}">
+        <span th:text="${medSpec.getName()}"> </span>
+    </div>
+</div>

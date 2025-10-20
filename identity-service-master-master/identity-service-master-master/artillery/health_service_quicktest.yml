@@ -1,0 +1,13 @@
+config:
+  target: "https://dev.vemsalud.com"
+  http:
+    timeout: 120
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: Warm up
+scenarios: 
+  - flow:
+    - get: 
+        url: "/identity-service/v1/health"
+    name: "Health"

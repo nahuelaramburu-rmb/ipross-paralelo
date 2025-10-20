@@ -1,0 +1,12 @@
+{
+  "name": "Medical Center Test",
+  "address": {
+    "street": "Street Test 5",
+    "district": "District Test 5",
+    "streetNumber": "567",
+    "apartment": "5 A",
+    "city": {
+      "id": 1
+    }
+  }
+}

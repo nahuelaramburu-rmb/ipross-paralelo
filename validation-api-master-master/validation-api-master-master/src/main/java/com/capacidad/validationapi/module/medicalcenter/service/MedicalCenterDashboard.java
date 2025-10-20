@@ -1,0 +1,9 @@
+package com.capacidad.validationapi.module.medicalcenter.service;
+
+import com.capacidad.validationapi.module.dashboard.service.DashboardBudgetStatistics;
+import com.capacidad.validationapi.module.dashboard.service.DashboardMedicalAuthorizationStatistics;
+import com.capacidad.validationapi.module.dashboard.service.DashboardPractitionerStatistics;
+import com.capacidad.validationapi.module.dashboard.service.DashboardSettlementStatistics;
+
+public interface MedicalCenterDashboard extends DashboardMedicalAuthorizationStatistics, DashboardSettlementStatistics, DashboardBudgetStatistics, DashboardPractitionerStatistics {
+}

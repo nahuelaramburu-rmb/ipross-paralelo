@@ -1,0 +1,12 @@
+{
+  "name": "Association Test",
+  "address": {
+    "street": "Street Test 4",
+    "district": "District Test 4",
+    "streetNumber": "456",
+    "apartment": "4 A",
+    "city": {
+      "id": 1
+    }
+  }
+}

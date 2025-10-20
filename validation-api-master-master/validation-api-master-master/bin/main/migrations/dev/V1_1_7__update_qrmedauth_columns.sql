@@ -1,0 +1,2 @@
+alter table medical_authorization drop constraint ukf33kwbx3xvub727km24fquh9n;
+alter table medical_authorization drop column encrypted_qr;

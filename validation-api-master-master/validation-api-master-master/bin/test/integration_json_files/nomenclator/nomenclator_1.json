@@ -1,0 +1,14 @@
+{
+  "nomenclatorCode": 1001,
+  "medicalPracticeArea": {
+    "id": 1
+  },
+  "medicalPracticeType": {
+    "id": 1
+  },
+  "nomenclatorConfig": {
+    "reportRequired": false,
+    "expirationDays": 30,
+    "maxInTransaction": 1
+  }
+}

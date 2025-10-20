@@ -1,0 +1,7 @@
+<div th:fragment="beneficiary">
+    <span style="font-size: 16px;">Afiliado</span><br/>
+    <strong>[[${data.getBeneficiary().getLastName()}]], [[${data.getBeneficiary().getName()}]]</strong>
+    [[${data.getBeneficiary().getIdType().getAlias()}]] [[${data.getBeneficiary().getIdNumber()}]]<br/>
+    [[${data.getBeneficiary().getBeneficiaryCode()}]]<br/>
+    Pago de coseguros: <strong>[[${data.getBeneficiary().getPaymentMethod().getName()}]]</strong>
+</div>

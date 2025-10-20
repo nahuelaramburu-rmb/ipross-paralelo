@@ -1,0 +1,1 @@
+update application_scope_role set operations = 'read,create,update' where id = 131;

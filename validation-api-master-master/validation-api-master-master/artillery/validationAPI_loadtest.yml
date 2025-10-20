@@ -1,0 +1,39 @@
+config:
+  target: "https://dev.vemsalud.com"
+  http:
+    timeout: 120
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: Warm up
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 600
+      arrivalRate: 50
+      name: Sustained load
+scenarios: 
+  - flow: 
+    - post:
+        url: "/validation-api/v1/authorizations/id-authorization"
+        headers:
+          authorization: "Bearer eyJraWQiOiJaQ043UjNOVlcyaGVJenBVVmlZb09WTXNOa2RyVzFWYWFITkFRbUU9IiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJiMTIxNmI4Zi01OGEzLTRhMzQtYjc3ZS1jMmIwYjVmM2FhM2UiLCJyb2xlIjoibWVkaWNhbF9jZW50ZXIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImlzcyI6Imh0dHBzOi8vZGV2LWFwcC52ZW1zYWx1ZC5jb20vaWRlbnRpdHktc2VydmljZS92MSIsImNsaWVudF9pZCI6InB1YmxpYy1jbGllbnQiLCJhdWQiOiJxa1ViSUFGMlU0SE5VVlU3c3lGYmNRRk9UVlNYdUUsVzZja0lrSHBUNXVhSTFUUVNqY0pUTXUxY25JekhPLDRxaWJPNFd5M3EyNU1PRDVPNU90VGsxQzI1N1lBViIsInNjb3BlIjoicmVhZDpwcmFjdGl0aW9uZXJzLHJlYWQ6bWVkaWNhbF9hdXRob3JpemF0aW9ucyxjcmVhdGU6bWVkaWNhbF9hdXRob3JpemF0aW9ucyx1cGRhdGU6bWVkaWNhbF9hdXRob3JpemF0aW9ucyxyZWFkOnVzZXJzLGNyZWF0ZTp1c2VycyxkZWxldGU6dXNlcnMscmVhZDpiZW5lZmljaWFyaWVzLHJlYWQ6bm9tZW5jbGF0b3JzLHJlYWQ6cmVwb3J0cyxhbGw6ZmlsZXMscmVhZDpwcmFjdGl0aW9uZXJfYnVkZ2V0cyx1cGRhdGU6cHJhY3RpdGlvbmVyX2J1ZGdldHMscmVhZDpiYXRjaGVzLHJlYWQ6bm90aWZpY2F0aW9ucyx1cGRhdGU6bm90aWZpY2F0aW9ucyxjcmVhdGU6ZGV2aWNlcyx1cGRhdGU6ZGV2aWNlcyxyZWFkOnByZV9hdXRob3JpemF0aW9ucyxyZWFkOm1lZGljaW5lcyxyZWFkOnByZXNjcmlwdGlvbnMsY3JlYXRlOnByZXNjcmlwdGlvbnMsdXBkYXRlOnByZXNjcmlwdGlvbnMscmVhZDpjb250cmFjdHMscmVhZDptZWRpY2FsX2F1dGhvcml6YXRpb25faXRlbXMscmVhZDpzZXR0bGVtZW50cyx1cGRhdGU6c2V0dGxlbWVudHMiLCJyZXNvdXJjZV9pZCI6IjI5NDc3OWFkLWE0YmQtNDc3NS05MDNhLTM5YTY4YjdkZTk2YSIsImV4cCI6MTYxMDk5NDI2NywiaWF0IjoxNjEwOTkwNjY3LCJ0ZW5hbnQiOiJ0ZXN0LXRlbmFudC1kZXY6ODEyYTQ3YzktNzQ4Zi00NTBmLWJmZjctOTM0YmViYmIwYjVlIiwiZW1haWwiOiJkc2Fmc2Fmc2FAZHNhLmNvbSIsInVzZXJuYW1lIjoiY29uc3VhNCIsImdyb3VwIjoiZGV2In0.mp0ITffFLxsw-iMppEYRPBQMtNiV0R8mJA8dR_B7CMLrwfLgUjIcHXdBdACF5sY7wzOY0w8eDAZzIV2C97nkFqnoNSr74xiu2uX47zoczFVNAV20vhTsZnd0pwjiOQtKgRWZI_2txSPbH80tWEj5SOcEIU0oEdVV2IHqNetmV06IcCDl-pi02Cbdsr0YWTIZZ0ELULgDHQBPJulmChsQVZBszX0024Eww13kGFP4uF6UeyioawoZbNetr63oe_U8s3cFoVsODnPIVqrGUrfCnRf1UcHmXs3ENrU4xf95rOMhVJ7Yzyh8huv8LNmrbn447aXKDVvEYt27gaJFWHbXRs7IIEZfSWN316T0b3tVPG5Pl6NPn31fJQyUsSPkbf-rJ9RNp68qOEDq6eT7GOtNZTQbvUIjWSCnkHiDUYVMLzJPiAGlu2SOjRJMHNDpGyFlnp1GT_W9-Lqd2TBWFWCZTky2wDGkwrkonInYt8xk7MG5kqwHyd-jNULUA5LLK2ZHhLoKVHKzchFiOUG-sqziQPTW0WEAF_2SkJzO-8KuePNvw-92dNhpRdvKzfxwmfQNuefu4zA1gt7oPTdn_sHwD2-bcbMUsWVyWwQEeeDwha99Y0uSWFYdGaSHBM52tuMA97C9Uy5XfWnIqoPF0MnOFyBA10XV91IDBQhVwWRX4Qk"
+        json:
+          practitioner:
+            id: 1600
+          petitioner:
+            id: 1600
+          preMedicalAuthorization:
+          medicalAuthorizationItems:
+          - nomenclator:
+              id: 1
+            quantity: 1
+          selectedContract:
+            id: 1
+          beneficiary:
+            idType:
+              id: 1
+            idNumber: 30222123
+        name: "Validation"
+    

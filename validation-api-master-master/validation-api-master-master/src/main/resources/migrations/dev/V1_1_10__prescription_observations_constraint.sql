@@ -1,0 +1,1 @@
+alter table prescription alter column observations set not null;

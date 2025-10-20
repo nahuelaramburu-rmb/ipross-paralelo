@@ -1,0 +1,2 @@
+alter table contract_adjustment drop constraint uk9s6n1aevsuccytgluyt9q4jcw;
+alter table contract_adjustment drop constraint uknp56v6ss6e3cpe5llk1dvfy8i;

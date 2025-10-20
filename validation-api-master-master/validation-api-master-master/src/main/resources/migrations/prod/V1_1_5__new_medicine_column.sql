@@ -1,0 +1,1 @@
+alter table if exists medicine add column authorized_dosage numeric(19, 2);

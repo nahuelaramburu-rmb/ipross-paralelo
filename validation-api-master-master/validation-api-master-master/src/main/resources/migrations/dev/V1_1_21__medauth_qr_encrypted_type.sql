@@ -1,0 +1,1 @@
+alter table medical_authorization alter encrypted_qr_key type varchar(255);

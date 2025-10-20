@@ -1,0 +1,1 @@
+alter table prescription_item ADD COLUMN daily_dosage varchar(255);

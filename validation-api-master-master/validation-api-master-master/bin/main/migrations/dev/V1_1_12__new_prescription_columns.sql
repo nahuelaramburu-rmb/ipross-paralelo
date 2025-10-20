@@ -1,0 +1,3 @@
+alter table if exists prescription add column cancellation_reason varchar(255);
+create table prescription_audit_log (id int8 not null, rev int4 not null, revtype int2, client_id varchar(255), created_at timestamp, created_by varchar(255), modified_at timestamp, modified_by varchar(255), cancellation_reason varchar(255), cancellation_reason_mod boolean, primary key (id, rev));
+alter table if exists prescription_audit_log add constraint FKtq67bpxioa7jhnwbih1st0jgb foreign key (rev) references revinfo;

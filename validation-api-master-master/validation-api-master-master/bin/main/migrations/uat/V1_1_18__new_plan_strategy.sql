@@ -1,0 +1,33 @@
+alter table if exists beneficiary_insurance_plan add column id int8;
+create sequence beneficiary_insurance_plan_seq start 1 increment 1;
+update beneficiary_insurance_plan set id = nextval('beneficiary_insurance_plan_seq');
+alter table beneficiary_insurance_plan alter column id set not null;
+alter table beneficiary_insurance_plan drop constraint beneficiary_insurance_plan_pkey;
+alter table beneficiary_insurance_plan add primary key (id);
+alter table if exists beneficiary_insurance_plan add column client_id varchar(255);
+alter table if exists beneficiary_insurance_plan add column created_at timestamp;
+alter table if exists beneficiary_insurance_plan add column created_by varchar(255);
+alter table if exists beneficiary_insurance_plan add column deleted boolean DEFAULT false not null;
+alter table if exists beneficiary_insurance_plan add column deletion_token uuid DEFAULT uuid_nil() not null;
+alter table if exists beneficiary_insurance_plan add column modified_at timestamp;
+alter table if exists beneficiary_insurance_plan add column modified_by varchar(255);
+alter table if exists beneficiary_insurance_plan add column tenant_id uuid;
+update beneficiary_insurance_plan set tenant_id = '812a47c9-748f-450f-bff7-934bebbb0b5e';
+alter table beneficiary_insurance_plan alter column tenant_id set not null;
+alter table if exists beneficiary_insurance_plan add column expiration_date date;
+alter table if exists beneficiary_insurance_plan add column priority int4;
+update beneficiary_insurance_plan set priority = 1;
+alter table beneficiary_insurance_plan alter column priority set not null;
+alter table if exists insurance_plan add column priority int4;
+update insurance_plan set priority = 1;
+alter table insurance_plan alter column priority set not null;
+alter table if exists beneficiary_insurance_plan drop constraint if exists UKiyoe7cmgrvlgm4iohx3dk4mlh;
+alter table if exists beneficiary_insurance_plan add constraint UKiyoe7cmgrvlgm4iohx3dk4mlh unique (insurance_plan_id, beneficiary_id, deleted, deletion_token, tenant_id);
+alter table if exists beneficiary_insurance_plan drop constraint if exists UKrll3lowu1wa8s1w8mdyxum1n3;
+alter table if exists beneficiary_insurance_plan add constraint UKrll3lowu1wa8s1w8mdyxum1n3 unique (beneficiary_id, priority, deleted, deletion_token, tenant_id);
+create table beneficiary_insurance_plan_audit_log (id int8 not null, rev int4 not null, revtype int2, client_id varchar(255), created_at timestamp, created_by varchar(255), modified_at timestamp, modified_by varchar(255), expiration_date date, expiration_date_mod boolean, priority int4, priority_mod boolean, beneficiary_id int8, beneficiary_mod boolean, insurance_plan_id int8, insurance_plan_mod boolean, primary key (id, rev));
+alter table if exists beneficiary_insurance_plan_audit_log add constraint FKcj0vud7faxtpxftaj5egxjeyq foreign key (rev) references revinfo;
+insert into scheduler_job_info (id, cron_expression, job_class, job_group, job_name, cron_job, repeat_time)
+values (6, '0 15 0 ? * * *', 'com.capacidad.validationapi.module.scheduler.job.BeneficiaryInsurancePlanCronJob',
+        'CronJobs', 'BeneficiaryInsurancePlanCronJob', true, null);
+alter table if exists pre_medical_authorization_item add column charge_unit_price numeric(19, 2);

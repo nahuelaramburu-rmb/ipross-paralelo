@@ -1,0 +1,22 @@
+{
+  "practitioner": {
+    "id": 1
+  },
+  "insurancePlan": {
+    "id": 1
+  },
+  "validationItems": [
+    {
+      "nomenclator": {
+        "id": 1
+      },
+      "quantity": 1
+    },
+    {
+      "nomenclator": {
+        "id": 2
+      },
+      "quantity": 1
+    }
+  ]
+}
