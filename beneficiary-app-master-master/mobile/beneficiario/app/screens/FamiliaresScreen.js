@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -7,15 +7,21 @@ import {
     StatusBar,
     ScrollView,
     Image,
+    ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Toast from 'react-native-toast-message';
 import * as Colors from '../constants/Colors';
+import ApiService from '../services/api.service';
 
 const FamiliaresScreen = ({ onBack, loggedUser }) => {
     const [selectedMember, setSelectedMember] = useState(null);
+    const [familiares, setFamiliares] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Mock data de familiares
-    const familiares = [
+    // Mock data de fallback
+    const mockFamiliares = [
         {
             id: 1,
             nombre: 'Aramburu, Nahuel',
@@ -62,6 +68,75 @@ const FamiliaresScreen = ({ onBack, loggedUser }) => {
         },
     ];
 
+    useEffect(() => {
+        cargarFamiliares();
+    }, []);
+
+    const cargarFamiliares = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Obtener beneficiaryId del usuario logueado
+            const beneficiaryId = loggedUser?.id || loggedUser?.idNumber;
+
+            if (!beneficiaryId) {
+                console.warn('No beneficiaryId disponible, usando datos mock');
+                setFamiliares(mockFamiliares);
+                setLoading(false);
+                return;
+            }
+
+            // Intentar obtener datos reales
+            const response = await ApiService.getRelatives(beneficiaryId);
+
+            if (response.success && response.data && Array.isArray(response.data)) {
+                // Mapear los datos del API al formato de la app
+                const familiaresFormateados = response.data.map((fam, index) => ({
+                    id: fam.id || index + 1,
+                    nombre: `${fam.lastName || ''}, ${fam.name || ''}`.trim(),
+                    relacion: fam.relation || fam.relacion || 'Familiar',
+                    dni: String(fam.idNumber || fam.dni || ''),
+                    numeroAfiliado: fam.beneficiaryCode || fam.numeroAfiliado || '',
+                    categoria: fam.category?.name || fam.categoria || 'N/A',
+                    estado: fam.status?.name || fam.estado || 'Activo',
+                    edad: fam.age || fam.edad || 0,
+                    sexo: fam.gender?.[0] || fam.sexo?.[0] || 'M',
+                }));
+
+                setFamiliares(familiaresFormateados);
+
+                if (response.fallback) {
+                    Toast.show({
+                        type: 'info',
+                        text1: 'Modo offline',
+                        text2: 'Mostrando datos de ejemplo',
+                        position: 'top',
+                        visibilityTime: 2000,
+                    });
+                }
+            } else {
+                // Si no hay datos, usar mock
+                console.warn('No se obtuvieron familiares del API, usando mock');
+                setFamiliares(mockFamiliares);
+            }
+        } catch (error) {
+            console.error('Error cargando familiares:', error);
+            setError('No se pudieron cargar los datos');
+            setFamiliares(mockFamiliares);
+            
+            Toast.show({
+                type: 'error',
+                text1: 'Error de conexión',
+                text2: 'Mostrando datos de ejemplo',
+                position: 'top',
+                visibilityTime: 3000,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const getAvatarColor = (sexo) => {
         return sexo === 'M' ? '#1976d2' : '#e91e63';
     };
@@ -94,9 +169,15 @@ const FamiliaresScreen = ({ onBack, loggedUser }) => {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.content}>
-                {/* Resumen */}
-                <View style={styles.summaryCard}>
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={Colors.primary} />
+                    <Text style={styles.loadingText}>Cargando grupo familiar...</Text>
+                </View>
+            ) : (
+                <ScrollView style={styles.content}>
+                    {/* Resumen */}
+                    <View style={styles.summaryCard}>
                     <View style={styles.summaryItem}>
                         <Text style={styles.summaryNumber}>{familiares.length}</Text>
                         <Text style={styles.summaryLabel}>Integrantes</Text>
@@ -242,6 +323,7 @@ const FamiliaresScreen = ({ onBack, loggedUser }) => {
                     </Text>
                 </View>
             </ScrollView>
+            )}
         </View>
     );
 };
@@ -493,6 +575,17 @@ const styles = StyleSheet.create({
         color: '#1565c0',
         marginLeft: 12,
         lineHeight: 18,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 16,
+        color: Colors.grisOscuro,
     },
 });
 

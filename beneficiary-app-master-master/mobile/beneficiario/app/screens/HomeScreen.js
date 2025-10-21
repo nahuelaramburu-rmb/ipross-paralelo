@@ -133,7 +133,7 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
     }
 
     if (currentScreen === 'tramites') {
-        return <TramitesScreen onBack={handleBackToHome} />;
+        return <TramitesScreen onBack={handleBackToHome} loggedUser={loggedUser} />;
     }
 
     if (currentScreen === 'preautorizaciones') {

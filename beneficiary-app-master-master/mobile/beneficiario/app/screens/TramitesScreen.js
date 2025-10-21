@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -7,15 +7,22 @@ import {
     StatusBar,
     ScrollView,
     Modal,
+    ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Toast from 'react-native-simple-toast';
+import ApiService from '../services/api.service';
 import * as Colors from '../constants/Colors';
 
-const TramitesScreen = ({ onBack }) => {
+const TramitesScreen = ({ onBack, loggedUser }) => {
     const [selectedTab, setSelectedTab] = useState('disponibles'); // disponibles, proceso, completados
     const [selectedTramite, setSelectedTramite] = useState(null);
+    const [tramitesEnProceso, setTramitesEnProceso] = useState([]);
+    const [tramitesCompletados, setTramitesCompletados] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Mock data de trámites disponibles
+    // Mock data de fallback para trámites disponibles (estáticos)
     const tramitesDisponibles = [
         {
             id: 1,
@@ -64,8 +71,8 @@ const TramitesScreen = ({ onBack }) => {
         },
     ];
 
-    // Mock data de trámites en proceso
-    const tramitesEnProceso = [
+    // Mock data de fallback para trámites en proceso
+    const mockTramitesEnProceso = [
         {
             id: 101,
             titulo: 'Solicitud de Reintegro #2024-001234',
@@ -88,8 +95,8 @@ const TramitesScreen = ({ onBack }) => {
         },
     ];
 
-    // Mock data de trámites completados
-    const tramitesCompletados = [
+    // Mock data de fallback para trámites completados
+    const mockTramitesCompletados = [
         {
             id: 201,
             titulo: 'Cambio de Prestador #2024-000987',
@@ -107,6 +114,80 @@ const TramitesScreen = ({ onBack }) => {
             icon: 'person-add-outline',
         },
     ];
+
+    // Función para cargar los trámites desde la API
+    useEffect(() => {
+        cargarTramites();
+    }, []);
+
+    const cargarTramites = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Obtener el ID del beneficiario del usuario logueado
+            const beneficiaryId = loggedUser?.beneficiaryId || loggedUser?.id;
+            
+            if (!beneficiaryId) {
+                console.warn('No se encontró beneficiaryId, usando datos mock');
+                setTramitesEnProceso(mockTramitesEnProceso);
+                setTramitesCompletados(mockTramitesCompletados);
+                setLoading(false);
+                return;
+            }
+
+            // Llamar al endpoint de trámites con paginación
+            const response = await ApiService.getProcedures(beneficiaryId, 0, 100);
+            
+            if (response.success && response.data && Array.isArray(response.data)) {
+                // Mapear los datos de la API al formato de la app
+                const enProceso = [];
+                const completados = [];
+
+                response.data.forEach(tramite => {
+                    const tramiteMapped = {
+                        id: tramite.procedureCode || tramite.id || `TRAM-${Date.now()}`,
+                        titulo: tramite.title || tramite.type || 'Sin título',
+                        descripcion: tramite.description || tramite.detail || 'Sin descripción',
+                        estado: tramite.status || 'Desconocido',
+                        progreso: tramite.progress || 0,
+                        fechaInicio: tramite.startDate ? new Date(tramite.startDate).toLocaleDateString('es-AR') : 'Sin fecha',
+                        ultimaActualizacion: tramite.lastUpdate ? new Date(tramite.lastUpdate).toLocaleDateString('es-AR') : 'Sin fecha',
+                        fechaCompletado: tramite.completionDate ? new Date(tramite.completionDate).toLocaleDateString('es-AR') : undefined,
+                        icon: tramite.icon || 'document-outline',
+                    };
+
+                    // Clasificar según el estado
+                    const estadoLower = (tramite.status || '').toLowerCase();
+                    if (estadoLower.includes('completad') || estadoLower.includes('aprobad') || estadoLower.includes('finalizado')) {
+                        completados.push(tramiteMapped);
+                    } else {
+                        enProceso.push(tramiteMapped);
+                    }
+                });
+
+                setTramitesEnProceso(enProceso);
+                setTramitesCompletados(completados);
+            } else if (response.fallback) {
+                // Si la API falló, usar datos mock
+                console.log('Usando datos mock de trámites (modo offline)');
+                Toast.show('Modo offline: Mostrando datos de ejemplo', Toast.SHORT);
+                setTramitesEnProceso(mockTramitesEnProceso);
+                setTramitesCompletados(mockTramitesCompletados);
+            } else {
+                // Error desconocido
+                throw new Error('Error al obtener los trámites');
+            }
+        } catch (err) {
+            console.error('Error al cargar trámites:', err);
+            setError(err.message);
+            Toast.show('Error al cargar los trámites. Mostrando datos de ejemplo.', Toast.LONG);
+            setTramitesEnProceso(mockTramitesEnProceso);
+            setTramitesCompletados(mockTramitesCompletados);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getEstadoColor = (estado) => {
         switch (estado) {
@@ -274,6 +355,13 @@ const TramitesScreen = ({ onBack }) => {
                 </TouchableOpacity>
             </View>
 
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#6ac64f" />
+                    <Text style={styles.loadingText}>Cargando trámites...</Text>
+                </View>
+            ) : (
+            <>
             {/* Tabs */}
             <View style={styles.tabsContainer}>
                 <TouchableOpacity
@@ -378,6 +466,8 @@ const TramitesScreen = ({ onBack }) => {
                         </View>
                     </View>
                 </Modal>
+            )}
+            </>
             )}
         </View>
     );
@@ -617,6 +707,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
         marginLeft: 12,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 16,
+        color: '#666',
     },
 });
 

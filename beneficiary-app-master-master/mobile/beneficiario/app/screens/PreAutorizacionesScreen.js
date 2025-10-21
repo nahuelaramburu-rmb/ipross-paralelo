@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -8,17 +8,23 @@ import {
     TextInput,
     Modal,
     Alert,
+    ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Toast from 'react-native-simple-toast';
+import ApiService from '../services/api.service';
 
 const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
     const [searchText, setSearchText] = useState('');
     const [selectedTab, setSelectedTab] = useState('pendientes'); // pendientes, aprobadas, rechazadas
     const [selectedAuth, setSelectedAuth] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [preAutorizaciones, setPreAutorizaciones] = useState({ pendientes: [], aprobadas: [], rechazadas: [] });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Datos mock de pre-autorizaciones
-    const preAutorizaciones = {
+    // Datos mock de fallback para pre-autorizaciones
+    const mockPreAutorizaciones = {
         pendientes: [
             {
                 id: 'PA-2025-001',
@@ -92,6 +98,85 @@ const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
                 motivoRechazo: 'No está cubierto por el plan de salud. Tratamiento estético sin indicación médica.',
             },
         ],
+    };
+
+    // Función para cargar las pre-autorizaciones desde la API
+    useEffect(() => {
+        cargarPreAutorizaciones();
+    }, []);
+
+    const cargarPreAutorizaciones = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Obtener el ID del beneficiario del usuario logueado
+            const beneficiaryId = loggedUser?.beneficiaryId || loggedUser?.id;
+            
+            if (!beneficiaryId) {
+                console.warn('No se encontró beneficiaryId, usando datos mock');
+                setPreAutorizaciones(mockPreAutorizaciones);
+                setLoading(false);
+                return;
+            }
+
+            // Llamar al endpoint de autorizaciones con paginación
+            const response = await ApiService.getAuthorizations(beneficiaryId, 0, 100);
+            
+            if (response.success && response.data && Array.isArray(response.data)) {
+                // Mapear los datos de la API al formato de la app
+                const pendientes = [];
+                const aprobadas = [];
+                const rechazadas = [];
+
+                response.data.forEach(auth => {
+                    const authMapped = {
+                        id: auth.authorizationCode || auth.id || `PA-${Date.now()}`,
+                        tipo: auth.type || auth.category || 'Sin tipo',
+                        descripcion: auth.description || auth.detail || 'Sin descripción',
+                        prestador: auth.provider || auth.providerName || 'Sin prestador',
+                        fechaSolicitud: auth.requestDate ? new Date(auth.requestDate).toLocaleDateString('es-AR') : 'Sin fecha',
+                        estado: auth.status || 'Desconocido',
+                        prioridad: auth.priority || 'Normal',
+                        profesionalSolicitante: auth.requestingProfessional || auth.doctor || 'Sin especificar',
+                        especialidad: auth.specialty || 'Sin especificar',
+                        fechaAprobacion: auth.approvalDate ? new Date(auth.approvalDate).toLocaleDateString('es-AR') : undefined,
+                        fechaRechazo: auth.rejectionDate ? new Date(auth.rejectionDate).toLocaleDateString('es-AR') : undefined,
+                        validezHasta: auth.validUntil ? new Date(auth.validUntil).toLocaleDateString('es-AR') : undefined,
+                        numeroAutorizacion: auth.authorizationNumber || auth.authCode || undefined,
+                        observaciones: auth.observations || auth.notes || undefined,
+                        motivoRechazo: auth.rejectionReason || auth.rejectReason || undefined,
+                    };
+
+                    // Clasificar según el estado
+                    const estadoLower = (auth.status || '').toLowerCase();
+                    if (estadoLower.includes('aprobad') || estadoLower.includes('autorizada')) {
+                        aprobadas.push(authMapped);
+                    } else if (estadoLower.includes('rechazad') || estadoLower.includes('denegad')) {
+                        rechazadas.push(authMapped);
+                    } else {
+                        pendientes.push(authMapped);
+                    }
+                });
+
+                setPreAutorizaciones({ pendientes, aprobadas, rechazadas });
+            } else if (response.fallback) {
+                // Si la API falló, usar datos mock
+                console.log('Usando datos mock de pre-autorizaciones (modo offline)');
+                Toast.show('Modo offline: Mostrando datos de ejemplo', Toast.SHORT);
+                setPreAutorizaciones(mockPreAutorizaciones);
+            } else {
+                // Error desconocido
+                throw new Error('Error al obtener las pre-autorizaciones');
+            }
+        } catch (err) {
+            console.error('Error al cargar pre-autorizaciones:', err);
+            setError(err.message);
+            Toast.show('Error al cargar las pre-autorizaciones. Mostrando datos de ejemplo.', Toast.LONG);
+            setPreAutorizaciones(mockPreAutorizaciones);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleViewDetails = (auth) => {
@@ -203,6 +288,13 @@ const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
                 </TouchableOpacity>
             </View>
 
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#6ac64f" />
+                    <Text style={styles.loadingText}>Cargando pre-autorizaciones...</Text>
+                </View>
+            ) : (
+            <>
             {/* Search Bar */}
             <View style={styles.searchContainer}>
                 <Icon name="search-outline" size={20} color="#666" style={styles.searchIcon} />
@@ -384,6 +476,8 @@ const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
                     </View>
                 </View>
             </Modal>
+            </>
+            )}
         </View>
     );
 };
@@ -625,6 +719,17 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 16,
+        color: '#666',
     },
 });
 
