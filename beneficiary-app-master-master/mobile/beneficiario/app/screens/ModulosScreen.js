@@ -24,7 +24,7 @@ const ModulosScreen = ({ onBack, loggedUser }) => {
             nombre: 'Prestadores',
             descripcion: 'Red de prestadores de salud',
             icon: 'business',
-            color: '#4CAF50',
+            color: '#6ac64f',
             disponible: true,
         },
         {
@@ -64,7 +64,7 @@ const ModulosScreen = ({ onBack, loggedUser }) => {
             nombre: 'Pre-Autorizaciones',
             descripcion: 'Solicitud y seguimiento de autorizaciones',
             icon: 'checkmark-circle',
-            color: '#8BC34A',
+            color: '#6ac64f',
             disponible: true,
         },
         {
@@ -246,7 +246,7 @@ const ModulosScreen = ({ onBack, loggedUser }) => {
                 {/* Módulos Disponibles */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Icon name="checkmark-circle" size={24} color="#4CAF50" />
+                        <Icon name="checkmark-circle" size={24} color="#6ac64f" />
                         <Text style={styles.sectionTitle}>Módulos Disponibles</Text>
                     </View>
                     {disponibles.map(renderModuleCard)}

@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     confirmado: {
-        backgroundColor: '#4caf50',
+        backgroundColor: '#6ac64f',
     },
     pendiente: {
         backgroundColor: '#ff9800',

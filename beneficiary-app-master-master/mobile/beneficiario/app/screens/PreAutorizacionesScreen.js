@@ -114,7 +114,7 @@ const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
             case 'Pendiente Documentación':
                 return '#F44336';
             case 'Aprobada':
-                return '#4CAF50';
+                return '#6ac64f';
             case 'Rechazada':
                 return '#D32F2F';
             default:
@@ -335,7 +335,7 @@ const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
                                 {selectedAuth.validezHasta && (
                                     <View style={styles.detailSection}>
                                         <Text style={styles.detailLabel}>Válida Hasta:</Text>
-                                        <Text style={[styles.detailValue, { color: '#4CAF50' }]}>
+                                        <Text style={[styles.detailValue, { color: '#6ac64f' }]}>
                                             {selectedAuth.validezHasta}
                                         </Text>
                                     </View>

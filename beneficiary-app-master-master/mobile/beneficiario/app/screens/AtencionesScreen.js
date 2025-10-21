@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
         borderTopColor: Colors.light1,
     },
     estadoBadge: {
-        backgroundColor: '#4caf50',
+        backgroundColor: '#6ac64f',
         paddingHorizontal: 12,
         paddingVertical: 4,
         borderRadius: 12,
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
         color: Colors.primary,
     },
     estadoBadgeLarge: {
-        backgroundColor: '#4caf50',
+        backgroundColor: '#6ac64f',
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 8,

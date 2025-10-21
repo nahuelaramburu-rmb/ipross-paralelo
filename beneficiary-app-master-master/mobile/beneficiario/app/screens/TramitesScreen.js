@@ -115,7 +115,7 @@ const TramitesScreen = ({ onBack }) => {
             case 'Pendiente de Documentación':
                 return '#ff9800';
             case 'Aprobado':
-                return '#4caf50';
+                return '#6ac64f';
             case 'Rechazado':
                 return '#f44336';
             default:

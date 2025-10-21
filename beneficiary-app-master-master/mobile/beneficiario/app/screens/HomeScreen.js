@@ -21,7 +21,6 @@ import QRScreen from './QRScreen';
 import TokenScreen from './TokenScreen';
 import FamiliaresScreen from './FamiliaresScreen';
 import TramitesScreen from './TramitesScreen';
-import PrivacyPolicyScreen from './PrivacyPolicyScreen';
 import PreAutorizacionesScreen from './PreAutorizacionesScreen';
 import ModulosScreen from './ModulosScreen';
 
@@ -88,10 +87,6 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
             setTimeout(() => {
                 setCurrentScreen('modulos');
             }, 300);
-        } else if (option === 'Política de Privacidad') {
-            setTimeout(() => {
-                setCurrentScreen('privacy');
-            }, 300);
         } else {
             // Por ahora otras opciones muestran "En construcción"
             setTimeout(() => {
@@ -139,10 +134,6 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
 
     if (currentScreen === 'tramites') {
         return <TramitesScreen onBack={handleBackToHome} />;
-    }
-
-    if (currentScreen === 'privacy') {
-        return <PrivacyPolicyScreen onBack={handleBackToHome} />;
     }
 
     if (currentScreen === 'preautorizaciones') {
@@ -358,14 +349,6 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                             </TouchableOpacity>
 
                             <View style={styles.divider} />
-
-                            <TouchableOpacity 
-                                style={styles.menuItem} 
-                                onPress={() => handleMenuOption('Política de Privacidad')}
-                            >
-                                <Icon name="shield-checkmark" size={24} color="#333" />
-                                <Text style={styles.menuItemText}>Política de Privacidad</Text>
-                            </TouchableOpacity>
 
                             <TouchableOpacity 
                                 style={styles.menuItemLogout} 

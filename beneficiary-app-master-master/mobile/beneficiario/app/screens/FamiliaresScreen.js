@@ -166,7 +166,7 @@ const FamiliaresScreen = ({ onBack, loggedUser }) => {
                                         <Icon 
                                             name={familiar.estado === 'Activo' ? 'checkmark-circle' : 'close-circle'} 
                                             size={16} 
-                                            color={familiar.estado === 'Activo' ? '#4caf50' : '#f44336'} 
+                                            color={familiar.estado === 'Activo' ? '#6ac64f' : '#f44336'} 
                                         />
                                         <Text style={[
                                             styles.estadoText,
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     estadoActivoText: {
-        color: '#4caf50',
+        color: '#6ac64f',
     },
     familiarDetails: {
         marginTop: 16,
