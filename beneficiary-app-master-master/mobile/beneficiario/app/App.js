@@ -11,11 +11,9 @@ import {
     ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import HomeScreen from './screens/HomeScreen';
-
-const API_BASE_URL = 'http://168.181.187.5:81';
+import ApiService from './services/api.service';
 
 class App extends Component {
     constructor(props) {
@@ -57,50 +55,65 @@ class App extends Component {
         }
 
         this.setState({ isLoading: true });
-
-        console.log('=== INICIO LOGIN ===');
-        console.log('API_BASE_URL:', API_BASE_URL);
-        console.log('DNI:', idNumber);
-        console.log('URL completa:', `${API_BASE_URL}/identity-service/v1/auth/login`);
-
         try {
-            // Intentar login con la API real
-            console.log('Enviando petición al servidor...');
-            const response = await axios.post(
-                `${API_BASE_URL}/identity-service/v1/auth/login`,
-                {
-                    idNumber: idNumber,
-                    password: password,
-                },
-                {
-                    timeout: 10000, // 10 segundos de timeout
+            // Intentar login usando ApiService (usa API_HOST desde configs o fallback)
+            const result = await ApiService.login(idNumber, password);
+
+            if (result.success) {
+                // Caso fallback/local
+                if (result.fallback || result.userData) {
+                    const userData = result.userData || result.user || {};
+                    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNjQ0NzU4MiIsIm5hbWUiOiJFeGFtcGxlIFVzZXIiLCJyb2xlIjoiQkVORUZJQ0lBUll9.mock';
+
+                    this.setState({
+                        isLoading: false,
+                        loginSuccess: true,
+                        loggedUser: {
+                            idNumber: String(userData.idNumber || idNumber),
+                            nombre: userData.name || userData.nombre || 'Usuario IPROSS',
+                            numero_afiliado: userData.beneficiaryCode || idNumber,
+                            access_token: mockToken,
+                            refresh_token: mockToken,
+                        },
+                    });
+
+                    setTimeout(() => {
+                        this.setState({
+                            isLoggedIn: true,
+                            loginSuccess: false,
+                            idNumber: '',
+                            password: '',
+                        });
+                    }, 2000);
+
+                    return;
                 }
-            );
 
-            console.log('Respuesta recibida:', response.status);
-            console.log('Datos de respuesta:', JSON.stringify(response.data, null, 2));
+                // Login real con tokens
+                const tokens = result.tokens || result.message || {};
+                const accessToken = tokens.access_token || tokens.accessToken || null;
+                const refreshToken = tokens.refresh_token || tokens.refreshToken || null;
 
-            const userData = response.data;
+                // Guardar tokens en el servicio
+                ApiService.accessToken = accessToken;
+                ApiService.refreshToken = refreshToken;
 
-            // El backend retorna el token y datos del usuario
-            if (userData.access_token || userData.message?.access_token) {
-                const accessToken = userData.access_token || userData.message.access_token;
-                const refreshToken = userData.refresh_token || userData.message.refresh_token;
-                
-                // Login exitoso
+                // Intentar obtener datos del beneficiario
+                const beneficiaryRes = await ApiService.getBeneficiaryData();
+                const beneficiaryData = (beneficiaryRes && beneficiaryRes.data) ? beneficiaryRes.data : {};
+
                 this.setState({
                     isLoading: false,
                     loginSuccess: true,
                     loggedUser: {
                         idNumber: idNumber,
-                        nombre: userData.nombre || userData.fullName || 'Usuario IPROSS',
-                        numero_afiliado: userData.affiliateNumber || idNumber,
+                        nombre: beneficiaryData.name || beneficiaryData.nombre || 'Usuario IPROSS',
+                        numero_afiliado: beneficiaryData.beneficiaryCode || idNumber,
                         access_token: accessToken,
                         refresh_token: refreshToken,
                     },
                 });
 
-                // Mostrar mensaje de éxito por 2 segundos
                 setTimeout(() => {
                     this.setState({
                         isLoggedIn: true,
@@ -109,101 +122,29 @@ class App extends Component {
                         password: '',
                     });
                 }, 2000);
-            } else {
-                // Respuesta inesperada
-                this.setState({ isLoading: false });
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'Respuesta inesperada del servidor.',
-                    position: 'top',
-                    visibilityTime: 4000,
-                });
-            }
-        } catch (error) {
-            console.log('=== ERROR DE LOGIN - Intentando modo offline ===');
-            console.error('Error:', error.message);
-            
-            // LOGIN OFFLINE - Verificar credenciales hardcodeadas
-            if (idNumber === '36447582' && password === 'Password123') {
-                console.log('=== LOGIN OFFLINE EXITOSO ===');
-                console.log('DNI:', idNumber);
-                
-                // Simular token JWT
-                const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNjQ0NzU4MiIsIm5hbWUiOiJBcmFtYnVydSwgTmFodWVsIiwicm9sZSI6IkJFTkVGSUNJQVJZIn0.mocktoken';
-                
-                this.setState({
-                    isLoading: false,
-                    loginSuccess: true,
-                    loggedUser: {
-                        idNumber: idNumber,
-                        nombre: 'Aramburu, Nahuel',
-                        numero_afiliado: '03-36447582/00',
-                        access_token: mockToken,
-                        refresh_token: mockToken,
-                    },
-                });
 
-                // Mostrar mensaje de éxito por 2 segundos
-                setTimeout(() => {
-                    this.setState({
-                        isLoggedIn: true,
-                        loginSuccess: false,
-                        idNumber: '',
-                        password: '',
-                    });
-                }, 2000);
                 return;
             }
 
-            // Si no es el usuario offline, mostrar el error apropiado
+            // Si llegamos aquí, resultado.success === false
             this.setState({ isLoading: false });
-            
-            if (error.response) {
-                const { status, data } = error.response;
-                
-                if (status === 404) {
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Usuario no encontrado',
-                        text2: 'El DNI ingresado no está registrado en el sistema.',
-                        position: 'top',
-                        visibilityTime: 4000,
-                    });
-                } else if (status === 401) {
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Credenciales incorrectas',
-                        text2: 'El DNI o contraseña son incorrectos.',
-                        position: 'top',
-                        visibilityTime: 4000,
-                    });
-                } else {
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Error del servidor',
-                        text2: `El servidor respondió con error ${status}.`,
-                        position: 'top',
-                        visibilityTime: 4000,
-                    });
-                }
-            } else if (error.request) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error de conexión',
-                    text2: 'No se pudo conectar al servidor. Trabajando en modo offline.',
-                    position: 'top',
-                    visibilityTime: 3000,
-                });
-            } else {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Credenciales incorrectas',
-                    text2: 'DNI o contraseña incorrectos.',
-                    position: 'top',
-                    visibilityTime: 4000,
-                });
-            }
+            Toast.show({
+                type: 'error',
+                text1: 'Error de autenticación',
+                text2: result.error || 'Credenciales incorrectas',
+                position: 'top',
+                visibilityTime: 4000,
+            });
+        } catch (error) {
+            console.error('Login unexpected error:', error);
+            this.setState({ isLoading: false });
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Ocurrió un error al intentar iniciar sesión. Intentá nuevamente.',
+                position: 'top',
+                visibilityTime: 4000,
+            });
         }
     };
 
