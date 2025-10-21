@@ -11,6 +11,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { login } from '../../actions/profileAction';
 import Button from '../../components/Button';
 import TextField from '../../components/TextField';
+import LoginLoadingModal from '../../components/LoginLoadingModal';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
@@ -73,6 +74,7 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <AuthenticationWrapper>
+            <LoginLoadingModal visible={loading} />
             <View style={styles.container}>
                 <View style={styles.loginForm}>
                     <View style={styles.inputContainer}>

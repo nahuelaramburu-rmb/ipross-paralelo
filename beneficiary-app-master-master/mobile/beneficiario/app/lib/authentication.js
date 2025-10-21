@@ -1,6 +1,7 @@
 import SInfo from 'react-native-sensitive-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getVersion } from 'react-native-device-info';
+import { FALLBACK_DATA } from '../configs/api.config';
 
 export const authenticateUser = async (credentials) => _authenticateUser(credentials);
 export const updateAccessToken = async () => _updateAccessToken();
@@ -11,6 +12,21 @@ export const hasToUpdateApp = async () => _hasToUpdateApp();
 import { apiUrls, loginKeys } from '../configs/api';
 
 const _authenticateUser = async (credentials) => {
+    // Verificar si es login offline con credenciales de fallback
+    if (
+        credentials.username == FALLBACK_DATA.USER.idNumber && 
+        credentials.password === FALLBACK_DATA.USER.password
+    ) {
+        console.log('🔓 Login offline detectado - usando FALLBACK_DATA');
+        return {
+            access_token: 'offline_token_' + Date.now(),
+            refresh_token: 'offline_refresh_' + Date.now(),
+            token_type: 'Bearer',
+            expires_in: 86400,
+            offline_mode: true
+        };
+    }
+
     const body = {
         username: credentials.username,
         password: credentials.password,
@@ -51,7 +67,7 @@ const _authenticateUser = async (credentials) => {
 
         return authResponse;
     } catch (err) {
-        console.log(err);
+        console.log('❌ Error en authenticateUser:', err);
         return { error: err };
     }
 };
@@ -98,6 +114,12 @@ const _updateAccessToken = async () => {
 };
 
 const _getUserData = async (token) => {
+    // Si es token offline, devolver datos de fallback
+    if (token && token.startsWith('offline_token_')) {
+        console.log('🔓 getUserData offline - retornando FALLBACK_DATA');
+        return FALLBACK_DATA.USER.beneficiaryData;
+    }
+
     try {
         const response = await fetch(apiUrls['api'] + 'beneficiaries/auth', {
             method: 'GET',
@@ -116,7 +138,7 @@ const _getUserData = async (token) => {
 
         return json;
     } catch (err) {
-        console.log(err);
+        console.log('❌ Error en getUserData:', err);
         return { error: err };
     }
 };
