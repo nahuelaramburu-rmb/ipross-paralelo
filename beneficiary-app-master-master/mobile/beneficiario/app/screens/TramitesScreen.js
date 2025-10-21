@@ -10,7 +10,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Toast from 'react-native-simple-toast';
+import Toast from 'react-native-toast-message';
 import ApiService from '../services/api.service';
 import * as Colors from '../constants/Colors';
 
@@ -171,7 +171,13 @@ const TramitesScreen = ({ onBack, loggedUser }) => {
             } else if (response.fallback) {
                 // Si la API falló, usar datos mock
                 console.log('Usando datos mock de trámites (modo offline)');
-                Toast.show('Modo offline: Mostrando datos de ejemplo', Toast.SHORT);
+                Toast.show({
+                    type: 'info',
+                    text1: 'Modo offline',
+                    text2: 'Mostrando datos de ejemplo',
+                    position: 'top',
+                    visibilityTime: 2000,
+                });
                 setTramitesEnProceso(mockTramitesEnProceso);
                 setTramitesCompletados(mockTramitesCompletados);
             } else {
@@ -181,7 +187,13 @@ const TramitesScreen = ({ onBack, loggedUser }) => {
         } catch (err) {
             console.error('Error al cargar trámites:', err);
             setError(err.message);
-            Toast.show('Error al cargar los trámites. Mostrando datos de ejemplo.', Toast.LONG);
+            Toast.show({
+                type: 'error',
+                text1: 'Error al cargar',
+                text2: 'Mostrando datos de ejemplo',
+                position: 'top',
+                visibilityTime: 3000,
+            });
             setTramitesEnProceso(mockTramitesEnProceso);
             setTramitesCompletados(mockTramitesCompletados);
         } finally {

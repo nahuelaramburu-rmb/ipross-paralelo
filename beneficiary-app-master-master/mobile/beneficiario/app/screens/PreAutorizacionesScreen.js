@@ -11,7 +11,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Toast from 'react-native-simple-toast';
+import Toast from 'react-native-toast-message';
 import ApiService from '../services/api.service';
 
 const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
@@ -163,7 +163,13 @@ const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
             } else if (response.fallback) {
                 // Si la API falló, usar datos mock
                 console.log('Usando datos mock de pre-autorizaciones (modo offline)');
-                Toast.show('Modo offline: Mostrando datos de ejemplo', Toast.SHORT);
+                Toast.show({
+                    type: 'info',
+                    text1: 'Modo offline',
+                    text2: 'Mostrando datos de ejemplo',
+                    position: 'top',
+                    visibilityTime: 2000,
+                });
                 setPreAutorizaciones(mockPreAutorizaciones);
             } else {
                 // Error desconocido
@@ -172,7 +178,13 @@ const PreAutorizacionesScreen = ({ onBack, loggedUser }) => {
         } catch (err) {
             console.error('Error al cargar pre-autorizaciones:', err);
             setError(err.message);
-            Toast.show('Error al cargar las pre-autorizaciones. Mostrando datos de ejemplo.', Toast.LONG);
+            Toast.show({
+                type: 'error',
+                text1: 'Error al cargar',
+                text2: 'Mostrando datos de ejemplo',
+                position: 'top',
+                visibilityTime: 3000,
+            });
             setPreAutorizaciones(mockPreAutorizaciones);
         } finally {
             setLoading(false);
