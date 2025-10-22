@@ -361,7 +361,7 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                                 <Text style={styles.menuItemLogoutText}>Cerrar Sesión</Text>
                             </TouchableOpacity>
 
-                            <Text style={styles.version}>v1.4.0</Text>
+                            <Text style={styles.version}>v1.7.0</Text>
                         </ScrollView>
                     </Animated.View>
                 </View>
