@@ -2,7 +2,7 @@
   "expo": {
     "name": "IPROSS Beneficiarios",
     "slug": "ipross-beneficiarios",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "orientation": "portrait",
     "scheme": "iprossbeneficiarios",
     "userInterfaceStyle": "automatic",
@@ -27,7 +27,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.ipross.rionegro",
-      "versionCode": 3,
+      "versionCode": 10,
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -36,6 +36,10 @@
         "android.permission.WAKE_LOCK",
         "android.permission.DETECT_SCREEN_CAPTURE",
         "com.google.android.c2dm.permission.RECEIVE"
+      ],
+      "blockedPermissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -43,6 +47,13 @@
     },
     "plugins": [
       "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "La aplicación accede a tus fotos para que puedas adjuntar documentación.",
+          "cameraPermission": false
+        }
+      ],
       [
         "expo-build-properties",
         {

@@ -6,7 +6,7 @@ import * as Colors from '../../constants/Colors';
 import { ProcedureImageContainer, ProcedureImage } from './ProcedureImage';
 import { moderateScale, verticalScale } from '../../lib/size-normalizer';
 import { useNavigation } from '@react-navigation/native';
-import ImagePicker from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { DropDownHolder } from '../DropDownHolder';
 import strings from '../../constants/Strings';
 import { getCertificateTypes } from '../../actions/procedureAction';
@@ -18,8 +18,17 @@ import { useFormik } from 'formik';
 import Button from '../Button';
 import PropTypes from 'prop-types';
 
-const getFileExtension = (name) => {
-    return name.split('/').pop();
+const getFileExtension = (mimeTypeOrUri) => {
+    // Si es un tipo MIME como 'image/jpeg', extraer la extensión
+    if (mimeTypeOrUri && mimeTypeOrUri.includes('/')) {
+        return mimeTypeOrUri.split('/').pop();
+    }
+    // Si es una URI, extraer la extensión del nombre del archivo
+    if (mimeTypeOrUri && mimeTypeOrUri.includes('.')) {
+        return mimeTypeOrUri.split('.').pop();
+    }
+    // Por defecto, asumir jpg
+    return 'jpg';
 };
 
 const ProcedureSchema = Yup.object().shape({
@@ -32,22 +41,6 @@ const ProcedureSchema = Yup.object().shape({
     }),
     images: Yup.array().min(1, strings.errors.required),
 });
-
-const options = {
-    title: 'Seleccione una imagen',
-    takePhotoButtonTitle: 'Tomar foto',
-    chooseFromLibraryButtonTitle: 'Seleccionar desde galería',
-    cancelButtonTitle: 'Cancelar',
-    cameraType: 'back',
-    mediaType: 'photo',
-    quality: 0.8,
-    maxWidth: 1200,
-    maxHeight: 1200,
-    storageOptions: {
-        skipBackup: true,
-        path: 'images',
-    },
-};
 
 const ProcedureForm = ({
     disabled,
@@ -143,34 +136,47 @@ const ProcedureForm = ({
         setFieldValue('certificateType', text);
     };
 
-    const pickAnImage = () => {
-        ImagePicker.showImagePicker(options, (response) => {
-            console.log('Response = ', response);
-
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-                DropDownHolder.alert('error', 'Error', response.error);
-            } else if (response.customButton) {
-                console.log('User tapped custom button: ', response.customButton);
-            } else {
-                let source;
-                if (Platform.OS === 'android') {
-                    source = { uri: response.uri, isStatic: true };
-                } else {
-                    source = { uri: response.uri.replace('file://', ''), isStatic: true };
-                }
-
-                const ext = getFileExtension(response.type);
-                const filename = `Documento-${new Date().getTime()}.${ext}`;
-
-                setFieldValue('images', [
-                    ...values.images,
-                    { id: new Date().getTime(), uri: source.uri, type: response.type, name: filename },
-                ]);
+    const pickAnImage = async () => {
+        try {
+            // Solicitar permisos para la galería
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            
+            if (permissionResult.granted === false) {
+                DropDownHolder.alert('error', 'Error', 'Se requiere permiso para acceder a la galería');
+                return;
             }
-        });
+
+            // Lanzar el selector de imágenes
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                quality: 0.8,
+                allowsEditing: false,
+            });
+
+            if (result.canceled) {
+                console.log('User cancelled image picker');
+                return;
+            }
+
+            const response = result.assets[0];
+            let source;
+            if (Platform.OS === 'android') {
+                source = { uri: response.uri, isStatic: true };
+            } else {
+                source = { uri: response.uri.replace('file://', ''), isStatic: true };
+            }
+
+            const ext = getFileExtension(response.mimeType || response.uri);
+            const filename = `Documento-${new Date().getTime()}.${ext}`;
+
+            setFieldValue('images', [
+                ...values.images,
+                { id: new Date().getTime(), uri: source.uri, type: response.mimeType || 'image/jpeg', name: filename },
+            ]);
+        } catch (error) {
+            console.log('Error en pickAnImage:', error);
+            DropDownHolder.alert('error', 'Error', 'No se pudo seleccionar la imagen');
+        }
     };
 
     const onRemoveImage = (name) => {

@@ -18,7 +18,7 @@ jest.mock('react-native-gesture-handler', () => {
     return MyModule;
 });
 */
-jest.mock('react-native-image-picker');
+jest.mock('expo-image-picker');
 
 jest.mock('react-native-config', () => ({
     LOGIN_KEY: 'a',

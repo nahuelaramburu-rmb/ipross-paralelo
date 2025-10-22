@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { getVersion } from 'react-native-device-info';
 import * as Colors from '../../constants/Colors';
 import strings from '../../constants/Strings';
 import { moderateScale, verticalScale } from '../../lib/size-normalizer';
@@ -136,6 +137,7 @@ const LoginScreen = ({ navigation }) => {
                         raised={true}
                         onPress={register}
                     />
+                    <Text style={styles.versionText}>v{getVersion()}</Text>
                 </View>
             </View>
         </AuthenticationWrapper>
@@ -170,6 +172,13 @@ const styles = StyleSheet.create({
     },
     loginButton: {
         marginBottom: verticalScale(8),
+    },
+    versionText: {
+        marginTop: verticalScale(16),
+        fontSize: moderateScale(12),
+        color: Colors.secondaryText,
+        textAlign: 'center',
+        opacity: 0.6,
     },
 });
 

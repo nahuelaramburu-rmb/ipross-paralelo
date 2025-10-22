@@ -4,28 +4,12 @@ import { moderateScale, verticalScale } from '../lib/size-normalizer';
 import * as Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { font_styles } from '../lib/default-styles';
-import ImagePicker from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { fileUploaderWithProgress } from '../lib/utils';
 import { apiUrls } from '../configs/api';
 import { DropdownHolder } from './DropDownHolder';
 import strings from '../constants/Strings';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-
-const options = {
-    title: 'Seleccionar Imagen',
-    cameraType: 'back',
-    mediaType: 'photo',
-    cancelButtonTitle: 'Cancelar',
-    takePhotoButtonTitle: 'Tomar una foto',
-    chooseFromLibraryButtonTitle: 'Seleccionar desde galería',
-    quality: 0.8,
-    maxWidth: 1200,
-    maxHeight: 1200,
-    storageOptions: {
-        skipBackup: true,
-        path: 'images',
-    },
-};
 
 export default class FileUploader extends Component {
     constructor(props) {
@@ -51,64 +35,83 @@ export default class FileUploader extends Component {
         }
     }
 
-    _selectFile() {
-        ImagePicker.showImagePicker(options, (response) => {
-            console.log('Response = ', response);
-
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else if (response.customButton) {
-                console.log('User tapped custom button: ', response.customButton);
-            } else {
-                let source;
-                if (Platform.OS === 'android') {
-                    source = { uri: response.uri, isStatic: true };
-                } else {
-                    source = { uri: response.uri.replace('file://', ''), isStatic: true };
-                }
-
-                const ext = this._getExtension(response.fileName);
-                const filename = `App-Consultorio-${new Date().toISOString()}.${ext}`;
-                const data = new FormData();
-                data.append('file', {
-                    uri: source.uri,
-                    type: `image/${ext}`,
-                    name: filename,
-                });
-                const url = apiUrls['api'] + `storage/reports?authorizationId=${this.props.relatedId}`;
-                const opt = {
-                    method: 'post',
-                    headers: {},
-                    body: data,
-                };
-
-                this.setState({
-                    currentPhotos: [
-                        ...this.state.currentPhotos,
-                        { name: filename, progress: 0, success: null },
-                    ],
-                });
-
-                fileUploaderWithProgress(url, opt, (progress) => this._updateProgress(filename, progress))
-                    .then((res) => {
-                        console.log(res);
-                        if (res.status >= 200 && res.status <= 299)
-                            this._updateFileUpdateStatus(filename, true);
-                        else this._updateFileUpdateStatus(filename, false);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        this._updateFileUpdateStatus(filename, false);
-                        DropdownHolder.alert(
-                            'error',
-                            strings.common.error,
-                            strings.common.image_cannot_be_uploaded
-                        );
-                    });
+    async _selectFile() {
+        try {
+            // Solicitar permisos para la galería
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            
+            if (permissionResult.granted === false) {
+                DropdownHolder.alert('error', 'Error', 'Se requiere permiso para acceder a la galería');
+                return;
             }
-        });
+
+            // Lanzar el selector de imágenes
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                quality: 0.8,
+                allowsEditing: false,
+            });
+
+            if (result.canceled) {
+                console.log('User cancelled image picker');
+                return;
+            }
+
+            const response = result.assets[0];
+            let source;
+            if (Platform.OS === 'android') {
+                source = { uri: response.uri, isStatic: true };
+            } else {
+                source = { uri: response.uri.replace('file://', ''), isStatic: true };
+            }
+
+            // Extraer la extensión del nombre del archivo o URI
+            const ext = this._getExtension(response.fileName || response.uri);
+            const filename = `App-Consultorio-${new Date().toISOString()}.${ext}`;
+            const data = new FormData();
+            data.append('file', {
+                uri: source.uri,
+                type: `image/${ext}`,
+                name: filename,
+            });
+            const url = apiUrls['api'] + `storage/reports?authorizationId=${this.props.relatedId}`;
+            const opt = {
+                method: 'post',
+                headers: {},
+                body: data,
+            };
+
+            this.setState({
+                currentPhotos: [
+                    ...this.state.currentPhotos,
+                    { name: filename, progress: 0, success: null },
+                ],
+            });
+
+            fileUploaderWithProgress(url, opt, (progress) => this._updateProgress(filename, progress))
+                .then((res) => {
+                    console.log(res);
+                    if (res.status >= 200 && res.status <= 299)
+                        this._updateFileUpdateStatus(filename, true);
+                    else this._updateFileUpdateStatus(filename, false);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this._updateFileUpdateStatus(filename, false);
+                    DropdownHolder.alert(
+                        'error',
+                        strings.common.error,
+                        strings.common.image_cannot_be_uploaded
+                    );
+                });
+        } catch (error) {
+            console.log('Error en _selectFile:', error);
+            DropdownHolder.alert(
+                'error',
+                strings.common.error,
+                'No se pudo seleccionar la imagen'
+            );
+        }
     }
 
     _getExtension(name) {

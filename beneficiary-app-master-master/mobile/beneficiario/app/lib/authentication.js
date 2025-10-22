@@ -12,21 +12,6 @@ export const hasToUpdateApp = async () => _hasToUpdateApp();
 import { apiUrls, loginKeys } from '../configs/api';
 
 const _authenticateUser = async (credentials) => {
-    // Verificar si es login offline con credenciales de fallback
-    if (
-        credentials.username == FALLBACK_DATA.USER.idNumber && 
-        credentials.password === FALLBACK_DATA.USER.password
-    ) {
-        console.log('🔓 Login offline detectado - usando FALLBACK_DATA');
-        return {
-            access_token: 'offline_token_' + Date.now(),
-            refresh_token: 'offline_refresh_' + Date.now(),
-            token_type: 'Bearer',
-            expires_in: 86400,
-            offline_mode: true
-        };
-    }
-
     const body = {
         username: credentials.username,
         password: credentials.password,
@@ -68,6 +53,22 @@ const _authenticateUser = async (credentials) => {
         return authResponse;
     } catch (err) {
         console.log('❌ Error en authenticateUser:', err);
+        
+        // Si hay error de red, intentar login offline con credenciales de fallback
+        if (
+            credentials.username == FALLBACK_DATA.USER.idNumber && 
+            credentials.password === FALLBACK_DATA.USER.password
+        ) {
+            console.log('🔓 Error de conexión detectado - usando login offline con FALLBACK_DATA');
+            return {
+                access_token: 'offline_token_' + Date.now(),
+                refresh_token: 'offline_refresh_' + Date.now(),
+                token_type: 'Bearer',
+                expires_in: 86400,
+                offline_mode: true
+            };
+        }
+        
         return { error: err };
     }
 };
