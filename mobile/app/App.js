@@ -156,13 +156,18 @@ class App extends Component {
             return <HomeScreen loggedUser={this.state.loggedUser} onLogout={() => this.setState({ isLoggedIn: false })} />;
         }
 
-        // Mostrar mensaje de éxito
+        // Mostrar pantalla de carga con logo
         if (loginSuccess) {
             return (
                 <View style={[styles.container, styles.successContainer]}>
                     <View style={styles.successMessage}>
-                        <Text style={styles.successText}>✅ Logueado con éxito</Text>
-                        <Text style={styles.successSubText}>Redirigiendo...</Text>
+                        <Image
+                            source={require('./images/ipross_logo.png')}
+                            style={styles.logoImageSuccess}
+                            resizeMode='contain'
+                        />
+                        <ActivityIndicator size="large" color="#6ac64f" style={styles.loadingIndicator} />
+                        <Text style={styles.successSubText}>Cargando...</Text>
                     </View>
                 </View>
             );
@@ -257,6 +262,11 @@ class App extends Component {
                             <Text style={styles.registerButtonText}>Registrarse</Text>
                         </TouchableOpacity>
                     </View>
+                    
+                    {/* Versión de la aplicación */}
+                    <View style={styles.versionContainer}>
+                        <Text style={styles.versionText}>v1.6.0</Text>
+                    </View>
                 </ScrollView>
                 
                 {/* Toast Component */}
@@ -328,14 +338,14 @@ const styles = StyleSheet.create({
         marginTop: -4,
     },
     forgotText: {
-        color: '#b8d154',
+        color: '#6ac64f',
         fontSize: 15,
         fontWeight: '500',
     },
     
     // Botón Ingresar (verde lima)
     loginButton: {
-        backgroundColor: '#b8d154',
+        backgroundColor: '#6ac64f',
         borderRadius: 32,
         paddingVertical: 18,
         alignItems: 'center',
@@ -355,7 +365,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     loginButtonDisabled: {
-        backgroundColor: '#d4e49f',
+        backgroundColor: '#a5d47a',
     },
     
     // Botón Registrarse (blanco con borde verde)
@@ -365,7 +375,7 @@ const styles = StyleSheet.create({
         paddingVertical: 18,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#b8d154',
+        borderColor: '#6ac64f',
     },
     registerButtonText: {
         color: '#000',
@@ -393,17 +403,31 @@ const styles = StyleSheet.create({
         shadowRadius: 12,
         elevation: 8,
         borderWidth: 2,
-        borderColor: '#b8d154',
+        borderColor: '#6ac64f',
     },
-    successText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#b8d154',
-        marginBottom: 12,
+    logoImageSuccess: {
+        width: 200,
+        height: 100,
+        marginBottom: 20,
+    },
+    loadingIndicator: {
+        marginBottom: 20,
     },
     successSubText: {
         fontSize: 16,
         color: '#666',
+    },
+    
+    // Versión de la aplicación
+    versionContainer: {
+        alignItems: 'center',
+        marginTop: 40,
+        paddingBottom: 20,
+    },
+    versionText: {
+        fontSize: 16,
+        color: '#6ac64f',
+        fontWeight: '600',
     },
 });
 

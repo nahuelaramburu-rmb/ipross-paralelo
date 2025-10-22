@@ -8,7 +8,7 @@ const TopNavigationTitle = ({ title, textColor }) => {
         <React.Fragment>
             {typeof title === 'string' ? (
                 <Text
-                    style={[font_styles.headline, { color: textColor ? textColor : Colors.primaryText }]}
+                    style={[font_styles.headline, { color: textColor ? textColor : Colors.inverseText }]}
                     numberOfLines={1}
                     ellipsizeMode='tail'>
                     {title}

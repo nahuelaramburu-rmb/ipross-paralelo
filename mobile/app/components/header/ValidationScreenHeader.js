@@ -23,7 +23,7 @@ const ValidationScreenHeader = ({}) => {
 
     const rightButton = (
         <TopNavigationBudgeButton
-            image={<Icon name='ios-options' size={moderateScale(24)} color={Colors.primaryText} />}
+            image={<Icon name='ios-options' size={moderateScale(24)} color={Colors.inverseText} />}
             type='RIGHT'
             count={count}
             action={openModal}

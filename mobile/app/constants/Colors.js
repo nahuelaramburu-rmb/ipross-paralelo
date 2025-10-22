@@ -6,8 +6,8 @@
 // Colores Principales - Verde IPROSS (Nuevo diseño)
 export const primary = '#6ac64f';
 export const accent = '#6ac64f';
-export const accentSecondary = '#a6ce39';
-export const accentTertiary = '#7ed461';
+export const accentSecondary = '#6ac64f';
+export const accentTertiary = '#6ac64f';
 
 // Colores Secundarios - Azul IPROSS
 export const secondaryBlue = '#007be0';
@@ -55,8 +55,8 @@ export const backgroundTertiary = '#f5f5f5';
 export default {
   primary: {
     green: '#6ac64f',
-    greenDark: '#5ab03f',
-    greenLight: '#7ed461',
+    greenDark: '#6ac64f',
+    greenLight: '#6ac64f',
   },
   secondary: {
     blue: '#007be0',

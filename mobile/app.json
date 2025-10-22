@@ -2,7 +2,7 @@
   "expo": {
     "name": "IPROSS Beneficiarios",
     "slug": "ipross-beneficiarios",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "orientation": "portrait",
     "scheme": "iprossbeneficiarios",
     "userInterfaceStyle": "automatic",
@@ -27,7 +27,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.ipross.rionegro",
-      "versionCode": 10,
+      "versionCode": 11,
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -63,10 +63,12 @@
             "buildToolsVersion": "35.0.0",
             "usesCleartextTraffic": true,
             "gradleVersion": "8.8",
-            "androidGradlePluginVersion": "8.3.0"
+            "androidGradlePluginVersion": "8.3.0",
+            "newArchEnabled": false
           },
           "ios": {
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "15.1",
+            "newArchEnabled": false
           }
         }
       ]
