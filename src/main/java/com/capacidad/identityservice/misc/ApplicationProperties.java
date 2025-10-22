@@ -53,7 +53,14 @@ public class ApplicationProperties {
     }
 
     public String getActiveProfile() {
-        return environment.getActiveProfiles()[0];
+        String[] activeProfiles = environment.getActiveProfiles();
+        if (activeProfiles.length == 0) {
+            // Ningún perfil activo -> usar el por defecto o manejarlo
+            return environment.getDefaultProfiles().length > 0
+                    ? environment.getDefaultProfiles()[0]
+                    : "default";
+        }
+        return activeProfiles[0];
     }
 
 }

@@ -26,6 +26,8 @@ public interface ApplicationUserService extends BaseService<ApplicationUser, Lon
 
     String verifyAccount(int otpCode, UUID sub);
 
+    String verifyAccountByIdNumber(int otpCode, Long idNumber);
+
     void confirmForgotPassword(RestorePasswordDTO input) throws ObjectNotFoundException, ObjectNotValidException;
 
     ApplicationUser restorePassword(String email) throws ObjectNotFoundException;

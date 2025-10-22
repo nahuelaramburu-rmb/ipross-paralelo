@@ -1,6 +1,7 @@
 package com.capacidad.identityservice.model;
 
 import com.capacidad.identityservice.model.base.BaseEntity;
+import com.capacidad.identityservice.model.dto.ProfileDTO;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -24,13 +25,6 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     //Sirve para garantizar que los objetos serializados sean compatibles entre distintas versiones de la clase
     private static final long serialVersionUID = -2156950437969065955L;
 
-
-    public ApplicationUser(String username, String email, String password, Profile profile) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.profile = profile;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
@@ -92,6 +86,7 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     private Set<ApplicationUserContext> contextSet = new HashSet<>();
 
 
+    // listado de jwt tokens asociados al user , se persisten en db
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
@@ -104,6 +99,13 @@ public class ApplicationUser extends BaseEntity<Long> implements Serializable {
     }
 
 
+//    public Profile setProfileFromProfileDTO(ProfileDTO profileDTO) {
+//
+//        return new Profile.builder()
+//
+//
+//
+//    }
 
 }
 

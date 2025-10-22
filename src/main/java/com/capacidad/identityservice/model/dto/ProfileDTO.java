@@ -21,7 +21,7 @@ public class ProfileDTO extends BaseDTO<Long> {
     @NotBlank
     @JsonProperty("last_name")
     private String lastName;
-
+        
     @Positive
     @NotNull
     @JsonProperty("id_number")

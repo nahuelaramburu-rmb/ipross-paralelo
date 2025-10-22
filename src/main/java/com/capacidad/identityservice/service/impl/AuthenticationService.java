@@ -1,16 +1,16 @@
 package com.capacidad.identityservice.service.impl;
 
-import com.capacidad.identityservice.config.security.JwtService;
 import com.capacidad.identityservice.model.*;
 import com.capacidad.identityservice.model.dto.authdto.AuthenticationResponse;
-import com.capacidad.identityservice.model.dto.authdto.LoginRequestDTO;
+import com.capacidad.identityservice.model.dto.authdto.LoginRequest;
 import com.capacidad.identityservice.model.dto.authdto.RegisterRequest;
+import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
+import com.capacidad.identityservice.model.projection.ProfileProjection;
 import com.capacidad.identityservice.repository.*;
 import com.capacidad.identityservice.service.ApplicationUserService;
 import com.capacidad.identityservice.service.ApplicationUserSupportService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -73,23 +70,38 @@ public class AuthenticationService {
 
 
     // obtiene el token del user asociado a CustomUserDetails
-    public AuthenticationResponse login(LoginRequestDTO loginRequestDTO) throws ObjectNotFoundException {
+    public AuthenticationResponse login(LoginRequest loginRequestDTO) throws ObjectNotFoundException {
 
-        Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findByEmail(loginRequestDTO.getEmail());
+      //  Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findByEmail(loginRequestDTO.getEmail());
 
-        if (applicationUserOptional.isEmpty()){
+        Optional<ApplicationUserProjection> applicationUserOptionalIdNumber =
+                applicationUserRepository.findProjectedByProfile_IdNumber(loginRequestDTO.getIdNumber());
+
+
+
+        if (applicationUserOptionalIdNumber.isEmpty()) {
 
             throw new ObjectNotFoundException("user not found");
 
         }
-        ApplicationUser appUser = applicationUserOptional.get();
 
-        System.out.println( "app user name " + appUser.getUsername());
+
+        ApplicationUserProjection appUser = applicationUserOptionalIdNumber.get();
+
+
+        // aca me esta dando null
+        ProfileProjection userProfile = appUser.getProfile();
+
+        Long userIdNumber = userProfile.getIdNumber();
+        String userIdType = userProfile.getIdType();
+
+
+        System.out.println("app user name " + appUser.getUsername());
 
         // se encarga de validar el user y password,
         // lanza una excepcion en casos incorrectos.
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequestDTO.getEmail(), loginRequestDTO.getPassword()
+                appUser.getUsername(), loginRequestDTO.getPassword()
         ));
 
         // obtiene el customUserDetails , en base a username
@@ -98,20 +110,23 @@ public class AuthenticationService {
 
 
         // todo , obtener role , operations asociadas al user !!
-        String userRole = user.getRole().getName();
+        String userRole = "ROLE_" + user.getRole().getName();
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
 
         Map<String, Object> extraClaims = new HashMap<>();
 
+        extraClaims.put("id_number", userIdNumber);
+        extraClaims.put("id_type", userIdType);
+
         extraClaims.put("role", userRole);
 
-        extraClaims.put("operatiors", authorities.stream()
+        extraClaims.put("operations", authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
-        extraClaims.put("token type" , "");
+        extraClaims.put("token type", "");
 
-        var jwtToken = jwtService.generateToken(extraClaims,user);
+        var jwtToken = jwtService.generateToken(extraClaims, user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserTokens(user);
@@ -131,7 +146,7 @@ public class AuthenticationService {
 
         Optional<ApplicationUser> persistedUser = applicationUserRepository.findById(user.getApplicationUser().getId());
 
-        if (persistedUser.isEmpty()){
+        if (persistedUser.isEmpty()) {
             throw new ObjectNotFoundException("no existe el user");
         }
 
@@ -160,7 +175,7 @@ public class AuthenticationService {
     }
 
 
-    public void refreshToken(
+    public AuthenticationResponse refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException, ObjectNotFoundException {
@@ -170,7 +185,7 @@ public class AuthenticationService {
         final String userEmail;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
+            return null;
         }
 
         refreshToken = authHeader.substring(7);
@@ -183,19 +198,40 @@ public class AuthenticationService {
                 var accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                var authResponse = AuthenticationResponse.builder()
+
+                return AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+
+                //new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+        return null;
     }
 
 
     // // registra un beneficiary ------------------------------------------------------------------
-    public ApplicationUser createBeneficiary(ApplicationUser user) throws ObjectNotValidException, ObjectNotFoundException {
-        log.info("create - args: {}({})", user.getClass(), user);
+    public ApplicationUser createBeneficiary(RegisterRequest request) throws ObjectNotValidException, ObjectNotFoundException {
+      //  log.info("create - args: {}({})", user.getClass(), user);
+
+        ApplicationUser user = new ApplicationUser();
+
+
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+
+        Profile profile = Profile.builder()
+                .name(request.getProfile().getName())
+                .lastName(request.getProfile().getLastName())
+                .idNumber(request.getProfile().getIdNumber())
+                .idType(request.getProfile().getIdType())
+                .build();
+
+
+        user.setProfile(profile);
+
         initializeUserBeneficiaryCreation(user);
         user.setChallengeType(ChallengeType.FORCE_CHANGE_PASSWORD);
         applicationUserRepository.save(user);
@@ -218,8 +254,28 @@ public class AuthenticationService {
 
 
     // // registra un practitioner ------------------------------------------------------------------
-    public ApplicationUser createPractitioner(ApplicationUser user) throws ObjectNotValidException, ObjectNotFoundException {
-        log.info("create - args: {}({})", user.getClass(), user);
+    public ApplicationUser createPractitioner(RegisterRequest request) throws ObjectNotValidException, ObjectNotFoundException {
+      //  log.info("create - args: {}({})", user.getClass(), user);
+
+        ApplicationUser user = new ApplicationUser();
+
+
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+
+        Profile profile = Profile.builder()
+                .name(request.getProfile().getName())
+                .lastName(request.getProfile().getLastName())
+                .idNumber(request.getProfile().getIdNumber())
+                .idType(request.getProfile().getIdType())
+                .build();
+
+
+        user.setProfile(profile);
+
+
+
         initializeUserPractitionerCreation(user);
         user.setChallengeType(ChallengeType.FORCE_CHANGE_PASSWORD);
         applicationUserRepository.save(user);

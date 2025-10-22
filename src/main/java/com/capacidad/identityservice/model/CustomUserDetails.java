@@ -30,6 +30,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
     private ApplicationUser applicationUser;
     private Role role;
     private final String tenantId;
+    private Integer idNumber;
+    //private final String idType;
 
 
     public String getTenantId() {
@@ -66,6 +68,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
                              String password,
                              Role role,
                              Collection<? extends GrantedAuthority> authorities
+
     ) {
         this(
                 username,
@@ -78,6 +81,28 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer, Ser
                 null);
 
         this.role = role;
+    }
+
+
+    // constructor con username, password, rol del user y idnumber ,
+    public CustomUserDetails(String username,
+                             String password,
+                             Role role,
+                             Collection<? extends GrantedAuthority> authorities,
+                             Integer idNumber
+    ) {
+        this(
+                username,
+                password,
+                true,
+                true,
+                true,
+                true,
+                authorities,
+                null);
+
+        this.role = role;
+        this.idNumber = idNumber;
     }
 
 

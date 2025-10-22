@@ -1,19 +1,21 @@
-package com.capacidad.identityservice.config.security;
+package com.capacidad.identityservice.service.impl;
 
-import com.capacidad.identityservice.model.ApplicationUser;
 import com.capacidad.identityservice.model.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +24,13 @@ public class JwtService {
 
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
+
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
+
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -37,6 +42,7 @@ public class JwtService {
     }
 
     public String generateToken(CustomUserDetails customUserDetails) {
+
         return generateToken(new HashMap<>(), customUserDetails);
     }
 
@@ -73,6 +79,7 @@ public class JwtService {
         return (username.equals(applicationUser.getUsername())) && !isTokenExpired(token);
     }
 
+
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -94,9 +101,37 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+
+    public List<GrantedAuthority> extractAuthorities(String token) {
+        Claims claims = extractAllClaims(token);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        //  Roles
+        Object roleClaim = claims.get("role");
+        if (roleClaim != null) {
+            String role = roleClaim.toString();
+            // Aseguramos el prefijo ROLE_ para que funcione con hasRole()
+            if (!role.startsWith("ROLE_")) {
+                role = "ROLE_" + role;
+            }
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+
+        //  Operations (permisos)
+        Object operationsClaim = claims.get("operations");
+        if (operationsClaim instanceof List<?>) {
+            ((List<?>) operationsClaim).forEach(op -> {
+                if (op != null) {
+                    authorities.add(new SimpleGrantedAuthority(op.toString()));
+                }
+            });
+        }
+
+        return authorities;
+    }
+
 }
-
-
 
 
 //  public String generateToken(CustomUserDetails userDetails) {
@@ -109,10 +144,10 @@ public class JwtService {
 //
 //
 //        // aca debo obtener las operaciones asignadas a ese role,
-////        List<String> roles = userDetails.getAuthorities().stream()
-////             //   .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
-////                .map(GrantedAuthority::getAuthority)
-////                .toList();
+/// /        List<String> roles = userDetails.getAuthorities().stream()
+/// /             //   .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
+/// /                .map(GrantedAuthority::getAuthority)
+/// /                .toList();
 //
 //        Role role = userDetails.getRole();
 //

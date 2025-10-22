@@ -1,7 +1,8 @@
 package com.capacidad.identityservice.controller;
 
 import com.capacidad.identityservice.model.ApplicationUser;
-import com.capacidad.identityservice.model.dto.authdto.LoginRequestDTO;
+import com.capacidad.identityservice.model.dto.authdto.LoginRequest;
+import com.capacidad.identityservice.model.dto.authdto.RefreshTokenRequest;
 import com.capacidad.identityservice.model.dto.authdto.RegisterRequest;
 import com.capacidad.identityservice.misc.DTOtoEntityMapper;
 import com.capacidad.identityservice.misc.constant.ControllerEndpoints;
@@ -10,13 +11,18 @@ import com.capacidad.identityservice.service.ApplicationUserContextService;
 import com.capacidad.identityservice.service.ApplicationUserService;
 import com.capacidad.identityservice.service.impl.AuthenticationService;
 import com.capacidad.identityservice.service.impl.CustomUserDetailsService;
+import com.capacidad.identityservice.service.impl.JwtService;
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 // http://localhost:8080/identity-service/auth/login
@@ -127,13 +133,16 @@ public class AuthController {
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private JwtService jwtService;
+
 
     // sirve para registrar users en app mobile,
     // no esta implementado para multitenancy
     @PostMapping("/register-beneficiary")
     public ResponseEntity<?> registerBeneficiary(@RequestBody RegisterRequest request) throws ObjectNotFoundException, ObjectNotValidException {
 
-        ApplicationUser user = authenticationService.createBeneficiary(dtOtoEntityMapper.mapRegisterRequestToApplicationUser(request));
+        ApplicationUser user = authenticationService.createBeneficiary(request);
 
         RegisterResponseDTO registerResponseDTO = dtOtoEntityMapper.ApplicationUserToRegisterResponse(user);
 
@@ -146,7 +155,7 @@ public class AuthController {
     @PostMapping("/register-practitioner")
     public ResponseEntity<?> registerPractitioner(@RequestBody RegisterRequest request) throws ObjectNotFoundException, ObjectNotValidException {
 
-        ApplicationUser user = authenticationService.createPractitioner(dtOtoEntityMapper.mapRegisterRequestToApplicationUser(request));
+        ApplicationUser user = authenticationService.createPractitioner(request);
 
         RegisterResponseDTO registerResponseDTO = dtOtoEntityMapper.ApplicationUserToRegisterResponse(user);
 
@@ -154,26 +163,27 @@ public class AuthController {
     }
 
 
-
     // se valida el user con email y password
     // todo , se debe implementar el login validator, que permite loggearse despues de x tiempo y depues de x veces
     // todo , debe retornar un jwt , con data del user , roles , para luego poder acceder a ciertos endpoints y ser autorizado
+    @Transactional
     @PostMapping(value = ControllerEndpoints.ENDPOINT_LOGIN)
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO , HttpServletRequest request) throws ObjectNotFoundException, ObjectNotValidException {
-
-     //   var user = applicationUserService.login(loginRequestDTO);
-
-        //RegisterResponseDTO loginResponseDTO = dtOtoEntityMapper.ApplicationUserToRegisterResponse(user);
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequestDTO, HttpServletRequest request) throws ObjectNotFoundException, ObjectNotValidException {
 
         return ResponseEntity.ok(Map.of("message", authenticationService.login(loginRequestDTO)));
 
-        // retornar el token de acceso
-        //return ResponseEntity.ok(Map.of("message", "login exitoso"));
     }
 
 
+    // se renueva el access token , para que el user no deba loggearse de nuevo
+    @PostMapping(value = ControllerEndpoints.ENDPOINT_REFRESH)
+    public ResponseEntity<?> refresh(HttpServletRequest request,
+                                     HttpServletResponse response) throws ObjectNotFoundException, IOException {
 
 
+        return ResponseEntity.ok(Map.of("message", authenticationService.refreshToken(request, response)));
+
+    }
 
 
 }

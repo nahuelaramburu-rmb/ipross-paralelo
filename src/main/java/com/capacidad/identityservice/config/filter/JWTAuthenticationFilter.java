@@ -1,30 +1,17 @@
 package com.capacidad.identityservice.config.filter;
 
-import com.capacidad.identityservice.config.TenantContext;
-import com.capacidad.identityservice.config.security.JWTAuthenticationToken;
-import com.capacidad.identityservice.config.security.JwtService;
-import com.capacidad.identityservice.config.token.TokenVerifier;
+import com.capacidad.identityservice.service.impl.JwtService;
 import com.capacidad.identityservice.exception.GlobalExceptionHandler;
-import com.capacidad.identityservice.misc.Utils;
-import com.capacidad.identityservice.misc.securityutils.SecurityUtils;
 import com.capacidad.identityservice.model.CustomUserDetails;
-import com.capacidad.identityservice.model.Group;
-import com.capacidad.identityservice.model.Tenant;
 import com.capacidad.identityservice.repository.TokenRepository;
 import com.capacidad.identityservice.service.TenantService;
 
 import com.capacidad.identityservice.service.impl.CustomUserDetailsService;
-import com.capacidad.utils.TokenUtils;
-import com.capacidad.utils.exception.ObjectNotFoundException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -36,15 +23,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static com.capacidad.identityservice.functional.ThrowingConsumer.throwingConsumer;
-import static com.capacidad.identityservice.misc.Utils.isNotCustomEndpoint;
-import static com.capacidad.identityservice.misc.Utils.sendError;
-import static com.capacidad.utils.Constants.*;
 
 
 /*
@@ -94,8 +72,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if (request.getServletPath().contains("/identity-service/v1/auth/**")) {
-
+        if (request.getServletPath().startsWith("/identity-service/v1/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -116,17 +93,22 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             // ver aca
+            // todo , aca debo pasar el username , no el email ,16/10/25
             CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
 
             var isTokenValid = tokenRepository.findByToken(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
 
+
+            // obtengo las authorities del token
+            List<GrantedAuthority> authorities = jwtService.extractAuthorities(jwt);
+
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        userDetails.getAuthorities()
+                        authorities
                 );
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)

@@ -143,9 +143,25 @@ public class Utils {
 
     //obtiene el principal (usuario/identificador)
     public static String getAuthenticatedAuthorityPrincipal() {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication instanceof BaseAuthenticationToken ? (String) authentication.getPrincipal()
-                : null;
+
+        // como authentication es instancia de CustomUserDetails
+        // se retonar el email del user ,
+        // para luego extraer su info de la db
+        if (authentication != null) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof com.capacidad.identityservice.model.CustomUserDetails) {
+                com.capacidad.identityservice.model.CustomUserDetails user =
+                        (com.capacidad.identityservice.model.CustomUserDetails) principal;
+
+                return user.getUsername();
+            }
+        }
+
+        return null;
+        //return authentication instanceof BaseAuthenticationToken ? (String) authentication.getPrincipal()
+        //                : null;
     }
 
     //obtiene un UUID ligado al token JWT

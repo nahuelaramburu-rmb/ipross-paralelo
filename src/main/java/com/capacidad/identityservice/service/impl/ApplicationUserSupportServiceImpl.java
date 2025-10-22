@@ -115,12 +115,17 @@ public class ApplicationUserSupportServiceImpl implements ApplicationUserSupport
     }
 
     // Genera un código OTP(one time password)  usando un “salt” (semilla única).
+    // todo , por ahora , solo en registro de user se genera el otp,
+    //  ver manera para que pueda generarlo de forma independiente,  21/10/25
     @Override
     public Integer generateOtpCode(String salt) {
         return authenticator.generateOtp(salt);
     }
 
     // Valida que un OTP ingresado sea correcto para un determinado “salt”.
+    // todo, modificar validateOtp , actualmente usa servicios de google,
+    //  por ahora , validar otp contra el otp del user en db
+    //  si el user no posee otp en db , buscar manera que lo pueda generar,  21/10/25
     @Override
     public boolean isOtpValid(int otp, String salt) {
         return authenticator.validateOtp(otp, salt);

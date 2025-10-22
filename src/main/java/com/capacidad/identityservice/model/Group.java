@@ -1,5 +1,5 @@
 package com.capacidad.identityservice.model;
 
 public enum Group {
-    DEV, PROD, TEST, UAT
+    DEV, PROD, TEST, UAT,DEFAULT
 }

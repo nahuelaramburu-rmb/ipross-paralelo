@@ -24,7 +24,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+
+import java.util.List;
 
 import static com.capacidad.identityservice.misc.constant.ControllerEndpoints.*;
 import static com.capacidad.identityservice.misc.constant.ScopeConstants.*;
@@ -69,10 +72,16 @@ public class WebSecurityConfig {
 
         // Configuración de endpoints ignorados
         http
-                .cors()
-                .and()
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOriginPatterns(List.of("*")); // usa patterns para soportar wildcards
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setExposedHeaders(List.of("Authorization", "Content-Type"));
+                    config.setAllowCredentials(false); // debe ser false si usas '*'
+                    return config;
+                }))
                 .csrf().disable()
-
                 .authorizeHttpRequests(authorize -> authorize
 
                         .requestMatchers(HttpMethod.GET, ENDPOINT_HEALTH).permitAll()
@@ -97,16 +106,21 @@ public class WebSecurityConfig {
                         .requestMatchers(ENDPOINT_USERS + ENDPOINT_FORGOT + "/**").permitAll()
 
                         .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD + "/**/username/**").permitAll()
+
+                        // users/me
                         .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + ENDPOINT_ME).authenticated()
+
                         .requestMatchers(ENDPOINT_ACTUATOR + "/**").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + ENDPOINT_PASSWORD_RESET).hasAnyRole(ADMIN, FUNDER)
                         .requestMatchers(HttpMethod.PUT, ENDPOINT_USERS + "/**/sub/**").hasAuthority(Utils.buildScope(UPDATE, USERS))
                         .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS))
 
-                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").permitAll() // acceso
-                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").permitAll() // acceso
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(READ, USERS)) // acceso
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_USERS + "/**").hasAuthority(Utils.buildScope(CREATE, USERS)) // acceso
 
+                        // auth creados
                         .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_LOGIN).permitAll() // acceso a login
+                        .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_REFRESH).permitAll() // acceso a refresh token
                         .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_REGISTER_BENEFICIARY).permitAll() // acceso a register
                         .requestMatchers(HttpMethod.POST, ENDPOINT_AUTH + ENDPOINT_REGISTER_PRACTITIONER).permitAll() // acceso a register
 

@@ -98,6 +98,9 @@ public class CustomUserDetailsService implements UserDetailsService {
             userRole = contextSet.iterator().next().getRole();
 
 
+            //userRole.setName("ROLE_" + userRole.getName().toUpperCase());
+
+
             // obtengo las operaciones permitidas a el rol del user
             //   List<Operation> roleOperations = scopeRoleRepository.findAllOperationsByRoleName(userRole.getName());
 

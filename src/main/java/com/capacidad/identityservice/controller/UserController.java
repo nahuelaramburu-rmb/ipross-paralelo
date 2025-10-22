@@ -62,11 +62,18 @@ public class UserController {
     /**
      * Public Access
      **/
+
+    // este controller tomara un otp ya generado ( en validation ) y el dni del user ,
+    // para cambiar el estado de la cuenta a -> verified=true
     @GetMapping("/verification/{otp}/{sub}")
-    public ResponseEntity<Object> verifyAccount(@PathVariable Integer otp, @PathVariable UUID sub) {
-        String html = userService.verifyAccount(otp, sub);
+    public ResponseEntity<Object> verifyAccount(@PathVariable Integer otp, @PathVariable Long idNumber) {
+
+       // String html = userService.verifyAccount(otp, sub);
+        String html = userService.verifyAccountByIdNumber(otp, idNumber);
+
         return ResponseEntity.ok(html);
     }
+
 
     /**
      * Public Access
@@ -90,7 +97,7 @@ public class UserController {
     }
 
 
-    // se usaria para obtener los datos del user , en la app , ejemplo : "cuenta info"
+    // se usa para obtener los datos del user , en la app , ejemplo : "cuenta info"
     @GetMapping(ENDPOINT_ME)
     public ResponseEntity<ApplicationUserProjection> getProfile() throws ObjectNotFoundException {
         return ResponseEntity.ok(userService.getAuthUser());

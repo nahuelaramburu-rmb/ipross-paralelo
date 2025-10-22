@@ -156,18 +156,39 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> buildGenericErrorResponse(HttpServletRequest request, Exception ex, HttpStatus httpStatus, String[] args) {
+
         String errorCode = StringUtils.deleteWhitespace(StringUtils.join(ex.getClass().getSimpleName(), DOT, ex.getMessage()));
+
         String enMessage = getLocaleMessage(errorCode, args, Locale.US).orElse(ex.getMessage());
+
         String i18nMessage = getLocaleMessage(errorCode, args, LocaleContextHolder.getLocale()).orElse(enMessage);
+
         log.error(LOG_ERROR_MESSAGE_TEMPLATE, enMessage, ex.getClass(), ex.getMessage());
+
         return buildErrorResponse(ex.getClass().getSimpleName(), i18nMessage, ex.getMessage(), httpStatus, request.getRequestURI());
     }
 
     private ResponseEntity<Object> buildErrorResponse(String type, String message, String code, HttpStatus httpStatus, String requestUri) {
+
+        // todo , no debe mostrar las rutas de nuestros endpoints ,
+        //{
+        //    "path": "/identity-service/v1/auth/login",
+        //    "code": "Bad credentials",
+        //    "message": "Usuario y/o contraseña incorrectos",
+        //    "type": "BadCredentials",
+        //    "timestamp": 1760628915380,
+        //    "status": 401
+        //}
+
+
         ApiError apiError = new ApiError(httpStatus.value(), message, processExceptionSimpleName(type), requestUri, code);
+        ApiError apiError2 = new ApiError(httpStatus.value(), "message", "type", "path", "code");
+
         HttpHeaders headers = new HttpHeaders();
+
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(apiError.getJsonObject(), headers, httpStatus);
+
+        return new ResponseEntity<>(apiError2.getJsonObject(), headers, HttpStatus.NOT_FOUND);
     }
 
     public Optional<String> getLocaleMessage(String message, String[] args, Locale locale) {

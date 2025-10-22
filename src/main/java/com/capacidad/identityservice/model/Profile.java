@@ -2,9 +2,7 @@ package com.capacidad.identityservice.model;
 
 import com.capacidad.identityservice.model.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -13,6 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @SequenceGenerator(name = "profile_seq_gen", sequenceName = "application_profile_seq", allocationSize = 1)
 public class Profile extends BaseEntity<Long> implements Serializable {
 

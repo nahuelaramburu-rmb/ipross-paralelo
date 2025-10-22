@@ -1,0 +1,12 @@
+extends: default
+base:
+  font-family: "Helvetica"
+  header:
+    font-size: 18
+    align: center
+  footer:
+    font-size: 10
+    align: center
+  page:
+    size: A4
+    margin: [2cm, 2cm, 2cm, 2cm]

@@ -12,6 +12,7 @@ public final class ControllerEndpoints {
     public static final String ENDPOINT_VERIFICATION = "/verification";
     public static final String ENDPOINT_FORGOT = "/forgot";
     public static final String ENDPOINT_LOGIN = "/login";
+    public static final String ENDPOINT_REFRESH = "/refresh";
     public static final String ENDPOINT_REGISTER_BENEFICIARY = "/register-beneficiary";
     public static final String ENDPOINT_REGISTER_PRACTITIONER = "/register-practitioner";
     public static final String ENDPOINT_LOGOUT = "/logout";

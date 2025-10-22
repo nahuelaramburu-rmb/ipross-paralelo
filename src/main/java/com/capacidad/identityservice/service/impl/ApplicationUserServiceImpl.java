@@ -1,6 +1,5 @@
 package com.capacidad.identityservice.service.impl;
 
-import com.capacidad.identityservice.config.security.JwtService;
 import com.capacidad.identityservice.exception.InvalidUserStateException;
 import com.capacidad.identityservice.misc.Utils;
 import com.capacidad.identityservice.model.*;
@@ -10,12 +9,11 @@ import com.capacidad.identityservice.repository.*;
 import com.capacidad.identityservice.service.ApplicationUserService;
 import com.capacidad.identityservice.service.ApplicationUserSupportService;
 import com.capacidad.identityservice.service.base.BaseServiceImpl;
-import com.capacidad.identityservice.service.service.utils.ApplicationUserServiceUtils;
+
 import com.capacidad.utils.exception.ObjectNotFoundException;
 import com.capacidad.utils.exception.ObjectNotValidException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -176,25 +174,77 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     @Override
     public String verifyAccount(int otpCode, UUID sub) {
         try {
+
+            // probar la verificacion con dni del user
+            ApplicationUser userDni = userRepository.findBySub(sub)
+                    .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundSub", sub.toString()));
+
+
             ApplicationUser user = userRepository.findBySub(sub)
                     .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundSub", sub.toString()));
+
             if (user.getState().getId().equals(StateReference.CONFIRMED.getId()))
                 return buildVerificationTemplateResponse("already-verified");
+
             if (!user.getState().getId().equals(StateReference.UNCONFIRMED.getId()) || user.getChallengeType() != ChallengeType.EMAIL_VERIFICATION_REQUIRED)
                 throw new ObjectNotValidException(INVALID_USER_STATE_ERROR_CODE);
+
             if (!user.getVerificationOtp().equals(otpCode) || !supportService.isOtpValid(otpCode, user.getEmail()))
                 throw new ObjectNotValidException("applicationUser.invalidVerificationOTP");
+
             user.setEmailVerified(true);
             State confirmed = supportService.getEntityReference(State.class, StateReference.CONFIRMED.getId());
             user.setState(confirmed);
             user.setChallengeType(null);
             userRepository.save(user);
+
             return buildVerificationTemplateResponse("verification-success");
+
         } catch (ObjectNotValidException | ObjectNotFoundException e) {
             log.error("({}) - exception: {}", e.getMessage(), e.getClass());
             return buildVerificationTemplateResponse("verification-error");
         }
     }
+
+
+
+    public String verifyAccountByIdNumber(int otpCode, Long idNumber) {
+        try {
+
+            // probar la verificacion con dni del user
+            ApplicationUser user = userRepository.findByProfile_IdNumber(idNumber)
+                    .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundSub", idNumber.toString()));
+
+            // si el user ya esta verificado
+            if (user.getState().getId().equals(StateReference.CONFIRMED.getId()))
+                return buildVerificationTemplateResponse("already-verified");
+
+            // se valida si el estado de confirmacion del user no es UNCONFIRMED  Ó
+            // se verifica el tipo de validacion del user , contra la validacion por email
+            if (!user.getState().getId().equals(StateReference.UNCONFIRMED.getId()) || user.getChallengeType() != ChallengeType.EMAIL_VERIFICATION_REQUIRED)
+                throw new ObjectNotValidException(INVALID_USER_STATE_ERROR_CODE);
+
+
+            // se valida si el otp que genero el user al registrarse , es el mismo al ingresado
+            if (!user.getVerificationOtp().equals(otpCode) || !supportService.isOtpValid(otpCode, user.getEmail()))
+                throw new ObjectNotValidException("applicationUser.invalidVerificationOTP");
+
+
+            user.setEmailVerified(true);
+            State confirmed = supportService.getEntityReference(State.class, StateReference.CONFIRMED.getId());
+            user.setState(confirmed);
+            user.setChallengeType(null); // aqui ya no se requiere que el user modifique su password,
+            userRepository.save(user);
+
+            return buildVerificationTemplateResponse("verification-success");
+
+        } catch (ObjectNotValidException | ObjectNotFoundException e) {
+            log.error("({}) - exception: {}", e.getMessage(), e.getClass());
+            return buildVerificationTemplateResponse("verification-error");
+        }
+    }
+
+
 
     private String buildVerificationTemplateResponse(String templateName) {
         return supportService.prepareTemplate(Collections.emptyMap(), templateName);
@@ -210,11 +260,14 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     }
 
 
+    // users/me
     @Override
     public ApplicationUserProjection getAuthUser() throws ObjectNotFoundException {
-        String principal = Utils.getAuthenticatedAuthorityPrincipal();
-        return userRepository.findProjectedByUsername(principal)
-                .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundUsername", principal));
+
+        String authUserEmail = Utils.getAuthenticatedAuthorityPrincipal();
+
+        return userRepository.findProjectedByEmail(authUserEmail)
+                .orElseThrow(() -> new ObjectNotFoundException("applicationUser.notFoundUsername", authUserEmail));
     }
 
 
@@ -243,6 +296,8 @@ public class ApplicationUserServiceImpl extends BaseServiceImpl<ApplicationUser,
     public void validate(ApplicationUser user) throws ObjectNotValidException {
         validateEmail(user.getEmail());
         validatePassword(user.getPassword());
+
+        // validar dni , cod beneficiario
     }
 
 

@@ -5,6 +5,7 @@ import com.capacidad.identityservice.model.projection.ApplicationUserProjection;
 import com.capacidad.identityservice.repository.base.ExtendedRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -18,12 +19,20 @@ public interface ApplicationUserRepository extends ExtendedRepository<Applicatio
 
     Optional<ApplicationUserProjection> findProjectedByUsername(String username);
 
+    Optional<ApplicationUserProjection> findProjectedByEmail(String email);
+
     Optional<ApplicationUser> findBySub(UUID sub);
 
     Optional<ApplicationUser> findById(Long id);
 
+    // buscar user , por dni , (dni esta en profile)
+    Optional<ApplicationUserProjection> findProjectedByProfile_IdNumber(Long idNumber);
 
-//    @Query(value = "select u from ApplicationUser u " +
+
+    Optional<ApplicationUser> findByProfile_IdNumber(Long idNumber);
+
+
+    //    @Query(value = "select u from ApplicationUser u " +
 //            "join fetch u.profile " +
 //            "join fetch u.state " +
 //            "where u.email = ?1")
