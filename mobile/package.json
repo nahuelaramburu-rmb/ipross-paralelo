@@ -1,0 +1,142 @@
+{
+  "name": "iprossvem",
+  "version": "1.7.0",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "test": "jest",
+    "lint": "eslint .",
+    "build:android": "eas build --platform android",
+    "build:ios": "eas build --platform ios",
+    "build:all": "eas build --platform all"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~4.0.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/datetimepicker": "8.2.0",
+    "@react-native-community/netinfo": "11.4.1",
+    "@react-native-firebase/app": "^23.3.1",
+    "@react-native-firebase/messaging": "^23.3.1",
+    "@react-native-masked-view/masked-view": "0.3.2",
+    "@react-navigation/bottom-tabs": "^6.4.0",
+    "@react-navigation/drawer": "^6.5.0",
+    "@react-navigation/native": "^6.0.13",
+    "@react-navigation/stack": "^6.3.4",
+    "axios": "^1.12.2",
+    "base-32": "0.0.3",
+    "base-64": "^1.0.0",
+    "crypto-js": "^4.2.0",
+    "expo": "~52.0.0",
+    "expo-build-properties": "~0.13.0",
+    "expo-constants": "~17.0.0",
+    "expo-crypto": "~14.0.0",
+    "expo-dev-client": "~5.0.0",
+    "expo-device": "~7.0.0",
+    "expo-font": "~13.0.0",
+    "expo-image-picker": "~16.0.0",
+    "expo-notifications": "~0.29.0",
+    "expo-splash-screen": "~0.29.0",
+    "expo-status-bar": "~2.0.0",
+    "formik": "^2.4.6",
+    "hashids": "^2.2.9",
+    "lodash": "^4.17.21",
+    "lottie-ios": "^3.1.9",
+    "lottie-react-native": "7.1.0",
+    "moment": "^2.30.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native": "0.76.9",
+    "react-native-action-button": "^2.8.5",
+    "react-native-calendario": "^3.5.2",
+    "react-native-config": "^1.5.1",
+    "react-native-date-picker": "^3.4.3",
+    "react-native-device-info": "^14.0.4",
+    "react-native-dropdownalert": "^5.2.0",
+    "react-native-extra-dimensions-android": "^1.2.5",
+    "react-native-gesture-handler": "~2.20.2",
+    "react-native-gifted-chat": "^0.16.3",
+    "react-native-global-props": "^1.1.5",
+    "react-native-keyboard-aware-scroll-view": "^0.9.3",
+    "react-native-modal": "^11.5.6",
+    "react-native-paper": "^5.14.5",
+    "react-native-progress": "^5.0.0",
+    "react-native-qrcode-svg": "^6.2.0",
+    "react-native-reanimated": "~3.16.1",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "~4.4.0",
+    "react-native-sensitive-info": "^5.5.8",
+    "react-native-svg": "15.8.0",
+    "react-native-tab-view": "^2.15.2",
+    "react-native-toast-message": "^2.3.3",
+    "react-native-vector-icons": "^10.0.3",
+    "react-native-web": "~0.19.6",
+    "react-redux": "^9.1.2",
+    "redux": "^5.0.1",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^3.1.0",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-modules-commonjs": "^7.27.1",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/runtime": "^7.12.5",
+    "@react-native-community/cli": "^20.0.2",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "@testing-library/react-native": "^11.5.4",
+    "@types/jest": "^26.0.15",
+    "babel-jest": "^30.1.2",
+    "eslint": "^7.12.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-react-native": "^3.10.0",
+    "expect": "^26.6.2",
+    "fetch-mock": "^12.5.4",
+    "jest": "^29.3.1",
+    "react-test-renderer": "18.2.0",
+    "redux-mock-store": "^1.5.4"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-extra-dimensions-android",
+          "react-native-keyboard-aware-scroll-view",
+          "react-native-push-notification",
+          "react-native-action-button",
+          "react-native-global-props"
+        ],
+        "listUnknownPackages": false
+      }
+    }
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "./node_modules/(?!react-native|react-navigation)/"
+    ],
+    "snapshotSerializers": [],
+    "setupFilesAfterEnv": [
+      "./app/setupTests.js"
+    ],
+    "setupFiles": [
+      "./node_modules/react-native-gesture-handler/jestSetup.js"
+    ],
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
+    ],
+    "collectCoverage": false,
+    "globals": {
+      "__DEV__": true
+    }
+  }
+}
