@@ -73,11 +73,6 @@
         }
       ]
     ],
-    "extra": {
-      "eas": {
-        "projectId": "24a14609-ea03-45f1-80be-15862953ee97"
-      }
-    },
     "owner": "fibonaku"
   }
 }
