@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "IPROSS Beneficiarios",
-    "slug": "ipross-beneficiarios",
-    "version": "1.7.0",
+    "name": "IPROSS Beta - Acceso Anticipado",
+    "slug": "ipross-beta-anticipado",
+    "version": "1.8.0",
     "orientation": "portrait",
     "scheme": "iprossbeneficiarios",
     "userInterfaceStyle": "automatic",
@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-  "bundleIdentifier": "com.ipross.rionegro"
+  "bundleIdentifier": "com.ipross.beta.anticipado"
     },
     "android": {
       "icon": "./assets/icon.png",
@@ -26,8 +26,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ipross.rionegro",
-      "versionCode": 12,
+      "package": "com.ipross.beta.anticipado",
+      "versionCode": 13,
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE",

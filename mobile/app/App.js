@@ -170,7 +170,7 @@ class App extends Component {
                         {/* Link Olvidó contraseña */}
                         <TouchableOpacity 
                             style={styles.forgotButton}
-                            onPress={() => this.setState({ currentScreen: 'forgotPassword' })}>
+                            onPress={() => alert('Recuperación de contraseña - En construcción')}>
                             <Text style={styles.forgotText}>¿Olvidó su contraseña?</Text>
                         </TouchableOpacity>
 
@@ -189,14 +189,15 @@ class App extends Component {
                         {/* Botón Registrarse */}
                         <TouchableOpacity
                             style={styles.registerButton}
-                            onPress={() => this.setState({ currentScreen: 'register' })}>
+                            onPress={() => alert('Registro - En construcción')}>
                             <Text style={styles.registerButtonText}>Registrarse</Text>
                         </TouchableOpacity>
                     </View>
                     
                     {/* Versión de la aplicación */}
                     <View style={styles.versionContainer}>
-                        <Text style={styles.versionText}>v1.7.0</Text>
+                        <Text style={styles.earlyAccessText}>Acceso Anticipado</Text>
+                        <Text style={styles.versionText}>v1.8.0</Text>
                     </View>
                 </ScrollView>
                 
@@ -354,6 +355,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 40,
         paddingBottom: 20,
+    },
+    earlyAccessText: {
+        fontSize: 14,
+        color: '#ff9800',
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: 4,
     },
     versionText: {
         fontSize: 16,

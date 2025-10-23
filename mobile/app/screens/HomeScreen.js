@@ -53,46 +53,16 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
     };
 
     const openWhatsApp = () => {
-        const phoneNumber = '5492920475511';
-        const url = `whatsapp://send?phone=${phoneNumber}`;
-        Linking.openURL(url).catch(() => {
-            alert('No se pudo abrir WhatsApp');
-        });
+        alert('WhatsApp - En construcción');
     };
 
     const handleMenuOption = (option) => {
         toggleSidebar();
         
-        if (option === 'Turnos') {
-            setTimeout(() => {
-                setCurrentScreen('turnos');
-            }, 300);
-        } else if (option === 'Prestadores') {
-            setTimeout(() => {
-                setCurrentScreen('prestadores');
-            }, 300);
-        } else if (option === 'Familiares') {
-            setTimeout(() => {
-                setCurrentScreen('familiares');
-            }, 300);
-        } else if (option === 'Trámites') {
-            setTimeout(() => {
-                setCurrentScreen('tramites');
-            }, 300);
-        } else if (option === 'Pre-Autorizaciones') {
-            setTimeout(() => {
-                setCurrentScreen('preautorizaciones');
-            }, 300);
-        } else if (option === 'Módulos') {
-            setTimeout(() => {
-                setCurrentScreen('modulos');
-            }, 300);
-        } else {
-            // Por ahora otras opciones muestran "En construcción"
-            setTimeout(() => {
-                alert(`${option} - En construcción`);
-            }, 300);
-        }
+        // TODAS las opciones muestran "En construcción" excepto Cerrar Sesión
+        setTimeout(() => {
+            alert(`${option} - En construcción`);
+        }, 300);
     };
 
     const handleBackToHome = () => {
@@ -100,7 +70,12 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
     };
 
     const handleTabChange = (screen) => {
-        setCurrentScreen(screen);
+        if (screen === 'home') {
+            setCurrentScreen(screen);
+        } else {
+            // Todas las pestañas excepto 'home' muestran "En construcción"
+            alert('Funcionalidad en construcción');
+        }
     };
 
     // Si estamos en otra pantalla, mostrar esa pantalla
@@ -361,7 +336,7 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                                 <Text style={styles.menuItemLogoutText}>Cerrar Sesión</Text>
                             </TouchableOpacity>
 
-                            <Text style={styles.version}>v1.7.0</Text>
+                            <Text style={styles.version}>v1.8.0</Text>
                         </ScrollView>
                     </Animated.View>
                 </View>
@@ -392,7 +367,7 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                             style={styles.fabMenuItem}
                             onPress={() => {
                                 setFabMenuVisible(false);
-                                setTimeout(() => setCurrentScreen('qr'), 300);
+                                setTimeout(() => alert('Código QR - En construcción'), 300);
                             }}
                         >
                             <Icon name="qr-code" size={24} color={Colors.primary} />
@@ -405,7 +380,7 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                             style={styles.fabMenuItem}
                             onPress={() => {
                                 setFabMenuVisible(false);
-                                setTimeout(() => setCurrentScreen('token'), 300);
+                                setTimeout(() => alert('Código Token - En construcción'), 300);
                             }}
                         >
                             <Icon name="key" size={24} color={Colors.primary} />
