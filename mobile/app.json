@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "IPROSS Beta - Acceso Anticipado",
-    "slug": "ipross-beta-anticipado",
+    "slug": "ipross",
     "version": "1.8.0",
     "orientation": "portrait",
     "scheme": "iprossbeneficiarios",
@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-  "bundleIdentifier": "com.ipross.beta.anticipado"
+  "bundleIdentifier": "com.iprossbeta.anticipado"
     },
     "android": {
       "icon": "./assets/icon.png",
@@ -26,7 +26,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ipross.beta.anticipado",
+      "package": "com.iprossbeta.anticipado",
       "versionCode": 13,
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",
@@ -35,7 +35,8 @@
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.WAKE_LOCK",
         "android.permission.DETECT_SCREEN_CAPTURE",
-        "com.google.android.c2dm.permission.RECEIVE"
+        "com.google.android.c2dm.permission.RECEIVE",
+        "android.permission.RECORD_AUDIO"
       ],
       "blockedPermissions": [
         "android.permission.CAMERA",
@@ -73,6 +74,11 @@
         }
       ]
     ],
-    "owner": "fibonaku"
+    "owner": "devsrmbcorp",
+    "extra": {
+      "eas": {
+        "projectId": "e7be06db"
+      }
+    }
   }
 }
