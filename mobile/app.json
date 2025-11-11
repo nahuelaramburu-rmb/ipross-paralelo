@@ -1,10 +1,10 @@
 {
   "expo": {
     "name": "IPROSS Beta - Acceso Anticipado",
-    "slug": "ipross",
-    "version": "1.8.0",
+    "slug": "ipross-beta-anticipado",
+    "version": "1.9.0",
     "orientation": "portrait",
-    "scheme": "iprossbeneficiarios",
+    "scheme": "ipross-beneficiarios",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
     "backgroundColor": "#f5f5f5",
@@ -27,7 +27,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.iprossbeta.anticipado",
-      "versionCode": 13,
+      "versionCode": 14,
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -74,10 +74,10 @@
         }
       ]
     ],
-    "owner": "devsrmbcorp",
+    "owner": "fibonaku",
     "extra": {
       "eas": {
-        "projectId": "e7be06db"
+        "projectId": "81c8345d-d765-4441-908b-dc7211129d11"
       }
     }
   }
