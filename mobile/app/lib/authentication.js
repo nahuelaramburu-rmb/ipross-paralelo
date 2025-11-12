@@ -1,5 +1,5 @@
 import SInfo from 'react-native-sensitive-info';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { getVersion } from 'react-native-device-info';
 import { API_CONFIG, FALLBACK_DATA } from '../configs/api.config';
 
@@ -42,7 +42,13 @@ const _authenticateUser = async (credentials) => {
             return { error: { message: 'Invalid response from server' } };
         }
         
-        await SInfo.setItem('refresh_token', tokenData.refresh_token, {});
+        // Intentar guardar refresh_token, pero no bloquear si falla (ej: sin biometría)
+        try {
+            await SInfo.setItem('refresh_token', tokenData.refresh_token, {});
+            console.log('✅ Refresh token guardado en storage seguro');
+        } catch (storageError) {
+            console.log('⚠️ No se pudo guardar refresh_token en storage (continuando sin persistencia):', storageError.message);
+        }
 
         let authResponse = {
             access_token: tokenData.access_token,
@@ -80,7 +86,15 @@ const _authenticateUser = async (credentials) => {
 
 const _updateAccessToken = async () => {
     try {
-        const refreshToken = await SInfo.getItem('refresh_token', {});
+        let refreshToken;
+        
+        // Intentar leer refresh_token, si falla retornar null
+        try {
+            refreshToken = await SInfo.getItem('refresh_token', {});
+        } catch (storageError) {
+            console.log('⚠️ No se pudo leer refresh_token del storage:', storageError.message);
+            throw new Error('No refresh token available');
+        }
 
         const response = await fetch(API_CONFIG.IDENTITY_SERVICE.BASE_URL + API_CONFIG.IDENTITY_SERVICE.ENDPOINTS.REFRESH, {
             method: 'POST',
@@ -107,7 +121,13 @@ const _updateAccessToken = async () => {
             throw new Error('Invalid refresh response from server');
         }
 
-        await SInfo.setItem('refresh_token', tokenData.refresh_token, {});
+        // Intentar guardar refresh_token, pero no bloquear si falla
+        try {
+            await SInfo.setItem('refresh_token', tokenData.refresh_token, {});
+            console.log('✅ Refresh token actualizado en storage seguro');
+        } catch (storageError) {
+            console.log('⚠️ No se pudo actualizar refresh_token en storage (continuando sin persistencia):', storageError.message);
+        }
 
         console.log('✅ Token refreshed successfully');
         return {
@@ -164,9 +184,16 @@ const _updateAccess = async () => {
             return tokenResponse;
         }
 
-        let profile = await AsyncStorage.getItem('profile');
-
-        if (profile) profile = JSON.parse(profile);
+        let profile;
+        
+        // Intentar leer profile, si falla continuar sin profile previo
+        try {
+            profile = await SecureStore.getItemAsync('profile');
+            if (profile) profile = JSON.parse(profile);
+        } catch (storageError) {
+            console.log('⚠️ No se pudo leer profile del SecureStore:', storageError.message);
+            profile = null;
+        }
 
         let newProfile = {
             ...(profile || {}),
@@ -178,7 +205,16 @@ const _updateAccess = async () => {
             },
         };
 
-        await AsyncStorage.setItem('profile', JSON.stringify(newProfile));
+        // Intentar guardar profile, pero no bloquear si falla
+        try {
+            await SecureStore.setItemAsync('profile', JSON.stringify(newProfile), {
+                keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY
+            });
+            console.log('✅ Profile guardado en SecureStore');
+        } catch (storageError) {
+            console.log('⚠️ No se pudo guardar profile en SecureStore (continuando sin persistencia):', storageError.message);
+        }
+
         return { profile: newProfile };
     } catch (err) {
         console.log(err);

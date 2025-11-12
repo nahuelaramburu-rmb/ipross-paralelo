@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 import {
     APPOINTMENT_LOGGED_IN,
@@ -44,7 +44,15 @@ const _login = async (dispatch, getState) => {
     };
 
     try {
-        await AsyncStorage.setItem('userapilogin', JSON.stringify(userapilogin));
+        // Intentar guardar, pero no bloquear si falla
+        try {
+            await SecureStore.setItemAsync('userapilogin', JSON.stringify(userapilogin), {
+                keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY
+            });
+            console.log('✅ userapilogin guardado en SecureStore');
+        } catch (storageError) {
+            console.log('⚠️ No se pudo guardar userapilogin en SecureStore (continuando sin persistencia):', storageError.message);
+        }
 
         dispatch({ type: APPOINTMENT_LOGGED_IN, userapilogin: userapilogin });
 
