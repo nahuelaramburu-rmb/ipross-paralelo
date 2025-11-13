@@ -12,6 +12,7 @@ import {
     Animated
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { getVersion } from 'react-native-device-info';
 import * as Colors from '../constants/Colors';
 import TurnosScreen from './TurnosScreen';
 import PrestadoresScreen from './PrestadoresScreen';
@@ -196,12 +197,12 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                 {/* Quick Actions */}
                 <View style={styles.quickActions}>
                     <TouchableOpacity style={styles.actionButton} onPress={() => alert('Plan Único - En construcción')}>
-                        <Icon name="document-text-outline" size={32} color={Colors.grisOscuro} />
+                        <Icon name="document-text-outline" size={28} color={Colors.grisOscuro} />
                         <Text style={styles.actionText}>Plan Único</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.actionButton} onPress={() => alert('Recibo de Sueldo - En construcción')}>
-                        <Icon name="card-outline" size={32} color={Colors.grisOscuro} />
+                        <Icon name="card-outline" size={28} color={Colors.grisOscuro} />
                         <Text style={styles.actionText}>Recibo de Sueldo</Text>
                     </TouchableOpacity>
                 </View>
@@ -209,10 +210,10 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                 {/* Bottom Navigation Icons */}
                 <View style={styles.bottomIcons}>
                     <TouchableOpacity style={styles.iconButton} onPress={() => alert('Familiares - En construcción')}>
-                        <Icon name="people-outline" size={24} color={Colors.grisOscuro} />
+                        <Icon name="people-outline" size={28} color={Colors.grisOscuro} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.iconButton} onPress={() => alert('Editar - En construcción')}>
-                        <Icon name="create-outline" size={24} color={Colors.grisOscuro} />
+                        <Icon name="create-outline" size={28} color={Colors.grisOscuro} />
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -336,7 +337,7 @@ const HomeScreen = ({ loggedUser, onLogout }) => {
                                 <Text style={styles.menuItemLogoutText}>Cerrar Sesión</Text>
                             </TouchableOpacity>
 
-                            <Text style={styles.version}>v1.8.0</Text>
+                            <Text style={styles.version}>{`v${getVersion()}`}</Text>
                         </ScrollView>
                     </Animated.View>
                 </View>

@@ -16,6 +16,7 @@ import HomeScreen from './screens/HomeScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import ApiService from './services/api.service';
+import { authenticateUser, getUserData } from './lib/authentication';
 
 class App extends Component {
     constructor(props) {
@@ -45,34 +46,61 @@ class App extends Component {
             return;
         }
 
-        // MODO DESARROLLO: Aceptar cualquier credencial sin validación
+        // Intentar autenticación real contra la API
         this.setState({ isLoading: true });
-        
-        // Simular login exitoso con datos mock
-        const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNjQ0NzU4MiIsIm5hbWUiOiJFeGFtcGxlIFVzZXIiLCJyb2xlIjoiQkVORUZJQ0lBUll9.mock';
-        
-        setTimeout(() => {
+
+        try {
+            const authResponse = await authenticateUser({ username: idNumber, password });
+
+            if (authResponse.error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Login fallido',
+                    text2: authResponse.error.message || JSON.stringify(authResponse.error),
+                    position: 'top',
+                    visibilityTime: 4000,
+                });
+                this.setState({ isLoading: false });
+                return;
+            }
+
+            const token = (authResponse.token_type ? authResponse.token_type + ' ' : 'Bearer ') + authResponse.access_token;
+
+            const userDataResponse = await getUserData(token);
+
+            if (userDataResponse.error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error obteniendo datos',
+                    text2: userDataResponse.error.message || JSON.stringify(userDataResponse.error),
+                    position: 'top',
+                    visibilityTime: 4000,
+                });
+                this.setState({ isLoading: false });
+                return;
+            }
+
+            // Guardar usuario y navegar a Home
             this.setState({
                 isLoading: false,
-                loginSuccess: true,
+                isLoggedIn: true,
                 loggedUser: {
-                    idNumber: idNumber,
-                    nombre: 'Usuario de Desarrollo',
-                    numero_afiliado: idNumber,
-                    access_token: mockToken,
-                    refresh_token: mockToken,
+                    ...userDataResponse,
+                    token,
                 },
+                idNumber: '',
+                password: '',
             });
-
-            setTimeout(() => {
-                this.setState({
-                    isLoggedIn: true,
-                    loginSuccess: false,
-                    idNumber: '',
-                    password: '',
-                });
-            }, 2000);
-        }, 1000);
+        } catch (err) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: err.message || 'Error de conexión',
+                position: 'top',
+                visibilityTime: 4000,
+            });
+            this.setState({ isLoading: false });
+        }
     };    render() {
         const { isLoggedIn, loginSuccess, currentScreen } = this.state;
 

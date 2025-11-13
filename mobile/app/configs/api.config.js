@@ -4,18 +4,14 @@
  * Define las URLs base para los servicios backend de IPROSS
  */
 
-// Host principal - puede ser sobreescrito por variable de entorno
-const DEFAULT_HOST = '168.181.187.5';
-const API_HOST = process.env.API_HOST || DEFAULT_HOST;
-
-// Protocolo HTTP (sin SSL en desarrollo)
-const PROTOCOL = 'http://';
+// URL base del servidor (Railway Production)
+const BASE_URL = 'https://backend-ipross-production.up.railway.app';
 
 // URLs base para cada servicio
 export const API_CONFIG = {
   // Servicio de identidad (autenticación)
   IDENTITY_SERVICE: {
-    BASE_URL: `${PROTOCOL}${API_HOST}:81/identity-service/v1`,
+    BASE_URL: `${BASE_URL}/identity-service/v1`,
     ENDPOINTS: {
       LOGIN: '/auth/login',
       REFRESH: '/auth/refresh',
@@ -24,7 +20,7 @@ export const API_CONFIG = {
   
   // Servicio de validación (datos de beneficiarios)
   VALIDATION_API: {
-    BASE_URL: `${PROTOCOL}${API_HOST}:82/validation-api/v1`,
+    BASE_URL: `${BASE_URL}/validation-api/v1`,
     ENDPOINTS: {
       BENEFICIARY_AUTH: '/beneficiaries/auth',
       AUTHORIZATIONS: '/authorizations',
@@ -46,23 +42,23 @@ export const API_CONFIG = {
 // Datos de fallback si la API no está disponible
 export const FALLBACK_DATA = {
   USER: {
-    idNumber: 36447582,
-    password: 'Password123',
+    idNumber: 35467201,
+    password: 'Ramones162',
     beneficiaryData: {
-      id: 61,
-      name: 'jose maria',
-      lastName: 'dominguez',
-      idNumber: 36447582,
-      beneficiaryCode: '03-30529552/05',
-      gender: 'MASCULINO',
-      birthDate: '1991-05-12',
+      id: 6,
+      name: 'patricio',
+      lastName: 'aguirre',
+      idNumber: 35467201,
+      deleted: false,
+      user: {
+        username: 'patricio',
+        email: 'patricionguirre@gmail.com',
+        role: 'BENEFICIARY',
+        tenant: 'default'
+      },
       status: {
         name: 'CON COBERTURA',
-        id: 8
-      },
-      beneficiaryCategory: {
-        name: 'estado_1',
-        id: 6
+        id: 1
       }
     }
   }

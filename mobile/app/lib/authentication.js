@@ -1,7 +1,7 @@
 import SInfo from 'react-native-sensitive-info';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { getVersion } from 'react-native-device-info';
-import { FALLBACK_DATA } from '../configs/api.config';
+import { API_CONFIG, FALLBACK_DATA } from '../configs/api.config';
 
 export const authenticateUser = async (credentials) => _authenticateUser(credentials);
 export const updateAccessToken = async () => _updateAccessToken();
@@ -9,53 +9,63 @@ export const getUserData = async (token) => _getUserData(token);
 export const updateAccess = async (profile) => _updateAccess(profile);
 export const hasToUpdateApp = async () => _hasToUpdateApp();
 
-import { apiUrls, loginKeys } from '../configs/api';
-
 const _authenticateUser = async (credentials) => {
     const body = {
-        username: credentials.username,
+        idNumber: credentials.username, // username ahora es el número de documento
         password: credentials.password,
-        grant_type: 'password',
-        client_id: loginKeys['key'],
-        client_secret: loginKeys['secret'],
     };
 
-    let formData = [];
-    for (let property in body) {
-        var encodedKey = encodeURIComponent(property);
-        var encodedValue = encodeURIComponent(body[property]);
-        formData.push(encodedKey + '=' + encodedValue);
-    }
-    formData = formData.join('&');
-
     try {
-        const response = await fetch(apiUrls['identity-service'] + 'oauth/token', {
+        const response = await fetch(API_CONFIG.IDENTITY_SERVICE.BASE_URL + API_CONFIG.IDENTITY_SERVICE.ENDPOINTS.LOGIN, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
             },
-            body: formData,
+            body: JSON.stringify(body),
+            timeout: 10000,
         });
 
         const json = await response.json();
 
         if (!response.ok) {
+            // Si el servidor responde con error (401, 404, etc), devolver ese error
+            console.log('❌ Login falló:', json);
             return { error: json };
         }
 
-        await SInfo.setItem('refresh_token', json.refresh_token, {});
+        // La respuesta viene en json.message según el formato nuevo
+        const tokenData = json.message;
+        
+        if (!tokenData || !tokenData.access_token) {
+            console.log('❌ Respuesta sin token válido');
+            return { error: { message: 'Invalid response from server' } };
+        }
+        
+        // Intentar guardar refresh_token, pero no bloquear si falla (ej: sin biometría)
+        try {
+            await SInfo.setItem('refresh_token', tokenData.refresh_token, {});
+            console.log('✅ Refresh token guardado en storage seguro');
+        } catch (storageError) {
+            console.log('⚠️ No se pudo guardar refresh_token en storage (continuando sin persistencia):', storageError.message);
+        }
 
         let authResponse = {
-            ...json,
+            access_token: tokenData.access_token,
+            refresh_token: tokenData.refresh_token,
+            token_type: 'Bearer',
         };
 
+        console.log('✅ Login exitoso');
         return authResponse;
     } catch (err) {
-        console.log('❌ Error en authenticateUser:', err);
+        console.log('❌ Error de red en authenticateUser:', err);
         
-        // Si hay error de red, intentar login offline con credenciales de fallback
+        // SOLO permitir modo offline si es exactamente el usuario de fallback Y hay error de red
+        // (NO si las credenciales son incorrectas)
         if (
+            err.message && 
+            (err.message.includes('Network request failed') || err.message.includes('timeout')) &&
             credentials.username == FALLBACK_DATA.USER.idNumber && 
             credentials.password === FALLBACK_DATA.USER.password
         ) {
@@ -69,47 +79,65 @@ const _authenticateUser = async (credentials) => {
             };
         }
         
-        return { error: err };
+        // Para cualquier otro error, devolver el error
+        return { error: { message: err.message || 'Error de conexión' } };
     }
 };
 
 const _updateAccessToken = async () => {
     try {
-        const refreshToken = await SInfo.getItem('refresh_token', {});
-
-        const body = {
-            grant_type: 'refresh_token',
-            client_id: loginKeys['key'],
-            client_secret: loginKeys['secret'],
-            refresh_token: refreshToken,
-        };
-
-        let formData = [];
-        for (let property in body) {
-            var encodedKey = encodeURIComponent(property);
-            var encodedValue = encodeURIComponent(body[property]);
-            formData.push(encodedKey + '=' + encodedValue);
+        let refreshToken;
+        
+        // Intentar leer refresh_token, si falla retornar null
+        try {
+            refreshToken = await SInfo.getItem('refresh_token', {});
+        } catch (storageError) {
+            console.log('⚠️ No se pudo leer refresh_token del storage:', storageError.message);
+            throw new Error('No refresh token available');
         }
-        formData = formData.join('&');
 
-        const response = await fetch(apiUrls['identity-service'] + 'oauth/token', {
+        const response = await fetch(API_CONFIG.IDENTITY_SERVICE.BASE_URL + API_CONFIG.IDENTITY_SERVICE.ENDPOINTS.REFRESH, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${refreshToken}`,
             },
-            body: formData,
+            timeout: 10000,
         });
 
         const json = await response.json();
 
-        if (!response.ok) throw json;
+        if (!response.ok) {
+            console.log('❌ Refresh token failed:', json);
+            throw new Error(json.message || 'Refresh token failed');
+        }
 
-        await SInfo.setItem('refresh_token', json.refresh_token, {});
+        // La respuesta viene en json.message según el formato nuevo
+        const tokenData = json.message;
+        
+        if (!tokenData || !tokenData.access_token) {
+            console.log('❌ Respuesta de refresh sin token válido');
+            throw new Error('Invalid refresh response from server');
+        }
 
-        return json;
+        // Intentar guardar refresh_token, pero no bloquear si falla
+        try {
+            await SInfo.setItem('refresh_token', tokenData.refresh_token, {});
+            console.log('✅ Refresh token actualizado en storage seguro');
+        } catch (storageError) {
+            console.log('⚠️ No se pudo actualizar refresh_token en storage (continuando sin persistencia):', storageError.message);
+        }
+
+        console.log('✅ Token refreshed successfully');
+        return {
+            access_token: tokenData.access_token,
+            refresh_token: tokenData.refresh_token,
+            token_type: 'Bearer',
+        };
+        
     } catch (err) {
-        console.log(err);
+        console.log('❌ Error refreshing token:', err);
         throw err;
     }
 };
@@ -122,25 +150,28 @@ const _getUserData = async (token) => {
     }
 
     try {
-        const response = await fetch(apiUrls['api'] + 'beneficiaries/auth', {
+        const response = await fetch(API_CONFIG.VALIDATION_API.BASE_URL + API_CONFIG.VALIDATION_API.ENDPOINTS.BENEFICIARY_AUTH, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
                 Authorization: token,
             },
+            timeout: 10000,
         });
 
         const json = await response.json();
 
         if (!response.ok) {
+            console.log('❌ Error obteniendo datos de usuario:', json);
             return { error: json };
         }
 
+        console.log('✅ Datos de usuario obtenidos exitosamente');
         return json;
     } catch (err) {
-        console.log('❌ Error en getUserData:', err);
-        return { error: err };
+        console.log('❌ Error de red en getUserData:', err);
+        return { error: { message: err.message || 'Error de conexión' } };
     }
 };
 
@@ -153,9 +184,16 @@ const _updateAccess = async () => {
             return tokenResponse;
         }
 
-        let profile = await AsyncStorage.getItem('profile');
-
-        if (profile) profile = JSON.parse(profile);
+        let profile;
+        
+        // Intentar leer profile, si falla continuar sin profile previo
+        try {
+            profile = await SecureStore.getItemAsync('profile');
+            if (profile) profile = JSON.parse(profile);
+        } catch (storageError) {
+            console.log('⚠️ No se pudo leer profile del SecureStore:', storageError.message);
+            profile = null;
+        }
 
         let newProfile = {
             ...(profile || {}),
@@ -167,7 +205,16 @@ const _updateAccess = async () => {
             },
         };
 
-        await AsyncStorage.setItem('profile', JSON.stringify(newProfile));
+        // Intentar guardar profile, pero no bloquear si falla
+        try {
+            await SecureStore.setItemAsync('profile', JSON.stringify(newProfile), {
+                keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY
+            });
+            console.log('✅ Profile guardado en SecureStore');
+        } catch (storageError) {
+            console.log('⚠️ No se pudo guardar profile en SecureStore (continuando sin persistencia):', storageError.message);
+        }
+
         return { profile: newProfile };
     } catch (err) {
         console.log(err);
